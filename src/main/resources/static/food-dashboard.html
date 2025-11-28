@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>FoodDB — Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/toast.css">
+    <link rel="stylesheet" href="css/modal.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="app neon full-width">
+
+    <aside class="sidebar neon-side">
+        <div class="brand neon-brand">FoodDB</div>
+        <nav class="nav-list">
+            <a class="nav-item active" href="food-dashboard.html">Dashboard</a>
+            <a class="nav-item" href="foods.html">Foods</a>
+            <a class="nav-item" href="reports.html">Reports</a>
+            <a class="nav-item" href="settings.html">Settings</a>
+        </nav>
+        <div class="sidebar-footer">
+            <button id="themeToggle" class="glow-btn">Glow</button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar neon-top">
+            <div class="search-wrap neon-search">
+                <svg class="icon-magnify" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16a6.471 6.471 0 004.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5z"/></svg>
+                <input id="searchInput" placeholder="Search foods by name or category">
+                <button id="searchClear">✕</button>
+            </div>
+
+            <div class="controls-right">
+                <label class="small">Category</label>
+                <select id="categoryFilter">
+                    <option value="">All Categories</option>
+                    <option>Fast Food</option>
+                    <option>Dessert</option>
+                    <option>Drink</option>
+                    <option>Rice</option>
+                    <option>Noodles</option>
+                    <option>Other</option>
+                </select>
+
+                <label class="small">Sort</label>
+                <select id="sortField">
+                    <option value="id">ID</option>
+                    <option value="name">Name</option>
+                    <option value="price">Price</option>
+                    <option value="category">Category</option>
+                </select>
+                <select id="sortDir">
+                    <option value="asc">Asc</option>
+                    <option value="desc">Desc</option>
+                </select>
+
+                <button id="btn-add" class="btn btn-primary neon-btn">+ Add Food</button>
+                <button id="exportCsv" class="btn neon-outline">Export CSV</button>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="grid">
+                <div class="card table-card neon-card">
+                    <div class="card-header">
+                        <h3>Foods</h3>
+                        <div class="page-info" id="pageInfo">Loading…</div>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table id="foodTable">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Category</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="foodBody"></tbody>
+                        </table>
+
+                        <div id="emptyState" class="empty" style="display:none">No items found</div>
+                        <div id="spinner" class="spinner" style="display:none"></div>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="pagination">
+                            <button id="prevBtn" class="btn neon-outline">Previous</button>
+                            <button id="nextBtn" class="btn neon-outline">Next</button>
+                        </div>
+                        <div class="pager">
+                            <span id="currentPage">0</span> / <span id="totalPages">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card stats-card neon-card">
+                    <h3>Category Breakdown</h3>
+                    <canvas id="categoryChart" width="400" height="400"></canvas>
+                    <div id="chartLegend" class="legend"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<div id="foodModal" class="modal" aria-hidden="true">
+    <div class="modal-content neon-modal">
+        <h2 id="modalTitle">Add Food</h2>
+        <form id="foodForm">
+            <input type="hidden" id="foodId">
+            <label>Name</label>
+            <input id="foodName" required>
+            <label>Price</label>
+            <input id="foodPrice" type="number" step="0.01" required>
+            <label>Category</label>
+            <select id="foodCategoryModal" required>
+                <option>Fast Food</option>
+                <option>Dessert</option>
+                <option>Drink</option>
+                <option>Rice</option>
+                <option>Noodles</option>
+                <option>Other</option>
+            </select>
+            <div class="modal-actions">
+                <button type="submit" class="btn btn-primary neon-btn">Save</button>
+                <button type="button" id="modalCancel" class="btn neon-outline">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script src="js/dashboard.js"></script>
+</body>
+</html>

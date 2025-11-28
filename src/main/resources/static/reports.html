@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Reports - FoodDB</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/toast.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="app neon full-width">
+    <aside class="sidebar neon-side">
+        <div class="brand neon-brand">FoodDB</div>
+        <nav class="nav-list">
+            <a class="nav-item" href="food-dashboard.html">Dashboard</a>
+            <a class="nav-item" href="foods.html">Foods</a>
+            <a class="nav-item active" href="reports.html">Reports</a>
+            <a class="nav-item" href="settings.html">Settings</a>
+        </nav>
+        <div class="sidebar-footer">
+            <button id="themeToggle" class="glow-btn">Glow</button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar neon-top">
+            <div class="search-wrap neon-search">
+                <input id="reportsSearch" placeholder="Filter reports by category or name">
+                <button id="reportsClear">✕</button>
+            </div>
+            <div class="controls-right">
+                <button id="refreshReports" class="btn neon-outline">Refresh</button>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="grid-2">
+                <div class="card neon-card">
+                    <h3>Summary</h3>
+                    <div id="summary" class="summary-grid">Loading…</div>
+                </div>
+
+                <div class="card neon-card">
+                    <h3>Category Distribution</h3>
+                    <canvas id="reportsChart" width="600" height="300"></canvas>
+                </div>
+            </div>
+
+            <div class="card neon-card">
+                <h3>Top Priced Items</h3>
+                <div id="topList"></div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script>
+    const API_ROOT = '/foods';
+    const summaryEl = document.getElementById('summary');
+    const topList = document.getElementById('topList');
+    const reportsChartCtx = document.getElementById('reportsChart')?.getContext('2d');
+    let reportsChart = null;
+
+    document.addEventListener('DOMContentLoaded', ()=>{ loadAllFoods(); document.getElementById('refreshReports').addEventListener('click', loadAllFoods); document.getElementById('reportsClear').addEventListener('click', ()=>{ document.getElementById('reportsSearch').value=''; loadAllFoods(); }); });
+
+    function fetchAll(){ return fetch(`${API_ROOT}?page=0&size=1000&sortField=id&sortDir=asc`).then(r=>r.json()).then(d=>d.content||[]); }
+
+    function loadAllFoods(){
+        fetchAll().then(data=>{
+            const counts={}; let totalPrice=0;
+            data.forEach(it=>{ const c=(it.category||'Other').trim(); counts[c]=(counts[c]||0)+1; totalPrice += Number(it.price||0); });
+            renderSummary(data.length, totalPrice, counts);
+            renderChart(counts);
+            renderTopItems(data);
+        }).catch(()=>showToast('Reports load failed','error'));
+    }
+
+    function renderSummary(total, price, counts){
+        summaryEl.innerHTML = `<div class="sum-card"><div class="sum-label">Total items</div><div class="sum-value">${total}</div></div><div class="sum-card"><div class="sum-label">Total price</div><div class="sum-value">${Number(price).toFixed(2)}</div></div>`;
+        Object.keys(counts).forEach(k=>{ const el=document.createElement('div'); el.className='sum-card'; el.innerHTML=`<div class="sum-label">${escapeHtml(k)}</div><div class="sum-value">${counts[k]}</div>`; summaryEl.appendChild(el); });
+    }
+
+    function renderChart(counts){
+        const labels=Object.keys(counts); const data=labels.map(l=>counts[l]); const colors=labels.map((_,i)=>`hsl(${(i*60)%360} 80% 60%)`);
+        if(!reportsChart && reportsChartCtx){ reportsChart = new Chart(reportsChartCtx, { type:'doughnut', data:{labels, datasets:[{data, backgroundColor:colors}]}, options:{responsive:true} }); } else if(reportsChart){ reportsChart.data.labels=labels; reportsChart.data.datasets[0].data=data; reportsChart.update(); }
+    }
+
+    function renderTopItems(items){
+        const sorted = items.slice().sort((a,b)=> (b.price||0)-(a.price||0)).slice(0,6);
+        topList.innerHTML = sorted.map(it=>`<div class="top-row"><div>${escapeHtml(it.name)}</div><div>${Number(it.price).toFixed(2)}</div></div>`).join('');
+    }
+
+    function showToast(text,type='info',timeout=3000){ const t=document.createElement('div'); t.className=`toast ${type} show`; t.textContent=text; document.getElementById('toastContainer').appendChild(t); setTimeout(()=>t.classList.remove('show'),timeout); setTimeout(()=>t.remove(),timeout+300); }
+
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+</script>
+
+</body>
+</html>

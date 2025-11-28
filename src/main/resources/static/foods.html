@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Foods - FoodDB</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/toast.css">
+    <link rel="stylesheet" href="css/modal.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="app neon full-width">
+
+    <aside class="sidebar neon-side">
+        <div class="brand neon-brand">FoodDB</div>
+        <nav class="nav-list">
+            <a class="nav-item" href="food-dashboard.html">Dashboard</a>
+            <a class="nav-item active" href="foods.html">Foods</a>
+            <a class="nav-item" href="reports.html">Reports</a>
+            <a class="nav-item" href="settings.html">Settings</a>
+        </nav>
+        <div class="sidebar-footer">
+            <button id="themeToggle" class="glow-btn">Glow</button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar neon-top">
+            <div class="search-wrap neon-search">
+                <input id="searchInputFoods" placeholder="Search foods by name or category">
+                <button id="searchClearFoods">✕</button>
+            </div>
+
+            <div class="controls-right">
+                <label class="small">Category</label>
+                <select id="categoryFilterFoods">
+                    <option value="">All Categories</option>
+                    <option>Fast Food</option>
+                    <option>Dessert</option>
+                    <option>Drink</option>
+                    <option>Rice</option>
+                    <option>Noodles</option>
+                    <option>Other</option>
+                </select>
+
+                <button id="btn-add-food" class="btn btn-primary neon-btn">+ Add Food</button>
+                <button id="exportCsvFoods" class="btn neon-outline">Export CSV</button>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="card table-card neon-card">
+                <div class="card-header">
+                    <h3>Foods</h3>
+                    <div id="foodsPageInfo" class="page-info">Loading…</div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                        <tr><th>#</th><th>Name</th><th>Price</th><th>Category</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody id="foodsBody"></tbody>
+                    </table>
+                    <div id="foodsEmpty" class="empty" style="display:none">No items found</div>
+                    <div id="foodsSpinner" class="spinner" style="display:none"></div>
+                </div>
+                <div class="card-footer">
+                    <div class="pagination">
+                        <button id="foodsPrev" class="btn neon-outline">Previous</button>
+                        <button id="foodsNext" class="btn neon-outline">Next</button>
+                    </div>
+                    <div class="pager">
+                        <span id="foodsCurrent">0</span> / <span id="foodsTotal">0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<div id="foodModalFoods" class="modal" aria-hidden="true">
+    <div class="modal-content neon-modal">
+        <h2 id="modalTitleFoods">Add Food</h2>
+        <form id="foodFormFoods">
+            <input type="hidden" id="foodIdFoods">
+            <label>Name</label>
+            <input id="foodNameFoods" required>
+            <label>Price</label>
+            <input id="foodPriceFoods" type="number" step="0.01" required>
+            <label>Category</label>
+            <select id="foodCategoryModalFoods" required>
+                <option>Fast Food</option>
+                <option>Dessert</option>
+                <option>Drink</option>
+                <option>Rice</option>
+                <option>Noodles</option>
+                <option>Other</option>
+            </select>
+            <div class="modal-actions">
+                <button type="submit" class="btn btn-primary neon-btn">Save</button>
+                <button type="button" id="modalCancelFoods" class="btn neon-outline">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script>
+    const API_ROOT = '/foods';
+    let pageF = 0;
+    let sizeF = 10;
+    let totalPagesF = 0;
+    let dataF = [];
+
+    const foodsBody = document.getElementById('foodsBody');
+    const foodsSpinner = document.getElementById('foodsSpinner');
+    const foodsEmpty = document.getElementById('foodsEmpty');
+    const foodsPrev = document.getElementById('foodsPrev');
+    const foodsNext = document.getElementById('foodsNext');
+    const foodsCurrent = document.getElementById('foodsCurrent');
+    const foodsTotal = document.getElementById('foodsTotal');
+
+    const searchInputFoods = document.getElementById('searchInputFoods');
+    const searchClearFoods = document.getElementById('searchClearFoods');
+    const categoryFilterFoods = document.getElementById('categoryFilterFoods');
+
+    const foodModalFoods = document.getElementById('foodModalFoods');
+    const foodFormFoods = document.getElementById('foodFormFoods');
+
+    document.addEventListener('DOMContentLoaded', ()=> {
+        loadFoodsPage();
+        attachFoodsHandlers();
+    });
+
+    function attachFoodsHandlers(){
+        foodsPrev.addEventListener('click', ()=>{ if(pageF>0){ pageF--; loadFoodsPage(); }});
+        foodsNext.addEventListener('click', ()=>{ if(pageF<totalPagesF-1){ pageF++; loadFoodsPage(); }});
+        document.getElementById('btn-add-food').addEventListener('click', ()=> openModalFoods());
+        foodFormFoods.addEventListener('submit', onSaveFoods);
+        document.getElementById('modalCancelFoods').addEventListener('click', closeModalFoods);
+        searchInputFoods.addEventListener('input', debounce(onSearchFoods,200));
+        searchClearFoods.addEventListener('click', ()=>{ searchInputFoods.value=''; onSearchFoods(); });
+        categoryFilterFoods.addEventListener('change', onSearchFoods);
+        document.getElementById('exportCsvFoods').addEventListener('click', exportCSVFoods);
+    }
+
+    function showSpinnerFoods(on=true){ foodsSpinner.style.display = on ? 'flex' : 'none'; }
+
+    function loadFoodsPage(){
+        showSpinnerFoods(true);
+        foodsEmpty.style.display='none';
+        fetch(`${API_ROOT}?page=${pageF}&size=${sizeF}&sortField=id&sortDir=asc`)
+            .then(r=>r.json())
+            .then(d=>{
+                totalPagesF = d.totalPages ?? 1;
+                foodsCurrent.textContent = pageF+1;
+                foodsTotal.textContent = totalPagesF;
+                document.getElementById('foodsPageInfo').textContent = `Showing ${d.numberOfElements} of ${d.totalElements} items`;
+                dataF = d.content || [];
+                renderFoods(dataF);
+                showSpinnerFoods(false);
+            })
+            .catch(()=>{ showToast('Failed to load','error'); showSpinnerFoods(false); });
+    }
+
+    function renderFoods(items){
+        const q=(searchInputFoods.value||'').trim().toLowerCase();
+        const cat=categoryFilterFoods.value;
+        const filtered = items.filter(it => {
+            const m1 = !q || it.name.toLowerCase().includes(q) || (it.category||'').toLowerCase().includes(q);
+            const m2 = !cat || it.category === cat;
+            return m1 && m2;
+        });
+        foodsBody.innerHTML='';
+        if(filtered.length===0){ foodsEmpty.style.display='block'; return; }
+        filtered.forEach(f=>{
+            const tr=document.createElement('tr');
+            tr.innerHTML = `<td>${f.id}</td><td>${escapeHtml(f.name)}</td><td>${Number(f.price).toFixed(2)}</td><td>${escapeHtml(f.category||'')}</td><td><button class="action-btn edit" onclick="onEditFoods(${f.id})">Edit</button><button class="action-btn delete" onclick="onDeleteFoods(${f.id})">Delete</button></td>`;
+            foodsBody.appendChild(tr);
+        });
+    }
+
+    function openModalFoods(item=null){
+        foodModalFoods.setAttribute('aria-hidden','false');
+        if(item){
+            document.getElementById('modalTitleFoods').textContent='Edit Food';
+            document.getElementById('foodIdFoods').value=item.id;
+            document.getElementById('foodNameFoods').value=item.name;
+            document.getElementById('foodPriceFoods').value=item.price;
+            document.getElementById('foodCategoryModalFoods').value=item.category||'Other';
+        } else {
+            document.getElementById('modalTitleFoods').textContent='Add Food';
+            document.getElementById('foodIdFoods').value='';
+            foodFormFoods.reset();
+        }
+    }
+
+    function closeModalFoods(){ foodModalFoods.setAttribute('aria-hidden','true'); }
+
+    function onSaveFoods(e){
+        e.preventDefault();
+        const id = document.getElementById('foodIdFoods').value;
+        const payload = { name: document.getElementById('foodNameFoods').value.trim(), price: parseFloat(document.getElementById('foodPriceFoods').value), category: document.getElementById('foodCategoryModalFoods').value };
+        if(!payload.name || isNaN(payload.price)){ showToast('Enter valid data','error'); return; }
+        const url = id ? `${API_ROOT}/${id}` : API_ROOT;
+        const method = id ? 'PUT' : 'POST';
+        fetch(url, { method, headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) })
+            .then(r=>r.json())
+            .then(()=>{ showToast(id ? 'Updated' : 'Created','success'); closeModalFoods(); loadFoodsPage(); })
+            .catch(()=>showToast('Save failed','error'));
+    }
+
+    function onEditFoods(id){
+        const found = dataF.find(x=>x.id===id);
+        if(!found) return;
+        openModalFoods(found);
+    }
+
+    function onDeleteFoods(id){
+        if(!confirm('Delete this food item?')) return;
+        fetch(`${API_ROOT}/${id}`,{method:'DELETE'}).then(r=>{ if(!r.ok) throw new Error(); showToast('Deleted','success'); loadFoodsPage(); }).catch(()=>showToast('Delete failed','error'));
+    }
+
+    function onSearchFoods(){ renderFoods(dataF); }
+
+    function showToast(text,type='info',timeout=3000){
+        const t=document.createElement('div'); t.className=`toast ${type} show`; t.textContent=text; document.getElementById('toastContainer').appendChild(t); setTimeout(()=>t.classList.remove('show'),timeout); setTimeout(()=>t.remove(),timeout+300);
+    }
+
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    function debounce(fn,t){ let to; return (...a)=>{ clearTimeout(to); to=setTimeout(()=>fn(...a),t); }; }
+    function exportCSVFoods(){
+        const rows = Array.from(foodsBody.querySelectorAll('tr')).map(tr=>Array.from(tr.children).slice(0,4).map(td=>td.textContent.trim()));
+        if(rows.length===0){ showToast('No data to export','info'); return; }
+        let csv = 'ID,Name,Price,Category\n' + rows.map(r=>r.map(c=>`"${c.replace(/"/g,'""')}"`).join(',')).join('\n');
+        const blob = new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='foods.csv'; a.click(); URL.revokeObjectURL(url);
+    }
+</script>
+</body>
+</html>
