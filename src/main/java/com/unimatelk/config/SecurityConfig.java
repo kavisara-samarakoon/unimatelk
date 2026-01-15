@@ -19,21 +19,36 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+
                 .authorizeHttpRequests(auth -> auth
+                        // Public pages + assets
                         .requestMatchers(
                                 "/", "/index.html",
-                                "/css/**", "/js/**", "/images/**",
-                                "/swagger-ui.html", "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/css/**", "/js/**", "/images/**", "/favicon.ico",
+                                "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
+
+                                // ✅ IMPORTANT: allow /api/me so it can return authenticated:false instead of redirecting
+                                "/api/me"
                         ).permitAll()
+
+                        // Everything else needs login
                         .anyRequest().authenticated()
                 )
+
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService) // ✅ THIS is the important wire-up
+                                .userService(customOAuth2UserService)
                         )
+                        // ✅ ALWAYS go back to UI after login (prevents /api/me?continue landing)
+                        .defaultSuccessUrl("/index.html", true)
                 )
-                .logout(logout -> logout.logoutSuccessUrl("/index.html"));
+
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/index.html")
+                )
+
+                // keep defaults
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
