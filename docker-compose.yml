@@ -1,0 +1,28 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: unimatelk-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: unimatelk
+      MYSQL_USER: unimatelk
+      MYSQL_PASSWORD: unimatelkpass
+    ports:
+      - "3307:3306"
+    volumes:
+      - unimatelk_mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: unimatelk-phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: unimatelk
+      PMA_PASSWORD: unimatelkpass
+    ports:
+      - "8081:80"
+
+volumes:
+  unimatelk_mysql_data:
