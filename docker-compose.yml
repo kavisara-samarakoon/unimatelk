@@ -1,6 +1,7 @@
 services:
   mysql:
     image: mysql:8.4
+    platform: linux/arm64/v8
     container_name: unimatelk-mysql
     restart: always
     environment:
@@ -15,6 +16,7 @@ services:
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
+    platform: linux/amd64
     container_name: unimatelk-phpmyadmin
     restart: always
     environment:
