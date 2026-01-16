@@ -9,7 +9,8 @@ services:
       MYSQL_USER: unimatelk
       MYSQL_PASSWORD: unimatelkpass
     ports:
-      - "3307:3306"
+      - "3307:3306
+      "
     volumes:
       - unimatelk_mysql_data:/var/lib/mysql
 
