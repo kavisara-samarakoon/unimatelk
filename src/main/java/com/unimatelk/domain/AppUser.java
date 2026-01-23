@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "app_users")
+@Table(name = "users")
 public class AppUser {
 
     @Id
@@ -23,13 +23,15 @@ public class AppUser {
     @Column(nullable = false, length = 20)
     private String role = "STUDENT";
 
+    @Column(nullable = false, length = 20)
+    private String status = "ACTIVE"; // ACTIVE / TEMP_BLOCKED / BANNED later
+
     @Column(name = "last_active_at")
     private Instant lastActiveAt;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
 
-    // getters/setters
     public Long getId() { return id; }
 
     public String getEmail() { return email; }
@@ -43,6 +45,9 @@ public class AppUser {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     public Instant getLastActiveAt() { return lastActiveAt; }
     public void setLastActiveAt(Instant lastActiveAt) { this.lastActiveAt = lastActiveAt; }
