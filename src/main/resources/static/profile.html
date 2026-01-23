@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>UniMateLK - Profile</title>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body>
+<div class="container">
+    <h1>My Profile</h1>
+    <a href="/index.html">← Back</a>
+
+    <p id="msg"></p>
+
+    <div class="card">
+        <label>Campus</label><input id="campus"/>
+        <label>Degree</label><input id="degree"/>
+        <label>Year of Study</label><input id="yearOfStudy" type="number"/>
+
+        <label>Gender</label><input id="gender"/>
+        <label>Gender Preference</label><input id="genderPref"/>
+
+        <label>Move-in Month</label><input id="moveInMonth"/>
+        <label>Bio</label><textarea id="bio" rows="4"></textarea>
+
+        <label>Phone</label><input id="phone"/>
+        <label>Facebook URL</label><input id="facebookUrl"/>
+        <label>Instagram URL</label><input id="instagramUrl"/>
+
+        <button id="saveBtn">Save Profile</button>
+    </div>
+
+    <div class="card">
+        <h3>Profile Photo</h3>
+        <img id="profileImg" style="max-width:200px; display:none"/>
+        <input id="profileFile" type="file" accept="image/*"/>
+        <button id="uploadProfileBtn">Upload</button>
+    </div>
+
+    <div class="card">
+        <h3>Cover Photo</h3>
+        <img id="coverImg" style="max-width:300px; display:none"/>
+        <input id="coverFile" type="file" accept="image/*"/>
+        <button id="uploadCoverBtn">Upload</button>
+    </div>
+</div>
+
+<script type="module" src="/js/profile.js"></script>
+</body>
+</html>

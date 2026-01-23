@@ -4,50 +4,46 @@ import com.unimatelk.domain.AppUser;
 import com.unimatelk.repo.AppUserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private final AppUserRepository appUserRepository;
+    private final AppUserRepository userRepo;
 
-    public CustomOAuth2UserService(AppUserRepository appUserRepository) {
-        this.appUserRepository = appUserRepository;
+    public CustomOAuth2UserService(AppUserRepository userRepo) {
+        this.userRepo = userRepo;
     }
 
     @Override
-    @Transactional
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) {
         OAuth2User oauthUser = super.loadUser(userRequest);
 
         String email = oauthUser.getAttribute("email");
         String name = oauthUser.getAttribute("name");
         String picture = oauthUser.getAttribute("picture");
 
-        if (email == null || email.isBlank()) {
-            // If Google didn't send email, you can't uniquely identify user
-            return oauthUser;
-        }
-
-        AppUser user = appUserRepository.findByEmail(email).orElseGet(() -> {
+        // Create user if not exists
+        AppUser user = userRepo.findByEmail(email).orElseGet(() -> {
             AppUser u = new AppUser();
             u.setEmail(email);
-            u.setRole("STUDENT"); // keep as String to match your DB column
+            u.setName(name != null ? name : "");
+            u.setPictureUrl(picture);
+            u.setRole("STUDENT");
+            u.setStatus("ACTIVE");
             u.setCreatedAt(Instant.now());
             return u;
         });
 
-        // update latest profile info every login
-        user.setName(name != null ? name : user.getName());
-        user.setPictureUrl(picture != null ? picture : user.getPictureUrl());
+        // Update last active info each login
         user.setLastActiveAt(Instant.now());
+        if (name != null) user.setName(name);
+        if (picture != null) user.setPictureUrl(picture);
 
-        appUserRepository.save(user);
+        userRepo.save(user);
 
         return oauthUser;
     }
