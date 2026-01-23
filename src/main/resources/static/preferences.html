@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>UniMateLK - Preferences</title>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body>
+<div class="container">
+    <h1>My Preferences</h1>
+    <a href="/index.html">← Back</a>
+    <p id="msg"></p>
+
+    <div class="card">
+        <label>Sleep Schedule (1-5)</label><input id="sleep" type="number" min="1" max="5"/>
+        <label>Cleanliness (1-5)</label><input id="clean" type="number" min="1" max="5"/>
+        <label>Noise Tolerance (1-5)</label><input id="noise" type="number" min="1" max="5"/>
+        <label>Guests OK (1-5)</label><input id="guests" type="number" min="1" max="5"/>
+
+        <label>Smoking OK</label>
+        <select id="smoking"><option value="true">Yes</option><option value="false">No</option></select>
+
+        <label>Drinking OK</label>
+        <select id="drinking"><option value="true">Yes</option><option value="false">No</option></select>
+
+        <label>Introvert/Extrovert (1-5)</label><input id="intro" type="number" min="1" max="5"/>
+
+        <button id="saveBtn">Save Preferences</button>
+    </div>
+</div>
+
+<script type="module" src="/js/preferences.js"></script>
+</body>
+</html>
