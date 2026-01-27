@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>UniMateLK - Match Feed</title>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body>
+<div class="container">
+    <h1>Match Feed</h1>
+    <a href="/index.html">← Back</a>
+
+    <p id="msg"></p>
+
+    <div class="card">
+        <h3>Search & Filters</h3>
+        <div class="grid">
+            <div>
+                <label>Campus</label>
+                <input id="campus" placeholder="e.g. Colombo"/>
+            </div>
+            <div>
+                <label>Degree</label>
+                <input id="degree" placeholder="e.g. IT"/>
+            </div>
+            <div>
+                <label>Year</label>
+                <input id="year" type="number" placeholder="1"/>
+            </div>
+            <div>
+                <label>Gender Preference</label>
+                <input id="genderPref" placeholder="Any / Male / Female"/>
+            </div>
+            <div class="full">
+                <label>Keyword</label>
+                <input id="keyword" placeholder="Search degree, campus, bio..."/>
+            </div>
+        </div>
+
+        <button id="searchBtn">Search</button>
+    </div>
+
+    <div class="card">
+        <div class="row">
+            <button id="prevBtn">← Prev</button>
+            <span id="pageText"></span>
+            <button id="nextBtn">Next →</button>
+        </div>
+    </div>
+
+    <div id="list"></div>
+</div>
+
+<script type="module" src="/js/matches.js"></script>
+</body>
+</html>

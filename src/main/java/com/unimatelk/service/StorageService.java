@@ -42,4 +42,28 @@ public class StorageService {
 
         return "/uploads/profiles/" + userId + "/" + name;
     }
+
+    public String storeChatImage(Long roomId, Long userId, MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) throw new IllegalArgumentException("File is required");
+        if (!ALLOWED.contains(file.getContentType())) throw new IllegalArgumentException("Only PNG/JPG/WEBP allowed");
+        if (file.getSize() > 5L * 1024 * 1024) throw new IllegalArgumentException("Max file size is 5MB");
+
+        String ext = switch (file.getContentType()) {
+            case "image/png" -> ".png";
+            case "image/jpeg" -> ".jpg";
+            case "image/webp" -> ".webp";
+            default -> "";
+        };
+
+        Path base = Paths.get(props.getUploadsDir()).toAbsolutePath().normalize();
+        Path dir = base.resolve("chat").resolve(String.valueOf(roomId));
+        Files.createDirectories(dir);
+
+        String name = "u" + userId + "-" + Instant.now().toEpochMilli() + ext;
+        Path target = dir.resolve(name);
+
+        Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+
+        return "/uploads/chat/" + roomId + "/" + name;
+    }
 }

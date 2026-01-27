@@ -15,12 +15,25 @@ public class Preference {
     private AppUser user;
 
     // 1-5 scales (simple)
+    @Column(name = "sleep_schedule")
     private Integer sleepSchedule;   // 1 early .. 5 late
+
+    @Column(name = "cleanliness")
     private Integer cleanliness;     // 1 low .. 5 high
+
+    @Column(name = "noise_tolerance")
     private Integer noiseTolerance;  // 1 quiet .. 5 loud ok
+
+    @Column(name = "guests")
     private Integer guests;          // 1 never .. 5 often ok
+
+    @Column(name = "smoking_ok")
     private Boolean smokingOk;
+
+    @Column(name = "drinking_ok")
     private Boolean drinkingOk;
+
+    @Column(name = "introvert")
     private Integer introvert;       // 1 intro .. 5 extro
 
     public Long getId() { return id; }

@@ -4,6 +4,7 @@ async function refreshStatus() {
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
     const userPic = document.getElementById("userPic");
+    const adminLink = document.getElementById("adminLink");
 
     try {
         const res = await fetch("/api/me", { credentials: "same-origin" });
@@ -20,6 +21,8 @@ async function refreshStatus() {
                 userPic.src = data.picture;
                 userPic.style.display = "inline-block";
             }
+
+            adminLink.style.display = (data.role === "ADMIN") ? "inline-block" : "none";
         } else {
             statusEl.textContent = "Not logged in. Click 'Login with Google'.";
             userLabel.textContent = "";
@@ -27,6 +30,7 @@ async function refreshStatus() {
             loginBtn.style.display = "inline-block";
             logoutBtn.style.display = "none";
             userPic.style.display = "none";
+            adminLink.style.display = "none";
         }
     } catch (e) {
         statusEl.textContent = "Error loading status. Check console logs.";
