@@ -1,0 +1,196 @@
+{
+  "info": {
+    "name": "UniMateLK API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "userId", "value": "1" },
+    { "key": "requestId", "value": "1" },
+    { "key": "roomId", "value": "1" },
+    { "key": "caseId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/health"
+      }
+    },
+    {
+      "name": "CSRF Token",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/csrf"
+      }
+    },
+    {
+      "name": "Me",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/me"
+      }
+    },
+    {
+      "name": "Profile - Get My Profile",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/profile/me"
+      }
+    },
+    {
+      "name": "Profile - Update My Profile",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-XSRF-TOKEN", "value": "<copy XSRF-TOKEN cookie here>" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"campus\":\"NSBM\",\n  \"degree\":\"BSc Software Engineering\",\n  \"yearOfStudy\":1,\n  \"gender\":\"Male\",\n  \"genderPreference\":\"Any\",\n  \"moveInMonth\":\"February\",\n  \"bio\":\"Hello!\",\n  \"phone\":\"\",\n  \"facebookUrl\":\"\",\n  \"instagramUrl\":\"\"\n}"
+        },
+        "url": "{{baseUrl}}/api/profile/me"
+      }
+    },
+    {
+      "name": "Preferences - Get My Preferences",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/preferences/me"
+      }
+    },
+    {
+      "name": "Preferences - Update My Preferences",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-XSRF-TOKEN", "value": "<copy XSRF-TOKEN cookie here>" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sleepSchedule\":3,\n  \"cleanliness\":4,\n  \"noiseTolerance\":3,\n  \"guests\":2,\n  \"smokingOk\":false,\n  \"drinkingOk\":true,\n  \"introvert\":3\n}"
+        },
+        "url": "{{baseUrl}}/api/preferences/me"
+      }
+    },
+    {
+      "name": "Match Feed",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/matches/feed?page=0&size=10"
+      }
+    },
+    {
+      "name": "Match Explain (by userId)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/matches/explain/{{userId}}"
+      }
+    },
+    {
+      "name": "Public Profile (by userId)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/profiles/{{userId}}"
+      }
+    },
+    {
+      "name": "Send Match Request (to userId)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "X-XSRF-TOKEN", "value": "<copy XSRF-TOKEN cookie here>" }
+        ],
+        "url": "{{baseUrl}}/api/requests/{{userId}}"
+      }
+    },
+    {
+      "name": "Incoming Requests",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/requests/incoming"
+      }
+    },
+    {
+      "name": "Outgoing Requests",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/requests/outgoing"
+      }
+    },
+    {
+      "name": "Accept Request (requestId)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "X-XSRF-TOKEN", "value": "<copy XSRF-TOKEN cookie here>" }
+        ],
+        "url": "{{baseUrl}}/api/requests/{{requestId}}/accept"
+      }
+    },
+    {
+      "name": "Chat Rooms",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/chat/rooms"
+      }
+    },
+    {
+      "name": "Chat Messages (roomId)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/chat/rooms/{{roomId}}/messages?page=0&size=50"
+      }
+    },
+    {
+      "name": "Report User (userId)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-XSRF-TOKEN", "value": "<copy XSRF-TOKEN cookie here>" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"reason\": \"Spam / inappropriate\"\n}"
+        },
+        "url": "{{baseUrl}}/api/safety/report/{{userId}}"
+      }
+    },
+    {
+      "name": "Block User (userId)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "X-XSRF-TOKEN", "value": "<copy XSRF-TOKEN cookie here>" }
+        ],
+        "url": "{{baseUrl}}/api/safety/block/{{userId}}"
+      }
+    },
+    {
+      "name": "Admin - Open Cases",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/admin/cases?status=OPEN&page=0&size=50"
+      }
+    },
+    {
+      "name": "Admin - Resolve Case (caseId)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-XSRF-TOKEN", "value": "<copy XSRF-TOKEN cookie here>" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"action\": \"UNBLOCK\",\n  \"note\": \"Reviewed and cleared\"\n}"
+        },
+        "url": "{{baseUrl}}/api/admin/cases/{{caseId}}/resolve"
+      }
+    }
+  ]
+}

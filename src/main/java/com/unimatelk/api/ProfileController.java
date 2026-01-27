@@ -2,9 +2,9 @@ package com.unimatelk.api;
 
 import com.unimatelk.domain.AppUser;
 import com.unimatelk.domain.Profile;
-import com.unimatelk.repo.AppUserRepository;
 import com.unimatelk.service.ProfileService;
 import com.unimatelk.service.StorageService;
+import com.unimatelk.service.CurrentUserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
@@ -15,30 +15,24 @@ import java.util.Map;
 
 @RestController
 public class ProfileController {
-
-    private final AppUserRepository userRepo;
+    private final CurrentUserService current;
     private final ProfileService profileService;
     private final StorageService storageService;
 
-    public ProfileController(AppUserRepository userRepo, ProfileService profileService, StorageService storageService) {
-        this.userRepo = userRepo;
+    public ProfileController(CurrentUserService current, ProfileService profileService, StorageService storageService) {
+        this.current = current;
         this.profileService = profileService;
         this.storageService = storageService;
     }
 
-    private AppUser currentUser(OAuth2User oauth) {
-        String email = oauth.getAttribute("email");
-        return userRepo.findByEmail(email).orElseThrow();
-    }
-
     @GetMapping("/api/profile/me")
     public Profile me(@AuthenticationPrincipal OAuth2User oauth) {
-        return profileService.getOrCreate(currentUser(oauth));
+        return profileService.getOrCreate(current.requireUser(oauth));
     }
 
     @PutMapping("/api/profile/me")
     public Profile updateMe(@AuthenticationPrincipal OAuth2User oauth, @RequestBody Profile incoming) {
-        Profile p = profileService.getOrCreate(currentUser(oauth));
+        Profile p = profileService.getOrCreate(current.requireUser(oauth));
 
         p.setCampus(incoming.getCampus() == null ? "" : incoming.getCampus());
         p.setDegree(incoming.getDegree() == null ? "" : incoming.getDegree());
@@ -58,7 +52,7 @@ public class ProfileController {
     @PostMapping("/api/profile/me/profile-photo")
     public Map<String, Object> uploadProfile(@AuthenticationPrincipal OAuth2User oauth,
                                              @RequestParam("file") MultipartFile file) throws IOException {
-        AppUser u = currentUser(oauth);
+        AppUser u = current.requireUser(oauth);
         Profile p = profileService.getOrCreate(u);
 
         String url = storageService.storeProfileImage(u.getId(), file, "profile");
@@ -71,7 +65,7 @@ public class ProfileController {
     @PostMapping("/api/profile/me/cover-photo")
     public Map<String, Object> uploadCover(@AuthenticationPrincipal OAuth2User oauth,
                                            @RequestParam("file") MultipartFile file) throws IOException {
-        AppUser u = currentUser(oauth);
+        AppUser u = current.requireUser(oauth);
         Profile p = profileService.getOrCreate(u);
 
         String url = storageService.storeProfileImage(u.getId(), file, "cover");
