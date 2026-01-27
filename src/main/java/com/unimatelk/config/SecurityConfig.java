@@ -25,12 +25,16 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/", "/index.html",
+                                "/profile.html", "/preferences.html",
+                                "/matches.html", "/user.html", "/requests.html",
+                                "/chat.html", "/admin.html",
                                 "/css/**", "/js/**", "/images/**", "/favicon.ico",
                                 "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
                                 "/api/me",
                                 "/api/csrf",
                                 "/uploads/**"
                         ).permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth -> oauth
