@@ -3,46 +3,44 @@ package com.unimatelk.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
-    private final CustomOAuth2UserService customOAuth2UserService;
-
-    public SecurityConfig(CustomOAuth2UserService customOAuth2UserService) {
-        this.customOAuth2UserService = customOAuth2UserService;
-    }
-
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                )
+                // Swagger "Try it out" does not send CSRF token, so PUT/POST gets 403.
+                // Easiest dev fix: ignore CSRF for API + Swagger endpoints.
+                .csrf(csrf -> csrf.ignoringRequestMatchers(
+                        "/api/**",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/actuator/**"
+                ))
+
                 .authorizeHttpRequests(auth -> auth
+                        // Allow Swagger + actuator health/info without login
                         .requestMatchers(
-                                "/", "/index.html",
-                                "/profile.html", "/preferences.html",
-                                "/matches.html", "/user.html", "/requests.html",
-                                "/chat.html", "/admin.html",
-                                "/css/**", "/js/**", "/images/**", "/favicon.ico",
-                                "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
-                                "/api/me",
-                                "/api/csrf",
-                                "/uploads/**"
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/actuator/health",
+                                "/actuator/info"
                         ).permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                        // Everything else requires login
                         .anyRequest().authenticated()
                 )
-                .oauth2Login(oauth -> oauth
-                        .userInfoEndpoint(u -> u.userService(customOAuth2UserService))
-                        .defaultSuccessUrl("/index.html", true)
-                )
-                .logout(logout -> logout.logoutSuccessUrl("/index.html"))
-                .httpBasic(Customizer.withDefaults());
+
+                // If you are using Google OAuth2 login (you are), keep this
+                .oauth2Login(Customizer.withDefaults())
+
+                .logout(logout -> logout.logoutSuccessUrl("/").permitAll());
 
         return http.build();
     }
