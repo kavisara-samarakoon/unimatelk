@@ -19,10 +19,12 @@ public class SecurityConfig {
                 // Easiest dev fix: ignore CSRF for API + Swagger endpoints.
                 .csrf(csrf -> csrf.ignoringRequestMatchers(
                         "/api/**",
+                        "/ws/**",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
                         "/actuator/**"
                 ))
+
 
                 .authorizeHttpRequests(auth -> auth
                         // Allow Swagger + actuator health/info without login
