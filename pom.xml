@@ -84,13 +84,6 @@
             <version>${springdoc.version}</version>
         </dependency>
 
-        <!-- WebSocket (STOMP + SockJS) -->
-        <!-- Required for @EnableWebSocketMessageBroker, WebSocketMessageBrokerConfigurer, StompEndpointRegistry, etc. -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
-        </dependency>
-
         <!-- Optional: tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
