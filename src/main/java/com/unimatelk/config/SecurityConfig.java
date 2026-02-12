@@ -2,8 +2,8 @@ package com.unimatelk.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
@@ -21,10 +21,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                // ✅ IMPORTANT: Use Cookie CSRF so your frontend can read XSRF-TOKEN cookie
+                // ✅ IMPORTANT: Use COOKIE-based CSRF (works with your api.js: XSRF-TOKEN + X-XSRF-TOKEN)
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        // Swagger + SockJS can break with CSRF, so ignore these only
+                        // Ignore only these (Swagger + websocket handshake)
                         .ignoringRequestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
@@ -34,18 +34,17 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Public pages/assets (so after logout it won’t auto-login again)
+                        // ✅ Public pages + static assets (so home page shows login/logout correctly)
                         .requestMatchers(
                                 "/", "/index.html",
-                                "/css/**", "/js/**", "/images/**",
-                                "/uploads/**",
-                                "/error"
+                                "/css/**", "/js/**", "/images/**", "/uploads/**",
+                                "/error", "/favicon.ico"
                         ).permitAll()
 
-                        // ✅ OAuth endpoints must be public
+                        // ✅ OAuth endpoints public
                         .requestMatchers("/oauth2/**", "/login/**").permitAll()
 
-                        // ✅ Needed so UI can show “Not logged in” and so CSRF cookie can be created
+                        // ✅ These MUST be public
                         .requestMatchers("/api/me", "/api/csrf").permitAll()
 
                         // ✅ Admin protection
@@ -55,13 +54,13 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
+                // ✅ Use your custom user service so roles (ADMIN) are assigned correctly
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(u -> u.userService(customOAuth2UserService))
                 )
 
-                // ✅ Logout must invalidate session + delete cookies
+                // ✅ Logout should invalidate session + remove cookies
                 .logout(logout -> logout
-                        .logoutUrl("/logout") // default, but explicit is clearer
                         .logoutSuccessUrl("/index.html?loggedOut=1")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
