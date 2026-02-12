@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
@@ -20,21 +21,37 @@ public class AuthController {
 
     @GetMapping("/api/me")
     public Map<String, Object> me(@AuthenticationPrincipal OAuth2User user) {
+        // Not logged in
         if (user == null) {
             return Map.of("authenticated", false);
         }
 
         String email = user.getAttribute("email");
-        AppUser dbUser = userRepo.findByEmail(email).orElse(null);
+        String name = user.getAttribute("name");
+        String picture = user.getAttribute("picture");
 
-        return Map.of(
-                "authenticated", true,
-                "id", dbUser != null ? dbUser.getId() : null,
-                "name", user.getAttribute("name"),
-                "email", email,
-                "picture", user.getAttribute("picture"),
-                "role", dbUser != null ? dbUser.getRole() : "STUDENT",
-                "status", dbUser != null ? dbUser.getStatus() : "ACTIVE"
-        );
+        AppUser dbUser = null;
+        if (email != null && !email.isBlank()) {
+            dbUser = userRepo.findByEmail(email).orElse(null);
+        }
+
+        // Use a normal Map (allows null values). Map.of() DOES NOT allow nulls.
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("authenticated", true);
+
+        Long id = (dbUser != null ? dbUser.getId() : null);
+        out.put("id", id);
+
+        // For your chat.js (it expects userId)
+        out.put("userId", id);
+
+        out.put("name", name != null ? name : "");
+        out.put("email", email != null ? email : "");
+        out.put("picture", picture); // can be null, OK in LinkedHashMap
+
+        out.put("role", (dbUser != null && dbUser.getRole() != null) ? dbUser.getRole() : "STUDENT");
+        out.put("status", (dbUser != null && dbUser.getStatus() != null) ? dbUser.getStatus() : "ACTIVE");
+
+        return out;
     }
 }
