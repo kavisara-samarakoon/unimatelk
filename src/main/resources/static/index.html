@@ -16,7 +16,7 @@
 
         <a id="loginBtn" class="btn" href="/oauth2/authorization/google">Login with Google</a>
 
-        <!-- ✅ Changed to button so it won’t open Spring’s “Confirm Log Out?” page -->
+        <!-- ✅ MUST be button (NOT <a href="/logout">) -->
         <button id="logoutBtn" class="btn secondary" style="display:none;">Logout</button>
 
         <a href="/profile.html">Profile</a>
@@ -37,7 +37,6 @@
     </section>
 </main>
 
-<!-- ✅ Make it a module so it can import api.js -->
 <script type="module" src="/js/index.js"></script>
 </body>
 </html>
