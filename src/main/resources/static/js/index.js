@@ -9,7 +9,7 @@ async function refreshStatus() {
     const adminLink = document.getElementById("adminLink");
 
     try {
-        const data = await apiFetch("/api/me", { method: "GET", cache: "no-store" });
+        const data = await apiFetch("/api/me", { method: "GET" });
 
         if (data.authenticated) {
             statusEl.textContent = `Logged in as ${data.name} (${data.email})`;
@@ -43,20 +43,25 @@ async function refreshStatus() {
 
 async function doLogout() {
     try {
-        // ✅ ensures XSRF-TOKEN cookie exists (CookieCsrfTokenRepository)
-        await initCsrf();
+        // Load CSRF token + correct header name from server
+        const { data } = await initCsrf();
 
-        // ✅ this will include X-XSRF-TOKEN header automatically from cookie (apiFetch)
+        // If token is null, SecurityConfig is still wrong (CSRF disabled for /api/**)
+        if (!data || !data.token || !data.headerName) {
+            console.error("CSRF data:", data);
+            alert("CSRF token is missing. Fix SecurityConfig (do NOT ignore /api/**).");
+            return;
+        }
+
+        // This POST will now include the correct CSRF header automatically via apiFetch()
         await apiFetch("/logout", { method: "POST" });
 
     } catch (e) {
-        // IMPORTANT: if logout fails (403), you will see it here
         console.error("Logout failed:", e);
-        alert("Logout failed. Check console (most common: CSRF 403).");
+        alert("Logout failed. Open console and check Network → POST /logout.");
         return;
     }
 
-    // Force UI reset + avoid stale cache
     location.replace("/index.html?loggedOut=1&ts=" + Date.now());
 }
 
@@ -68,6 +73,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (logoutBtn) logoutBtn.addEventListener("click", doLogout);
 });
 
-// Avoid showing old “logged in” UI when you return using back button / tab focus
 window.addEventListener("pageshow", refreshStatus);
 window.addEventListener("focus", refreshStatus);
