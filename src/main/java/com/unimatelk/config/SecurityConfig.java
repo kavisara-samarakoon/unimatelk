@@ -21,10 +21,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                // ✅ Enable CSRF using cookie (your frontend already reads XSRF-TOKEN cookie)
+                // ✅ IMPORTANT: Use Cookie CSRF so your frontend can read XSRF-TOKEN cookie
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        // Swagger/actuator/ws can be ignored; keep CSRF for /api/** enabled
+                        // Swagger + SockJS can break with CSRF, so ignore these only
                         .ignoringRequestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
@@ -34,33 +34,34 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Public landing + static assets (prevents auto-login loop after logout)
+                        // ✅ Public pages/assets (so after logout it won’t auto-login again)
                         .requestMatchers(
                                 "/", "/index.html",
                                 "/css/**", "/js/**", "/images/**",
-                                "/uploads/**"
+                                "/uploads/**",
+                                "/error"
                         ).permitAll()
 
-                        // ✅ Allow login flow endpoints
-                        .requestMatchers("/oauth2/**", "/login/**", "/error").permitAll()
+                        // ✅ OAuth endpoints must be public
+                        .requestMatchers("/oauth2/**", "/login/**").permitAll()
 
-                        // ✅ Allow these without login so UI can show “Not logged in”
+                        // ✅ Needed so UI can show “Not logged in” and so CSRF cookie can be created
                         .requestMatchers("/api/me", "/api/csrf").permitAll()
 
-                        // ✅ ADMIN ONLY
+                        // ✅ Admin protection
                         .requestMatchers("/admin.html", "/api/admin/**").hasRole("ADMIN")
 
                         // Everything else requires login
                         .anyRequest().authenticated()
                 )
 
-                // ✅ Ensure your DB role -> ROLE_* mapping is used
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(u -> u.userService(customOAuth2UserService))
                 )
 
-                // ✅ Logout must be POST (with CSRF). Also clear cookies & session.
+                // ✅ Logout must invalidate session + delete cookies
                 .logout(logout -> logout
+                        .logoutUrl("/logout") // default, but explicit is clearer
                         .logoutSuccessUrl("/index.html?loggedOut=1")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)

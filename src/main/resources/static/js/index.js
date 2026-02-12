@@ -9,12 +9,11 @@ async function refreshStatus() {
     const adminLink = document.getElementById("adminLink");
 
     try {
-        // no-store avoids stale UI (back/forward cache issues)
         const data = await apiFetch("/api/me", { method: "GET", cache: "no-store" });
 
         if (data.authenticated) {
             statusEl.textContent = `Logged in as ${data.name} (${data.email})`;
-            userLabel.textContent = `${data.name}`;
+            userLabel.textContent = data.name || "";
 
             loginBtn.style.display = "none";
             logoutBtn.style.display = "inline-block";
@@ -44,21 +43,24 @@ async function refreshStatus() {
 
 async function doLogout() {
     try {
-        // ensure XSRF-TOKEN cookie exists
+        // ✅ ensures XSRF-TOKEN cookie exists (CookieCsrfTokenRepository)
         await initCsrf();
 
-        // POST /logout with CSRF header (apiFetch handles it)
+        // ✅ this will include X-XSRF-TOKEN header automatically from cookie (apiFetch)
         await apiFetch("/logout", { method: "POST" });
+
     } catch (e) {
+        // IMPORTANT: if logout fails (403), you will see it here
         console.error("Logout failed:", e);
-    } finally {
-        // force real reload (prevents stale UI)
-        location.replace("/index.html?loggedOut=1&ts=" + Date.now());
+        alert("Logout failed. Check console (most common: CSRF 403).");
+        return;
     }
+
+    // Force UI reset + avoid stale cache
+    location.replace("/index.html?loggedOut=1&ts=" + Date.now());
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-    // generate CSRF cookie early (helps logout + future POSTs)
     await initCsrf().catch(() => {});
     await refreshStatus();
 
@@ -66,6 +68,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (logoutBtn) logoutBtn.addEventListener("click", doLogout);
 });
 
-// Fix “sometimes old UI” when returning using back button or switching tabs
+// Avoid showing old “logged in” UI when you return using back button / tab focus
 window.addEventListener("pageshow", refreshStatus);
 window.addEventListener("focus", refreshStatus);
