@@ -3,17 +3,28 @@ import { apiFetch, initCsrf } from "./api.js";
 let me = null;
 let stompClient = null;
 let currentRoomId = null;
-let currentSubscription = null;
+let currentSub = null;
 
-function el(id) { return document.getElementById(id); }
-function setMsg(text) { el("msg").textContent = text || ""; }
+const $ = (id) => document.getElementById(id);
 
-function qp(name) {
+function setToast(text, type="info"){
+    const el = $("msg");
+    el.className = "toast " + type;
+    el.textContent = text || "";
+}
+
+function qp(name){
     const u = new URL(window.location.href);
     return u.searchParams.get(name);
 }
 
-function escapeHtml(str) {
+function setRoomInUrl(roomId){
+    const u = new URL(window.location.href);
+    u.searchParams.set("room", String(roomId));
+    window.history.replaceState({}, "", u.toString());
+}
+
+function escapeHtml(str){
     return String(str || "")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
@@ -22,112 +33,146 @@ function escapeHtml(str) {
         .replaceAll("'", "&#039;");
 }
 
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-    return null;
-}
-
-function renderMessage(msg) {
+function renderMessage(m){
     const wrap = document.createElement("div");
-    wrap.className = "msg-row" + (String(msg.senderUserId) === String(me.userId) ? " me" : "");
+    const mine = String(m.senderUserId) === String(me.userId || me.id);
+    wrap.className = "chat-msg" + (mine ? " me" : "");
 
-    const time = msg.createdAt ? new Date(msg.createdAt).toLocaleString() : "";
-    let bodyHtml = "";
-    if (msg.type === "IMAGE" && msg.attachmentUrl) {
-        bodyHtml = `<div class="bubble"><img src="${msg.attachmentUrl}" alt="image" style="max-width:220px; border-radius:10px;"/></div>`;
+    const time = m.createdAt ? new Date(m.createdAt).toLocaleString() : "";
+    const meta = `<div class="meta">${escapeHtml(m.senderName || "")} · ${escapeHtml(time)}</div>`;
+
+    let body = "";
+    if ((m.type || "").toUpperCase() === "IMAGE" && m.attachmentUrl){
+        body = `<img src="${m.attachmentUrl}" alt="image"/>`;
     } else {
-        bodyHtml = `<div class="bubble">${escapeHtml(msg.content || "")}</div>`;
+        body = `<div>${escapeHtml(m.content || "")}</div>`;
     }
 
-    wrap.innerHTML = `
-        <div class="meta">${escapeHtml(msg.senderName || "")} · ${escapeHtml(time)}</div>
-        ${bodyHtml}
-    `;
-    el("messages").appendChild(wrap);
-    el("messages").scrollTop = el("messages").scrollHeight;
+    wrap.innerHTML = meta + body;
+    $("chatBox").appendChild(wrap);
+    $("chatBox").scrollTop = $("chatBox").scrollHeight;
 }
 
-async function connectWs() {
+async function connectWs(){
     if (stompClient && stompClient.connected) return;
 
-    const socket = new SockJS('/ws');
+    const socket = new SockJS("/ws");
     stompClient = Stomp.over(socket);
-    stompClient.debug = null; // silence logs
+    stompClient.debug = null;
 
     return new Promise((resolve, reject) => {
-        stompClient.connect({}, () => resolve(), (err) => reject(err));
+        stompClient.connect({}, () => resolve(), (e) => reject(e));
     });
 }
 
-async function selectRoom(roomId) {
-    currentRoomId = roomId;
-    el("roomTitle").textContent = `Room #${roomId}`;
-    el("messages").innerHTML = "";
-
-    // load history (API returns newest-first)
-    const page = await apiFetch(`/api/chat/rooms/${roomId}/messages?page=0&size=50`);
-    const items = [...(page.items || [])].reverse();
-    for (const m of items) renderMessage(m);
-
-    // connect websocket + subscribe
+async function subscribeRoom(roomId){
     await connectWs();
-    if (currentSubscription) {
-        currentSubscription.unsubscribe();
-        currentSubscription = null;
+
+    if (currentSub){
+        currentSub.unsubscribe();
+        currentSub = null;
     }
-    currentSubscription = stompClient.subscribe(`/topic/rooms/${roomId}`, (frame) => {
-        try {
+
+    currentSub = stompClient.subscribe(`/topic/rooms/${roomId}`, (frame) => {
+        try{
             const msg = JSON.parse(frame.body);
-            // avoid duplicate render if already in history: optional
             renderMessage(msg);
-        } catch (e) {
+        }catch(e){
             console.error(e);
         }
     });
 }
 
-async function loadRooms() {
-    const rooms = await apiFetch("/api/chat/rooms");
-    el("rooms").innerHTML = "";
+async function openRoom(roomId){
+    currentRoomId = roomId;
+    $("roomTitle").textContent = `Room #${roomId}`;
+    setRoomInUrl(roomId);
 
-    if (!rooms || rooms.length === 0) {
-        el("rooms").innerHTML = `<div class="muted">No chats yet. Accept a match request first.</div>`;
+    $("chatBox").innerHTML = "";
+
+    // Load history (API returns newest first, so reverse to show oldest→newest)
+    const page = await apiFetch(`/api/chat/rooms/${roomId}/messages?page=0&size=50`);
+    const items = Array.isArray(page.items) ? [...page.items].reverse() : [];
+    items.forEach(renderMessage);
+
+    await subscribeRoom(roomId);
+    setToast("✅ Connected. Start chatting!", "success");
+}
+
+function roomCardHtml(r){
+    const name = r.otherName || "Chat";
+    const last = r.lastMessage || "";
+    const at = r.lastAt ? new Date(r.lastAt).toLocaleString() : "";
+    const pic = r.otherPic ? `<img class="avatar" src="${r.otherPic}" alt="pic"/>` : `<div class="avatar"></div>`;
+
+    return `
+    <div class="row">
+      ${pic}
+      <div style="flex:1">
+        <div><b>${escapeHtml(name)}</b></div>
+        <div class="help">${escapeHtml(last)} ${at ? "· " + escapeHtml(at) : ""}</div>
+      </div>
+      <span class="badge">Open</span>
+    </div>
+  `;
+}
+
+async function loadRooms(){
+    const rooms = await apiFetch("/api/chat/rooms");
+    const box = $("roomsList");
+    box.innerHTML = "";
+
+    if (!rooms || rooms.length === 0){
+        box.innerHTML = `<div class="toast info">No chats yet. Go to Requests → Accept a request first.</div>`;
         return;
     }
 
-    for (const r of rooms) {
+    rooms.forEach(r => {
         const div = document.createElement("div");
-        div.className = "card";
+        div.className = "list-item";
         div.style.cursor = "pointer";
-        div.innerHTML = `
-            <strong>${escapeHtml(r.otherName || "Chat")}</strong>
-            <div class="muted">${escapeHtml(r.lastMessage || "")}</div>
-        `;
-        div.addEventListener("click", () => selectRoom(r.roomId));
-        el("rooms").appendChild(div);
-    }
+        div.innerHTML = roomCardHtml(r);
 
-    // auto-open if query param present
+        div.addEventListener("click", () => openRoom(r.roomId));
+        box.appendChild(div);
+    });
+
+    // Auto-open: room param if present, else open first room
     const qRoom = qp("room");
-    const first = qRoom ? rooms.find(x => String(x.roomId) === String(qRoom)) : rooms[0];
-    if (first) selectRoom(first.roomId);
+    const chosen = qRoom ? rooms.find(x => String(x.roomId) === String(qRoom)) : rooms[0];
+    if (chosen) await openRoom(chosen.roomId);
 }
 
-async function sendText() {
-    const text = el("text").value;
-    if (!currentRoomId) { setMsg("Pick a room first"); return; }
+async function sendText(){
+    const text = $("messageInput").value || "";
+    if (!currentRoomId){
+        setToast("Pick a chat room first.", "error");
+        return;
+    }
     if (!text.trim()) return;
 
     await connectWs();
-    stompClient.send(`/app/chat.send/${currentRoomId}`, {}, JSON.stringify({ content: text }));
-    el("text").value = "";
+    stompClient.send(`/app/chat.send/${currentRoomId}`, {}, JSON.stringify({ content: text.trim() }));
+    $("messageInput").value = "";
 }
 
-async function sendImage(file) {
-    if (!currentRoomId) { setMsg("Pick a room first"); return; }
-    if (!file) return;
+function getCookie(name){
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+    return null;
+}
+
+async function sendImage(){
+    if (!currentRoomId){
+        setToast("Pick a chat room first.", "error");
+        return;
+    }
+    const file = $("imageInput").files && $("imageInput").files[0];
+    if (!file){
+        setToast("Choose an image first.", "error");
+        return;
+    }
 
     const token = getCookie("XSRF-TOKEN");
     const form = new FormData();
@@ -140,13 +185,15 @@ async function sendImage(file) {
         body: form
     });
 
-    if (!res.ok) {
+    if (!res.ok){
         let err = "Upload failed";
-        try { const j = await res.json(); err = j.message || err; } catch (_) {}
+        try{ const j = await res.json(); err = j.message || err; }catch(_){}
         throw new Error(err);
     }
 
-    // Message will also arrive via WS broadcast, so no need to manually render.
+    // Message will appear via WebSocket broadcast
+    $("imageInput").value = "";
+    setToast("✅ Image sent!", "success");
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -155,46 +202,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await loadRooms();
 
-    el("sendBtn").addEventListener("click", () => {
-        sendText().catch(e => setMsg(e?.message || "Send failed"));
+    $("sendBtn").addEventListener("click", () => {
+        sendText().catch(e => setToast(e.message || "Send failed", "error"));
     });
-    el("text").addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
+
+    $("messageInput").addEventListener("keydown", (e) => {
+        if (e.key === "Enter"){
             e.preventDefault();
-            sendText().catch(e2 => setMsg(e2?.message || "Send failed"));
+            sendText().catch(e2 => setToast(e2.message || "Send failed", "error"));
         }
     });
 
-    el("file").addEventListener("change", async () => {
-        const file = el("file").files && el("file").files[0];
-        if (!file) return;
-
-        // preview
-        const url = URL.createObjectURL(file);
-        el("preview").innerHTML = `
-            <div class="muted">Preview:</div>
-            <img src="${url}" alt="preview" style="max-width:220px; border-radius:10px;"/>
-            <div style="margin-top:8px;">
-                <button class="btn" id="sendImgBtn">Send Image</button>
-                <button class="btn secondary" id="cancelImgBtn">Cancel</button>
-            </div>
-        `;
-
-        el("sendImgBtn").addEventListener("click", async () => {
-            try {
-                el("sendImgBtn").disabled = true;
-                await sendImage(file);
-                el("preview").innerHTML = "";
-                el("file").value = "";
-            } catch (e) {
-                setMsg(e?.message || "Image upload failed");
-            } finally {
-                el("sendImgBtn").disabled = false;
-            }
-        });
-        el("cancelImgBtn").addEventListener("click", () => {
-            el("preview").innerHTML = "";
-            el("file").value = "";
-        });
+    $("sendImageBtn").addEventListener("click", () => {
+        sendImage().catch(e => setToast(e.message || "Image failed", "error"));
     });
 });
