@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>UniMateLK - User</title>
     <link rel="stylesheet" href="/css/style.css"/>
 </head>
@@ -11,75 +11,20 @@
 <header class="topbar">
     <h1 class="brand"><span class="brand-badge"></span>UniMateLK</h1>
     <div class="top-actions">
-        <a class="btn ghost" href="/matches.html">← Back to Matches</a>
-        <nav class="navlinks">
-            <a href="/requests.html">Requests</a>
-            <a href="/chat.html">Chat</a>
-        </nav>
+        <a class="btn secondary" href="/matches.html">Matches</a>
+        <a class="btn secondary" href="/requests.html">Requests</a>
+        <a class="btn secondary" href="/chat.html">Chat</a>
     </div>
 </header>
 
 <main class="container">
-    <div class="toolbar">
-        <div class="left">
-            <h2 class="m0">User Profile</h2>
-            <span id="scoreBadge" class="badge">Compatibility</span>
-        </div>
-    </div>
+    <h2 id="title">Profile</h2>
+    <p id="msg" class="muted"></p>
 
-    <p id="msg" class="toast info">You can request a match from this page.</p>
-
-    <div class="grid two">
-        <section class="card">
-            <img id="coverImg" class="cover" style="display:none" alt="Cover photo"/>
-            <div class="mt12 row">
-                <img id="profileImg" class="avatar" style="display:none" alt="Profile photo"/>
-                <div>
-                    <h3 id="nameText" class="m0">User</h3>
-                    <p id="metaText" class="m0" style="color:var(--muted)">Details</p>
-                </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <div id="detailsBox"></div>
-
-            <div class="divider"></div>
-
-            <div class="row">
-                <button id="requestBtn" class="btn" type="button">Request Match</button>
-                <button id="blockBtn" class="btn danger" type="button">Block</button>
-                <button id="reportBtn" class="btn secondary" type="button">Report</button>
-            </div>
-
-            <p class="help mt12">
-                Safety: use report for harassment, spam or fake profiles.
-            </p>
-        </section>
-
-        <aside class="card">
-            <p class="section-title">Compatibility explanation</p>
-            <div id="explainBox" class="toast info">Loading...</div>
-
-            <div class="divider"></div>
-
-            <p class="section-title">What happens next?</p>
-            <div class="list">
-                <div class="list-item">
-                    <b>1) Send Request</b>
-                    <div class="help">The other person can accept or reject.</div>
-                </div>
-                <div class="list-item">
-                    <b>2) Accept</b>
-                    <div class="help">Chat will unlock for both users.</div>
-                </div>
-                <div class="list-item">
-                    <b>3) Meet safely</b>
-                    <div class="help">Share limited info until you trust the person.</div>
-                </div>
-            </div>
-        </aside>
-    </div>
+    <div id="profileCard" class="card"></div>
+    <div id="matchCard" class="card" style="margin-top:12px;"></div>
+    <div id="actions" class="card" style="margin-top:12px;"></div>
+    <div id="safety" class="card" style="margin-top:12px;"></div>
 </main>
 
 <script type="module" src="/js/user.js"></script>
