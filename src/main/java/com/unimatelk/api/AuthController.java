@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -21,36 +22,46 @@ public class AuthController {
 
     @GetMapping("/api/me")
     public Map<String, Object> me(@AuthenticationPrincipal OAuth2User user) {
-        // Not logged in
-        if (user == null) {
-            return Map.of("authenticated", false);
-        }
+        if (user == null) return Map.of("authenticated", false);
 
         String email = user.getAttribute("email");
         String name = user.getAttribute("name");
         String picture = user.getAttribute("picture");
 
         AppUser dbUser = null;
+
         if (email != null && !email.isBlank()) {
-            dbUser = userRepo.findByEmail(email).orElse(null);
+            dbUser = userRepo.findByEmail(email).orElseGet(() -> {
+                // ✅ FIX: auto-create if missing
+                AppUser u = new AppUser();
+                u.setEmail(email);
+                u.setName(name != null ? name : "");
+                u.setPictureUrl(picture);
+                u.setRole("STUDENT");
+                u.setStatus("ACTIVE");
+                u.setCreatedAt(Instant.now());
+                u.setLastActiveAt(Instant.now());
+                return userRepo.save(u);
+            });
+
+            dbUser.setLastActiveAt(Instant.now());
+            userRepo.save(dbUser);
         }
 
-        // Use a normal Map (allows null values). Map.of() DOES NOT allow nulls.
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("authenticated", true);
 
         Long id = (dbUser != null ? dbUser.getId() : null);
         out.put("id", id);
-
-        // For your chat.js (it expects userId)
         out.put("userId", id);
 
-        out.put("name", name != null ? name : "");
+        // Prefer DB values (more reliable)
+        out.put("name", dbUser != null ? dbUser.getName() : (name != null ? name : ""));
         out.put("email", email != null ? email : "");
-        out.put("picture", picture); // can be null, OK in LinkedHashMap
+        out.put("picture", dbUser != null ? dbUser.getPictureUrl() : picture);
 
-        out.put("role", (dbUser != null && dbUser.getRole() != null) ? dbUser.getRole() : "STUDENT");
-        out.put("status", (dbUser != null && dbUser.getStatus() != null) ? dbUser.getStatus() : "ACTIVE");
+        out.put("role", dbUser != null && dbUser.getRole() != null ? dbUser.getRole() : "STUDENT");
+        out.put("status", dbUser != null && dbUser.getStatus() != null ? dbUser.getStatus() : "ACTIVE");
 
         return out;
     }
