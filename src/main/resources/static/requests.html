@@ -1,27 +1,51 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <title>UniMateLK - Match Requests</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>UniMateLK - Requests</title>
     <link rel="stylesheet" href="/css/style.css"/>
 </head>
 <body>
-<div class="container">
-    <h1>Match Requests</h1>
-    <a href="/index.html">← Back</a>
 
-    <p id="msg"></p>
+<header class="topbar">
+    <h1 class="brand"><span class="brand-badge"></span>UniMateLK</h1>
+    <div class="top-actions">
+        <a class="btn ghost" href="/index.html">← Home</a>
+        <nav class="navlinks">
+            <a href="/profile.html">Profile</a>
+            <a href="/preferences.html">Preferences</a>
+            <a href="/matches.html">Matches</a>
+            <a href="/chat.html">Chat</a>
+        </nav>
+    </div>
+</header>
 
-    <div class="card">
-        <h3>Incoming</h3>
-        <div id="incoming"></div>
+<main class="container">
+    <div class="toolbar">
+        <div class="left">
+            <h2 class="m0">Match Requests</h2>
+            <span class="badge">Accept to unlock chat</span>
+        </div>
+        <div class="right">
+            <button id="refreshBtn" class="btn secondary" type="button">Refresh</button>
+        </div>
     </div>
 
-    <div class="card" style="margin-top:12px;">
-        <h3>Outgoing</h3>
-        <div id="outgoing"></div>
+    <p id="msg" class="toast info">Incoming requests appear below. Accept or reject.</p>
+
+    <div class="grid two">
+        <section class="card">
+            <p class="section-title">Incoming</p>
+            <div id="incomingList" class="list"></div>
+        </section>
+
+        <section class="card">
+            <p class="section-title">Outgoing</p>
+            <div id="outgoingList" class="list"></div>
+        </section>
     </div>
-</div>
+</main>
 
 <script type="module" src="/js/requests.js"></script>
 </body>

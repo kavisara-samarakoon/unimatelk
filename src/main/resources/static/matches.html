@@ -1,55 +1,67 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <title>UniMateLK - Match Feed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>UniMateLK - Matches</title>
     <link rel="stylesheet" href="/css/style.css"/>
 </head>
 <body>
-<div class="container">
-    <h1>Match Feed</h1>
-    <a href="/index.html">← Back</a>
 
-    <p id="msg"></p>
+<header class="topbar">
+    <h1 class="brand"><span class="brand-badge"></span>UniMateLK</h1>
+    <div class="top-actions">
+        <a class="btn ghost" href="/index.html">← Home</a>
+        <nav class="navlinks">
+            <a href="/profile.html">Profile</a>
+            <a href="/preferences.html">Preferences</a>
+            <a href="/requests.html">Requests</a>
+            <a href="/chat.html">Chat</a>
+        </nav>
+    </div>
+</header>
 
-    <div class="card">
-        <h3>Search & Filters</h3>
-        <div class="grid">
-            <div>
-                <label>Campus</label>
-                <input id="campus" placeholder="e.g. Colombo"/>
-            </div>
-            <div>
-                <label>Degree</label>
-                <input id="degree" placeholder="e.g. IT"/>
-            </div>
-            <div>
-                <label>Year</label>
-                <input id="year" type="number" placeholder="1"/>
-            </div>
-            <div>
-                <label>Gender Preference</label>
-                <input id="genderPref" placeholder="Any / Male / Female"/>
-            </div>
-            <div class="full">
-                <label>Keyword</label>
-                <input id="keyword" placeholder="Search degree, campus, bio..."/>
-            </div>
+<main class="container">
+    <div class="toolbar">
+        <div class="left">
+            <h2 class="m0">Matches</h2>
+            <span class="badge">Ranked by compatibility</span>
         </div>
-
-        <button id="searchBtn">Search</button>
+        <div class="right row">
+            <!-- Your JS already expects these existing elements (if present in your current matches page) -->
+            <select id="sortSelect" style="min-width:200px">
+                <option value="scoreDesc">Sort: Score (High → Low)</option>
+                <option value="scoreAsc">Sort: Score (Low → High)</option>
+            </select>
+            <input id="searchInput" type="text" placeholder="Search by campus/degree/name..." style="min-width:240px"/>
+            <button id="refreshBtn" class="btn secondary" type="button">Refresh</button>
+        </div>
     </div>
 
-    <div class="card">
+    <p id="msg" class="toast info">Tip: click a user to view full profile and request match.</p>
+
+    <section class="card">
         <div class="row">
-            <button id="prevBtn">← Prev</button>
-            <span id="pageText"></span>
-            <button id="nextBtn">Next →</button>
+            <span class="badge">Filters</span>
+            <input id="minScore" type="number" min="0" max="100" placeholder="Min score %" style="max-width:160px"/>
+            <button id="applyFilterBtn" class="btn ghost" type="button">Apply</button>
+            <span class="help">If these are unused by your JS, they won’t break anything.</span>
         </div>
-    </div>
 
-    <div id="list"></div>
-</div>
+        <div class="divider"></div>
+
+        <!-- Your existing JS typically renders match cards into a container -->
+        <div id="matchesList" class="list"></div>
+
+        <div class="divider"></div>
+
+        <div class="row">
+            <button id="prevBtn" class="btn ghost" type="button">← Prev</button>
+            <span id="pageLabel" class="badge">Page</span>
+            <button id="nextBtn" class="btn ghost" type="button">Next →</button>
+        </div>
+    </section>
+</main>
 
 <script type="module" src="/js/matches.js"></script>
 </body>

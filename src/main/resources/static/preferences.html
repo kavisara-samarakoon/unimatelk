@@ -1,33 +1,95 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>UniMateLK - Preferences</title>
     <link rel="stylesheet" href="/css/style.css"/>
 </head>
 <body>
-<div class="container">
-    <h1>My Preferences</h1>
-    <a href="/index.html">← Back</a>
-    <p id="msg"></p>
 
-    <div class="card">
-        <label>Sleep Schedule (1-5)</label><input id="sleep" type="number" min="1" max="5"/>
-        <label>Cleanliness (1-5)</label><input id="clean" type="number" min="1" max="5"/>
-        <label>Noise Tolerance (1-5)</label><input id="noise" type="number" min="1" max="5"/>
-        <label>Guests OK (1-5)</label><input id="guests" type="number" min="1" max="5"/>
-
-        <label>Smoking OK</label>
-        <select id="smoking"><option value="true">Yes</option><option value="false">No</option></select>
-
-        <label>Drinking OK</label>
-        <select id="drinking"><option value="true">Yes</option><option value="false">No</option></select>
-
-        <label>Introvert/Extrovert (1-5)</label><input id="intro" type="number" min="1" max="5"/>
-
-        <button id="saveBtn">Save Preferences</button>
+<header class="topbar">
+    <h1 class="brand"><span class="brand-badge"></span>UniMateLK</h1>
+    <div class="top-actions">
+        <a class="btn ghost" href="/index.html">← Home</a>
+        <nav class="navlinks">
+            <a href="/profile.html">Profile</a>
+            <a href="/matches.html">Matches</a>
+            <a href="/requests.html">Requests</a>
+            <a href="/chat.html">Chat</a>
+        </nav>
     </div>
-</div>
+</header>
+
+<main class="container">
+    <div class="toolbar">
+        <div class="left">
+            <h2 class="m0">My Preferences</h2>
+            <span class="badge">Use 1–5 scales where applicable</span>
+        </div>
+    </div>
+
+    <p id="msg" class="toast info">Fill preferences to improve your match scores.</p>
+
+    <section class="card">
+        <p class="section-title">Lifestyle</p>
+
+        <div class="form-row three">
+            <div>
+                <label for="noiseTolerance">Noise Tolerance (1–5)</label>
+                <input id="noiseTolerance" type="number" min="1" max="5" placeholder="1 (quiet) … 5 (noisy ok)" />
+            </div>
+            <div>
+                <label for="cleanliness">Cleanliness (1–5)</label>
+                <input id="cleanliness" type="number" min="1" max="5" placeholder="1 … 5" />
+            </div>
+            <div>
+                <label for="guestFrequency">Guest Frequency (1–5)</label>
+                <input id="guestFrequency" type="number" min="1" max="5" placeholder="1 … 5" />
+            </div>
+        </div>
+
+        <div class="form-row two">
+            <div>
+                <label for="sleepSchedule">Sleep Schedule</label>
+                <input id="sleepSchedule" placeholder="e.g., 11PM–7AM" />
+            </div>
+            <div>
+                <label for="studyHabits">Study Habits</label>
+                <input id="studyHabits" placeholder="e.g., prefers quiet evenings" />
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <p class="section-title">Roommate expectations</p>
+
+        <div class="form-row two">
+            <div>
+                <label for="smokingPreference">Smoking Preference</label>
+                <input id="smokingPreference" placeholder="e.g., No / OK outside" />
+            </div>
+            <div>
+                <label for="petPreference">Pet Preference</label>
+                <input id="petPreference" placeholder="e.g., No pets / OK with cats" />
+            </div>
+        </div>
+
+        <label for="notes">Additional Notes</label>
+        <textarea id="notes" rows="4" placeholder="Any deal breakers or preferences..."></textarea>
+
+        <div class="divider"></div>
+
+        <div class="row">
+            <button id="saveBtn" class="btn">Save Preferences</button>
+            <a class="btn ghost" href="/matches.html">View Matches</a>
+        </div>
+
+        <p class="help mt12">
+            If you enter values outside the allowed range, your backend validation will return an error.
+        </p>
+    </section>
+</main>
 
 <script type="module" src="/js/preferences.js"></script>
 </body>
