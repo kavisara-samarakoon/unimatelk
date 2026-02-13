@@ -28,41 +28,30 @@ public class AuthController {
         String name = user.getAttribute("name");
         String picture = user.getAttribute("picture");
 
-        AppUser dbUser = null;
+        AppUser dbUser = userRepo.findByEmail(email).orElseGet(() -> {
+            AppUser u = new AppUser();
+            u.setEmail(email);
+            u.setName(name != null ? name : "");
+            u.setPictureUrl(picture);
+            u.setRole("STUDENT");
+            u.setStatus("ACTIVE");
+            u.setCreatedAt(Instant.now());
+            u.setLastActiveAt(Instant.now());
+            return userRepo.save(u);
+        });
 
-        if (email != null && !email.isBlank()) {
-            dbUser = userRepo.findByEmail(email).orElseGet(() -> {
-                // ✅ FIX: auto-create if missing
-                AppUser u = new AppUser();
-                u.setEmail(email);
-                u.setName(name != null ? name : "");
-                u.setPictureUrl(picture);
-                u.setRole("STUDENT");
-                u.setStatus("ACTIVE");
-                u.setCreatedAt(Instant.now());
-                u.setLastActiveAt(Instant.now());
-                return userRepo.save(u);
-            });
-
-            dbUser.setLastActiveAt(Instant.now());
-            userRepo.save(dbUser);
-        }
+        dbUser.setLastActiveAt(Instant.now());
+        userRepo.save(dbUser);
 
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("authenticated", true);
-
-        Long id = (dbUser != null ? dbUser.getId() : null);
-        out.put("id", id);
-        out.put("userId", id);
-
-        // Prefer DB values (more reliable)
-        out.put("name", dbUser != null ? dbUser.getName() : (name != null ? name : ""));
-        out.put("email", email != null ? email : "");
-        out.put("picture", dbUser != null ? dbUser.getPictureUrl() : picture);
-
-        out.put("role", dbUser != null && dbUser.getRole() != null ? dbUser.getRole() : "STUDENT");
-        out.put("status", dbUser != null && dbUser.getStatus() != null ? dbUser.getStatus() : "ACTIVE");
-
+        out.put("id", dbUser.getId());
+        out.put("userId", dbUser.getId());
+        out.put("name", dbUser.getName());
+        out.put("email", dbUser.getEmail());
+        out.put("picture", dbUser.getPictureUrl());
+        out.put("role", dbUser.getRole());
+        out.put("status", dbUser.getStatus());
         return out;
     }
 }

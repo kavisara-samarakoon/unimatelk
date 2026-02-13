@@ -21,18 +21,17 @@ public class CurrentUserService {
         if (oauth == null) throw new IllegalArgumentException("Not authenticated");
 
         String email = oauth.getAttribute("email");
+        String name = oauth.getAttribute("name");
+        String picture = oauth.getAttribute("picture");
+
         if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("No email returned from Google account");
+            throw new IllegalArgumentException("Google did not return an email.");
         }
 
-        // ✅ FIX: auto-create user if missing
+        // ✅ create if missing
         AppUser user = userRepo.findByEmail(email).orElseGet(() -> {
             AppUser u = new AppUser();
             u.setEmail(email);
-
-            String name = oauth.getAttribute("name");
-            String picture = oauth.getAttribute("picture");
-
             u.setName(name != null ? name : "");
             u.setPictureUrl(picture);
             u.setRole("STUDENT");
@@ -42,15 +41,16 @@ public class CurrentUserService {
             return userRepo.save(u);
         });
 
-        // update last active each time
         user.setLastActiveAt(Instant.now());
+        if (name != null) user.setName(name);
+        if (picture != null) user.setPictureUrl(picture);
         userRepo.save(user);
 
         if ("BANNED".equalsIgnoreCase(user.getStatus())) {
             throw new AccessDeniedException("Your account is banned. Contact an admin.");
         }
         if ("TEMP_BLOCKED".equalsIgnoreCase(user.getStatus())) {
-            throw new AccessDeniedException("Your account is temporarily blocked due to reports. Contact an admin.");
+            throw new AccessDeniedException("Your account is temporarily blocked. Contact an admin.");
         }
 
         return user;
