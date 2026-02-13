@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>UniMateLK - Requests</title>
     <link rel="stylesheet" href="/css/style.css"/>
 </head>
@@ -11,39 +11,23 @@
 <header class="topbar">
     <h1 class="brand"><span class="brand-badge"></span>UniMateLK</h1>
     <div class="top-actions">
-        <a class="btn ghost" href="/index.html">← Home</a>
-        <nav class="navlinks">
-            <a href="/profile.html">Profile</a>
-            <a href="/preferences.html">Preferences</a>
-            <a href="/matches.html">Matches</a>
-            <a href="/chat.html">Chat</a>
-        </nav>
+        <a class="btn secondary" href="/matches.html">Matches</a>
+        <a class="btn secondary" href="/chat.html">Chat</a>
     </div>
 </header>
 
 <main class="container">
-    <div class="toolbar">
-        <div class="left">
-            <h2 class="m0">Match Requests</h2>
-            <span class="badge">Accept to unlock chat</span>
-        </div>
-        <div class="right">
-            <button id="refreshBtn" class="btn secondary" type="button">Refresh</button>
-        </div>
+    <h2>Match Requests</h2>
+    <p id="msg" class="muted"></p>
+
+    <div class="card">
+        <h3>Incoming Requests</h3>
+        <div id="incoming"></div>
     </div>
 
-    <p id="msg" class="toast info">Incoming requests appear below. Accept or reject.</p>
-
-    <div class="grid two">
-        <section class="card">
-            <p class="section-title">Incoming</p>
-            <div id="incomingList" class="list"></div>
-        </section>
-
-        <section class="card">
-            <p class="section-title">Outgoing</p>
-            <div id="outgoingList" class="list"></div>
-        </section>
+    <div class="card" style="margin-top:12px;">
+        <h3>Outgoing Requests</h3>
+        <div id="outgoing"></div>
     </div>
 </main>
 
