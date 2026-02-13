@@ -1,49 +1,138 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>UniMateLK - Profile</title>
     <link rel="stylesheet" href="/css/style.css"/>
 </head>
 <body>
-<div class="container">
-    <h1>My Profile</h1>
-    <a href="/index.html">← Back</a>
 
-    <p id="msg"></p>
+<header class="topbar">
+    <h1 class="brand"><span class="brand-badge"></span>UniMateLK</h1>
+    <div class="top-actions">
+        <a class="btn ghost" href="/index.html">← Home</a>
+        <nav class="navlinks">
+            <a href="/preferences.html">Preferences</a>
+            <a href="/matches.html">Matches</a>
+            <a href="/requests.html">Requests</a>
+            <a href="/chat.html">Chat</a>
+        </nav>
+    </div>
+</header>
 
-    <div class="card">
-        <label>Campus</label><input id="campus"/>
-        <label>Degree</label><input id="degree"/>
-        <label>Year of Study</label><input id="yearOfStudy" type="number"/>
-
-        <label>Gender</label><input id="gender"/>
-        <label>Gender Preference</label><input id="genderPref"/>
-
-        <label>Move-in Month</label><input id="moveInMonth"/>
-        <label>Bio</label><textarea id="bio" rows="4"></textarea>
-
-        <label>Phone</label><input id="phone"/>
-        <label>Facebook URL</label><input id="facebookUrl"/>
-        <label>Instagram URL</label><input id="instagramUrl"/>
-
-        <button id="saveBtn">Save Profile</button>
+<main class="container">
+    <div class="toolbar">
+        <div class="left">
+            <h2 class="m0">My Profile</h2>
+            <span class="badge">Fill accurate details for better matches</span>
+        </div>
     </div>
 
-    <div class="card">
-        <h3>Profile Photo</h3>
-        <img id="profileImg" style="max-width:200px; display:none"/>
-        <input id="profileFile" type="file" accept="image/*"/>
-        <button id="uploadProfileBtn">Upload</button>
-    </div>
+    <p id="msg" class="toast info">Tip: Upload a profile photo for higher trust.</p>
 
-    <div class="card">
-        <h3>Cover Photo</h3>
-        <img id="coverImg" style="max-width:300px; display:none"/>
-        <input id="coverFile" type="file" accept="image/*"/>
-        <button id="uploadCoverBtn">Upload</button>
+    <div class="grid two">
+        <section class="card">
+            <p class="section-title">Basic details</p>
+
+            <div class="form-row two">
+                <div>
+                    <label for="campus">Campus</label>
+                    <input id="campus" placeholder="e.g., Colombo / Kandy" />
+                </div>
+                <div>
+                    <label for="degree">Degree</label>
+                    <input id="degree" placeholder="e.g., Software Engineering" />
+                </div>
+            </div>
+
+            <div class="form-row three">
+                <div>
+                    <label for="yearOfStudy">Year of Study</label>
+                    <input id="yearOfStudy" type="number" min="1" max="10" placeholder="e.g., 2" />
+                </div>
+                <div>
+                    <label for="gender">Gender</label>
+                    <input id="gender" placeholder="e.g., Male / Female" />
+                </div>
+                <div>
+                    <label for="genderPref">Gender Preference</label>
+                    <input id="genderPref" placeholder="e.g., Any / Female" />
+                </div>
+            </div>
+
+            <label for="moveInMonth">Move-in Month</label>
+            <input id="moveInMonth" placeholder="e.g., February 2026" />
+            <p class="help">Use the same format for consistency (month + year).</p>
+
+            <label for="bio">Bio</label>
+            <textarea id="bio" rows="5" placeholder="Short intro: study habits, sleep schedule, cleanliness, hobbies..."></textarea>
+
+            <div class="divider"></div>
+
+            <p class="section-title">Contact (optional)</p>
+            <div class="form-row two">
+                <div>
+                    <label for="phone">Phone</label>
+                    <input id="phone" placeholder="e.g., +94..." />
+                </div>
+                <div>
+                    <label for="facebookUrl">Facebook URL</label>
+                    <input id="facebookUrl" placeholder="https://facebook.com/..." />
+                </div>
+            </div>
+
+            <label for="instagramUrl">Instagram URL</label>
+            <input id="instagramUrl" placeholder="https://instagram.com/..." />
+
+            <div class="divider"></div>
+
+            <div class="row">
+                <button id="saveBtn" class="btn">Save Profile</button>
+                <a class="btn ghost" href="/matches.html">Go to Matches</a>
+            </div>
+
+            <p class="help mt12">
+                If saving fails, check you are logged in and your backend is running.
+            </p>
+        </section>
+
+        <aside class="card">
+            <p class="section-title">Photos</p>
+
+            <div class="list">
+                <div class="list-item">
+                    <h3 class="m0">Profile Photo</h3>
+                    <p class="help">Displayed in match cards and user pages.</p>
+                    <img id="profileImg" class="avatar" style="width:96px;height:96px;display:none" alt="Profile photo preview"/>
+                    <div class="mt12">
+                        <input id="profileFile" type="file" accept="image/*"/>
+                    </div>
+                    <div class="mt12">
+                        <button id="uploadProfileBtn" class="btn">Upload Profile Photo</button>
+                    </div>
+                </div>
+
+                <div class="list-item">
+                    <h3 class="m0">Cover Photo</h3>
+                    <p class="help">Optional: makes your profile look nicer.</p>
+                    <img id="coverImg" class="cover" style="display:none" alt="Cover photo preview"/>
+                    <div class="mt12">
+                        <input id="coverFile" type="file" accept="image/*"/>
+                    </div>
+                    <div class="mt12">
+                        <button id="uploadCoverBtn" class="btn secondary">Upload Cover Photo</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+            <p class="help">
+                Safety: Don’t upload sensitive documents (IDs, cards).
+            </p>
+        </aside>
     </div>
-</div>
+</main>
 
 <script type="module" src="/js/profile.js"></script>
 </body>

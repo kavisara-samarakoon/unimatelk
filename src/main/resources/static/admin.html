@@ -1,23 +1,63 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>UniMateLK - Admin</title>
     <link rel="stylesheet" href="/css/style.css"/>
 </head>
 <body>
-<div class="container">
-    <h1>Admin Panel</h1>
-    <a href="/index.html">← Back</a>
 
-    <p id="msg"></p>
-
-    <div class="card">
-        <h3>Moderation Cases</h3>
-        <button class="btn" id="reloadBtn">Reload</button>
-        <div id="cases" style="margin-top:12px;"></div>
+<header class="topbar">
+    <h1 class="brand"><span class="brand-badge"></span>UniMateLK</h1>
+    <div class="top-actions">
+        <a class="btn ghost" href="/index.html">← Home</a>
+        <nav class="navlinks">
+            <a href="/matches.html">Matches</a>
+            <a href="/requests.html">Requests</a>
+            <a href="/chat.html">Chat</a>
+        </nav>
     </div>
-</div>
+</header>
+
+<main class="container">
+    <div class="toolbar">
+        <div class="left">
+            <h2 class="m0">Admin Moderation</h2>
+            <span class="badge">Reports • Blocks • Bans</span>
+        </div>
+        <div class="right">
+            <button id="refreshBtn" class="btn secondary" type="button">Refresh</button>
+        </div>
+    </div>
+
+    <p id="msg" class="toast info">Resolve reports by warning, unblocking, or banning users.</p>
+
+    <div class="grid two">
+        <section class="card">
+            <p class="section-title">Open reports</p>
+            <div id="reportsList" class="list"></div>
+        </section>
+
+        <section class="card">
+            <p class="section-title">Actions / details</p>
+            <div id="detailBox" class="toast info">Select a report to view actions.</div>
+
+            <div class="divider"></div>
+
+            <div class="list">
+                <div class="list-item">
+                    <b>Recommended admin demo</b>
+                    <div class="help">Create a report from a user page, then resolve here.</div>
+                </div>
+                <div class="list-item">
+                    <b>Safety policy</b>
+                    <div class="help">Repeated reports can auto-temporary-block a user in your backend.</div>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
 
 <script type="module" src="/js/admin.js"></script>
 </body>
