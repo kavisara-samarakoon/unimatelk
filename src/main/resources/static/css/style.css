@@ -22,7 +22,3 @@ small.err { color:#c00; display:block; margin-top:6px; }
 .grid .full { grid-column: 1 / -1; }
 .row { display:flex; align-items:center; justify-content:space-between; gap: 12px; }
 
-.match-card { display:flex; gap: 12px; align-items:flex-start; }
-.match-card img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
-.badge { display:inline-block; padding: 4px 8px; border-radius: 999px; background:#eef2ff; }
-.muted { color: #555; }
