@@ -9,32 +9,107 @@
 <body>
 
 <header class="topbar">
-    <h1 class="brand">UniMateLK</h1>
+    <h1 class="brand"><span class="brand-badge"></span>UniMateLK</h1>
 
     <div class="top-actions">
-        <span id="userLabel"></span>
+        <span id="userLabel" class="pill">Not logged in</span>
 
         <a id="loginBtn" class="btn" href="/oauth2/authorization/google">Login with Google</a>
-
-        <!-- ✅ MUST be button (NOT <a href="/logout">) -->
         <button id="logoutBtn" class="btn secondary" style="display:none;">Logout</button>
 
-        <a href="/profile.html">Profile</a>
-        <a href="/preferences.html">Go to Preferences</a>
-        <a href="/matches.html">Matches</a>
-        <a href="/requests.html">Requests</a>
-        <a href="/chat.html">Chat</a>
-        <a id="adminLink" href="/admin.html" style="display:none;">Admin</a>
+        <nav class="navlinks" aria-label="Main navigation">
+            <a href="/profile.html">Profile</a>
+            <a href="/preferences.html">Preferences</a>
+            <a href="/matches.html">Matches</a>
+            <a href="/requests.html">Requests</a>
+            <a href="/chat.html">Chat</a>
+            <a id="adminLink" href="/admin.html" style="display:none;">Admin</a>
+        </nav>
     </div>
 </header>
 
 <main class="container">
-    <section class="card">
-        <h2>Status</h2>
-        <p id="statusText">Loading...</p>
-        <img id="userPic" alt="profile"
-             style="display:none; width:64px; height:64px; border-radius:50%; margin-top:12px;">
-    </section>
+    <div class="grid two">
+        <section class="card">
+            <div class="profile-head">
+                <div class="row">
+                    <img id="userPic" class="avatar" alt="profile" style="display:none;">
+                    <div>
+                        <h2 class="m0">Welcome</h2>
+                        <p class="m0" style="color:var(--muted)">Find compatible roommates & connect safely.</p>
+                    </div>
+                </div>
+                <span class="badge">Secure Login • Matching • Chat • Moderation</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <h3 class="m0">Status</h3>
+            <p id="statusText" class="toast info mt8">Loading...</p>
+
+            <div class="divider"></div>
+
+            <div class="row">
+                <a class="btn" href="/profile.html">Complete Profile</a>
+                <a class="btn ghost" href="/preferences.html">Set Preferences</a>
+                <a class="btn ghost" href="/matches.html">View Matches</a>
+            </div>
+
+            <p class="help mt12">
+                Tip: Finish <b>Profile</b> + <b>Preferences</b> first, then check your match feed.
+            </p>
+        </section>
+
+        <aside class="card">
+            <p class="section-title">Quick checklist</p>
+            <div class="list">
+                <div class="list-item">
+                    <div class="row">
+                        <span class="badge success">1</span>
+                        <div>
+                            <div><b>Login</b></div>
+                            <div class="help">Google OAuth2</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="list-item">
+                    <div class="row">
+                        <span class="badge warn">2</span>
+                        <div>
+                            <div><b>Profile</b></div>
+                            <div class="help">Campus, degree, year, bio + photo</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="list-item">
+                    <div class="row">
+                        <span class="badge warn">3</span>
+                        <div>
+                            <div><b>Preferences</b></div>
+                            <div class="help">Noise, guests, cleanliness, etc.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="list-item">
+                    <div class="row">
+                        <span class="badge">4</span>
+                        <div>
+                            <div><b>Matches & Requests</b></div>
+                            <div class="help">Send/accept to unlock chat</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+            <p class="help">
+                Keyboard tip: in chat, press <span class="kbd">Enter</span> to send (if your JS supports it).
+            </p>
+        </aside>
+    </div>
 </main>
 
 <script type="module" src="/js/index.js"></script>
