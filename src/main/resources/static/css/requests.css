@@ -131,4 +131,17 @@
 .btn-reject{ background: linear-gradient(90deg, rgba(255,80,160,0.55), rgba(124,77,255,0.45)); }
 .btn-cancel{ background: rgba(255,255,255,0.10); }
 
+/* Empty state */
+.req-empty{
+    padding: 16px;
+    border-radius: 18px;
+    background: rgba(0,0,0,0.25);
+    border: 1px dashed rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.78);
+    text-align: center;
+}
 
+/* Responsive */
+@media (max-width: 980px){
+    .req-layout{ grid-template-columns: 1fr; }
+}
