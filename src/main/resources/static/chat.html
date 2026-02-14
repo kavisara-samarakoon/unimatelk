@@ -2,12 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>UniMateLK - Chat</title>
 
-    <!-- Global theme -->
     <link rel="stylesheet" href="/css/theme.css"/>
-    <!-- Chat styles -->
     <link rel="stylesheet" href="/css/chat.css"/>
 </head>
 <body>
@@ -22,79 +20,86 @@
 
 <main class="page">
 
-    <!-- ✅ Shared navbar mount (recommended so nav never disappears) -->
+    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
     <div id="navbarMount"></div>
 
     <section class="container">
-        <div class="glass-shell">
+        <div class="glass-shell chat-shell">
 
-            <!-- ✅ REQUIRED CHANGE: wrap 2 columns in .chat-layout -->
-            <div class="chat-layout">
+            <!-- ✅ REQUIRED by chat.js -->
+            <p id="msg" class="toast info">Select a room to start chatting.</p>
 
-                <!-- LEFT: Conversations -->
-                <section class="glass-card chat-sidebar">
-                    <div class="sidebar-head">
-                        <div>
-                            <div class="title">Chats</div>
-                            <div class="muted">Select a person to chat</div>
+            <div class="chat-grid">
+
+                <!-- LEFT: chat list -->
+                <aside class="glass-card chat-sidebar">
+                    <div class="chat-header" style="margin-bottom:2px;">
+                        <div class="title">
+                            <h3 style="margin:0;">Chats</h3>
+                            <p style="margin:0;">Select a person to open messages</p>
                         </div>
-                        <span class="badge" id="chatCount">0</span>
+                        <span class="badge">Rooms</span>
                     </div>
 
-                    <div class="sidebar-tools">
-                        <!-- Keep id=threadSearch if your JS uses it -->
-                        <input id="threadSearch" type="text" placeholder="Search chats..."/>
-                        <button id="newChatBtn" class="btn secondary" type="button">New</button>
+                    <!-- Optional search (pure UI; does not affect JS) -->
+                    <div class="search">
+                        <input type="text" placeholder="Search chats..."
+                               oninput="
+                const q=this.value.toLowerCase();
+                document.querySelectorAll('#roomsList > *').forEach(x=>{
+                  x.style.display = x.innerText.toLowerCase().includes(q) ? '' : 'none';
+                });
+              ">
                     </div>
 
-                    <!-- Keep id=threadList if your JS uses it -->
-                    <div id="threadList" class="thread-list">
-                        <!-- JS fills list -->
-                    </div>
-                </section>
+                    <!-- ✅ REQUIRED by chat.js -->
+                    <div class="chat-list" id="roomsList"></div>
+                </aside>
 
-                <!-- RIGHT: Messages -->
-                <section class="glass-card chat-panel">
-                    <div class="chat-head">
-                        <div>
-                            <div class="who" id="chatWith">No chat selected</div>
-                            <div class="sub" id="chatHint">Pick a user from the left panel</div>
+                <!-- RIGHT: messages + composer -->
+                <section class="glass-card chat-main">
+
+                    <!-- ✅ REQUIRED by chat.js -->
+                    <div class="chat-header">
+                        <div class="title">
+                            <h3 id="roomTitle">Select a room</h3>
+                            <p>Messages will appear here</p>
                         </div>
-                        <span class="badge" id="chatStatus">READY</span>
+                        <span class="badge">Live</span>
                     </div>
 
-                    <!-- Keep id=messages if your JS uses it -->
-                    <div id="messages" class="messages">
-                        <!-- JS fills messages -->
-                    </div>
+                    <!-- ✅ REQUIRED by chat.js -->
+                    <div class="chat-messages" id="chatBox"></div>
 
                     <!-- Composer -->
-                    <div class="composer">
-                        <!-- Keep id=messageInput if your JS uses it -->
-                        <input id="messageInput" type="text" placeholder="Type a message..." autocomplete="off"/>
-                        <!-- Keep id=sendBtn if your JS uses it -->
-                        <button id="sendBtn" class="btn" type="button">Send</button>
+                    <div class="chat-composer">
+                        <div class="row" style="width:100%; gap:10px;">
+                            <input id="messageInput" type="text" placeholder="Type a message..."/>
+                            <input id="imageInput" type="file" accept="image/*" style="max-width:190px;"/>
+                        </div>
+
+                        <div class="row" style="justify-content:flex-end; gap:10px;">
+                            <button id="sendImageBtn" type="button" class="btn secondary">Send Image</button>
+                            <button id="sendBtn" type="button" class="btn">Send</button>
+                        </div>
                     </div>
 
-                    <!-- Optional message area -->
-                    <p id="chatMsg" class="muted" style="margin:10px 0 0;"></p>
                 </section>
 
             </div>
-            <!-- end chat-layout -->
-
         </div>
     </section>
 
-    <!-- Navbar loader (only if you use navbar.js) -->
-    <script type="module">
-        import { mountNavbar } from "/js/navbar.js";
-        mountNavbar();
-    </script>
-
-    <!-- Your existing chat logic -->
-    <script type="module" src="/js/chat.js"></script>
-
 </main>
+
+<!-- ✅ Mount navbar explicitly (guaranteed) -->
+<script type="module">
+    import { mountNavbar } from "/js/navbar.js";
+    mountNavbar();
+</script>
+
+<!-- ✅ Your chat functionality -->
+<script type="module" src="/js/chat.js"></script>
+
 </body>
 </html>
