@@ -1,12 +1,21 @@
+/* =========================================================
+   auth.css (FINAL)
+   Glass login/signup with slide overlay + responsive fixes
+   (Includes the changes I told you to add)
+   ========================================================= */
+
+/* -------- Base -------- */
 * { box-sizing: border-box; }
-html, body { height: 100%; }
+html, body { height: 100%; max-width: 100%; overflow-x: hidden; }
+
 body {
     margin: 0;
     font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
     color: #111;
-    overflow: hidden;
+    overflow: hidden; /* desktop: no scroll */
 }
 
+/* -------- Background (animated blobs + grain) -------- */
 .bg {
     position: fixed;
     inset: 0;
@@ -45,6 +54,7 @@ body {
     opacity: 0.25;
 }
 
+/* -------- Layout -------- */
 .page {
     position: relative;
     z-index: 1;
@@ -54,19 +64,24 @@ body {
     padding: 18px;
 }
 
+/* ✅ RESPONSIVE FIX: shell must NOT be locked height */
 .glass-shell {
     width: min(980px, 96vw);
-    height: 560px;
+    height: auto;          /* ✅ IMPORTANT (was fixed) */
+    min-height: 560px;     /* keeps desktop look */
     position: relative;
     border-radius: 28px;
     overflow: hidden;
+
     background: rgba(255,255,255,0.12);
     border: 1px solid rgba(255,255,255,0.22);
     box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
 }
 
+/* Panels */
 .panel {
     position: absolute;
     top: 0;
@@ -82,20 +97,24 @@ body {
 .form-panel h1 { margin: 0 0 12px; font-size: 40px; color: rgba(255,255,255,0.95); }
 .muted { margin: 8px 0 14px; color: rgba(255,255,255,0.75); font-size: 14px; }
 
+/* Form fields */
 .form { display: grid; gap: 12px; }
-.field span { display:block; margin-bottom: 6px; color: rgba(255,255,255,0.85); font-size: 13px; }
+.field span { display:block; margin-bottom: 6px; color: rgba(255,255,255,0.88); font-size: 13px; }
+
 .field input {
     width: 100%;
     padding: 12px 14px;
     border-radius: 14px;
     border: 1px solid rgba(255,255,255,0.22);
     background: rgba(255,255,255,0.12);
-    color: rgba(255,255,255,0.95);
+    color: rgba(255,255,255,0.96);
     outline: none;
 }
-.field input::placeholder { color: rgba(255,255,255,0.55); }
+
+.field input::placeholder { color: rgba(255,255,255,0.60); }
 .field input:focus { border-color: rgba(255,255,255,0.55); }
 
+/* Buttons */
 .primary, .outline {
     width: 100%;
     padding: 12px 14px;
@@ -115,7 +134,7 @@ body {
 .link-btn {
     background: transparent;
     border: none;
-    color: rgba(255,255,255,0.85);
+    color: rgba(255,255,255,0.88);
     text-decoration: underline;
     cursor: pointer;
     padding: 0;
@@ -146,10 +165,11 @@ body {
 
 .hint {
     margin-top: 14px;
-    color: rgba(255,255,255,0.70);
+    color: rgba(255,255,255,0.72);
     font-size: 13px;
 }
 
+/* -------- Overlay (right half) -------- */
 .overlay {
     position: absolute;
     top: 0;
@@ -160,27 +180,27 @@ body {
     border-left: 1px solid rgba(255,255,255,0.18);
     display: grid;
     place-items: center;
-    overflow: hidden;
     transition: transform 0.65s cubic-bezier(.2,.9,.2,1);
 }
 
-#shell.right-active .overlay {
-    transform: translateX(-100%);
+.overlay-inner {
+    width: 200%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    transition: transform 0.65s cubic-bezier(.2,.9,.2,1);
 }
 
 .overlay-panel {
-    position: absolute;
-    inset: 0;
     display: grid;
     place-items: center;
     padding: 28px;
     text-align: center;
     color: rgba(255,255,255,0.95);
-    transition: opacity 0.35s ease;
 }
 
 .overlay-panel h2 { font-size: 40px; margin: 0 0 10px; }
-.overlay-panel p { margin: 0 0 18px; color: rgba(255,255,255,0.9); max-width: 320px; }
+.overlay-panel p  { margin: 0 0 18px; color: rgba(255,255,255,0.9); max-width: 320px; }
 
 .outline {
     width: auto;
@@ -190,18 +210,18 @@ body {
     color: rgba(255,255,255,0.95);
 }
 
-.overlay .hello { opacity: 1; pointer-events: auto; }
-.overlay .welcome { opacity: 0; pointer-events: none; }
-
-#shell.right-active .overlay .hello { opacity: 0; pointer-events: none; }
-#shell.right-active .overlay .welcome { opacity: 1; pointer-events: auto; }
-
+/* Positioning sign-in/sign-up panels */
 .sign-in { left: 0; }
 .sign-up { right: 0; opacity: 0; pointer-events: none; }
 
 #shell.right-active .sign-up { opacity: 1; pointer-events: auto; }
 #shell.right-active .sign-in { opacity: 0; pointer-events: none; }
 
+/* Slide effect */
+#shell.right-active .overlay { transform: translateX(-100%); }
+#shell.right-active .overlay-inner { transform: translateX(-50%); }
+
+/* Toast */
 .toast {
     position: fixed;
     bottom: 18px;
@@ -220,12 +240,44 @@ body {
 }
 .toast.show { opacity: 1; }
 
+/* =========================================================
+   ✅ RESPONSIVE FIXES (from the step)
+   - allow scrolling on small screens
+   - remove overlay on mobile
+   - stack panels
+   ========================================================= */
+
 @media (max-width: 860px){
-    .glass-shell { height: 700px; }
-    .panel { width: 100%; }
+    body { overflow-y: auto; }        /* ✅ allow scroll */
+    .page { height: auto; min-height: 100vh; }
+
+    .glass-shell {
+        min-height: auto;
+        padding: 14px;
+    }
+
+    /* Make panels stacked (not absolute side-by-side) */
+    .panel {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 18px;
+    }
+
+    /* Hide overlay on mobile to keep it clean */
     .overlay { display: none; }
-    .sign-up { display: none; }
-    .sign-in { display: grid; }
+
+    /* Show only one form at a time using the same JS class toggle */
+    .sign-up { display: none; opacity: 1; pointer-events: auto; }
+    .sign-in { display: block; }
+
     #shell.right-active .sign-in { display: none; }
-    #shell.right-active .sign-up { display: grid; opacity: 1; pointer-events: auto; left: 0; right: auto; }
+    #shell.right-active .sign-up { display: block; }
+}
+
+/* Smaller phones */
+@media (max-width: 420px){
+    .form-panel h1 { font-size: 30px; }
+    .overlay-panel h2 { font-size: 30px; }
+    .panel-inner { width: 100%; }
 }
