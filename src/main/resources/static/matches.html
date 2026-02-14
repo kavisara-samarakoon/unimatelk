@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>UniMateLK - Matches</title>
 
-    <!-- Glass theme -->
     <link rel="stylesheet" href="/css/theme.css"/>
-    <!-- Page-specific UI styles (we'll create next) -->
     <link rel="stylesheet" href="/css/matches.css"/>
 </head>
 <body>
@@ -22,30 +20,12 @@
 
 <main class="page">
 
-    <!-- Top bar -->
-    <header class="topbar">
-        <div class="brand">
-            <span class="brand-badge"></span>
-            UniMateLK
-        </div>
-
-        <nav class="navlinks">
-            <a href="/profile.html">Profile</a>
-            <a href="/preferences.html">Preferences</a>
-            <a href="/matches.html" style="border-color: rgba(255,255,255,0.5);">Matches</a>
-            <a href="/requests.html">Requests</a>
-            <a href="/chat.html">Chat</a>
-        </nav>
-
-        <div class="top-actions">
-            <a class="btn ghost" href="/logout">Logout</a>
-        </div>
-    </header>
+    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
+    <div id="navbarMount"></div>
 
     <section class="container">
         <div class="glass-shell">
 
-            <!-- Header row -->
             <div class="row" style="justify-content: space-between; align-items:flex-start;">
                 <div>
                     <h2 style="margin:0;">Suggested Matches</h2>
@@ -56,12 +36,10 @@
                 <span class="badge">Smart Matching</span>
             </div>
 
-            <!-- IMPORTANT: keep id="msg" -->
             <p id="msg" class="toast info" style="margin-top:12px;">
                 Use filters to refine your suggestions.
             </p>
 
-            <!-- Filters -->
             <div class="glass-card" style="margin-top:12px;">
                 <p class="section-title">Filters</p>
 
@@ -98,45 +76,46 @@
                 </div>
 
                 <div class="row" style="margin-top:12px;">
-                    <!-- IMPORTANT: keep id="searchBtn" -->
                     <button id="searchBtn" class="btn" type="button">Search</button>
                     <button class="btn secondary" type="button" id="resetFiltersBtn">Reset</button>
                 </div>
             </div>
 
-            <!-- Results -->
             <div class="results-head">
                 <p class="section-title" style="margin:0;">Results</p>
 
                 <div class="pager">
-                    <!-- IMPORTANT: keep these IDs -->
                     <button id="prevBtn" class="btn secondary" type="button">Prev</button>
                     <span id="pageText" class="badge">Page 1</span>
                     <button id="nextBtn" class="btn secondary" type="button">Next</button>
                 </div>
             </div>
 
-            <!-- IMPORTANT: keep id="list" -->
             <div id="list" class="match-grid"></div>
 
         </div>
     </section>
 
-    <!-- keeps your existing functionality -->
-    <script type="module" src="/js/matches.js"></script>
-
-    <!-- small helper ONLY for reset filters (does not touch your API logic) -->
-    <script>
-        // purely UI helper (safe)
-        document.getElementById("resetFiltersBtn")?.addEventListener("click", () => {
-            ["campus","degree","year","genderPref","keyword"].forEach(id => {
-                const el = document.getElementById(id);
-                if (!el) return;
-                el.value = "";
-            });
-        });
-    </script>
-
 </main>
+
+<!-- ✅ Mount navbar explicitly (guaranteed) -->
+<script type="module">
+    import { mountNavbar } from "/js/navbar.js";
+    mountNavbar();
+</script>
+
+<!-- ✅ Your matches functionality -->
+<script type="module" src="/js/matches.js"></script>
+
+<!-- ✅ Reset filters (UI helper only) -->
+<script>
+    document.getElementById("resetFiltersBtn")?.addEventListener("click", () => {
+        ["campus","degree","year","genderPref","keyword"].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = "";
+        });
+    });
+</script>
+
 </body>
 </html>

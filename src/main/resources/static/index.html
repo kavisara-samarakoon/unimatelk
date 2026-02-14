@@ -18,6 +18,10 @@
 </div>
 
 <main class="page">
+
+    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
+    <div id="navbarMount"></div>
+
     <div class="glass-shell" id="shell">
 
         <!-- LEFT: Sign In -->
@@ -26,12 +30,10 @@
                 <h1>Sign in</h1>
 
                 <div class="social-row">
-                    <!-- Your project uses Google OAuth -->
                     <a class="social-btn" href="/oauth2/authorization/google" title="Continue with Google">
                         <span class="icon">G</span>
                     </a>
 
-                    <!-- Optional placeholders -->
                     <button class="social-btn ghost" type="button" title="Facebook (UI only)">
                         <span class="icon">f</span>
                     </button>
@@ -61,7 +63,7 @@
 
                 <p class="hint">
                     ✅ Working login: <b>Google button</b> (G). <br/>
-                    Email/password is UI unless you add backend endpoints.
+                    Email/password works only if backend endpoints exist.
                 </p>
             </div>
         </section>
@@ -75,8 +77,8 @@
                     <a class="social-btn" href="/oauth2/authorization/google" title="Sign up with Google">
                         <span class="icon">G</span>
                     </a>
-                    <button class="social-btn ghost" type="button"><span class="icon">f</span></button>
-                    <button class="social-btn ghost" type="button"><span class="icon">in</span></button>
+                    <button class="social-btn ghost" type="button" title="Facebook (UI only)"><span class="icon">f</span></button>
+                    <button class="social-btn ghost" type="button" title="LinkedIn (UI only)"><span class="icon">in</span></button>
                 </div>
 
                 <p class="muted">or register with email</p>
@@ -106,29 +108,34 @@
             </div>
         </section>
 
-        <<!-- Overlay slider (glass) -->
+        <!-- Overlay slider -->
         <section class="overlay">
-            <!-- Visible when Sign In form is active -->
             <div class="overlay-panel hello">
                 <h2>Hello, Friend!</h2>
                 <p>Enter your personal details and start your journey with us.</p>
-                <button class="outline" id="goSignup">SIGN UP</button>
+                <button class="outline" id="goSignup" type="button">SIGN UP</button>
             </div>
 
-            <!-- Visible when Sign Up form is active -->
             <div class="overlay-panel welcome">
                 <h2>Welcome Back!</h2>
                 <p>To keep connected with us please login with your details.</p>
-                <button class="outline" id="goSignin">SIGN IN</button>
+                <button class="outline" id="goSignin" type="button">SIGN IN</button>
             </div>
         </section>
-
 
     </div>
 
     <div class="toast" id="toast"></div>
 </main>
 
+<!-- ✅ Mount navbar explicitly (guaranteed) -->
+<script type="module">
+    import { mountNavbar } from "/js/navbar.js";
+    mountNavbar();
+</script>
+
+<!-- ✅ Keep your auth logic -->
 <script src="/js/auth.js"></script>
+
 </body>
 </html>

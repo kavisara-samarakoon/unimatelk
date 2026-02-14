@@ -6,70 +6,101 @@
     <title>UniMateLK - Chat</title>
 
     <link rel="stylesheet" href="/css/theme.css"/>
-    <link rel="stylesheet" href="/css/style.css"/>
+    <link rel="stylesheet" href="/css/chat.css"/>
 </head>
 <body>
 
-<header class="topbar">
-    <h1 class="brand"><span class="brand-badge"></span>UniMateLK</h1>
-    <div class="top-actions">
-        <a class="btn secondary" href="/index.html">Home</a>
-        <a class="btn secondary" href="/matches.html">Matches</a>
-        <a class="btn secondary" href="/requests.html">Requests</a>
-        <a class="btn secondary" href="/profile.html">Profile</a>
-    </div>
-</header>
+<!-- Background -->
+<div class="bg">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="grain"></div>
+</div>
 
-<main class="container">
-    <div class="toolbar">
-        <div class="left">
-            <h2 class="m0">Chat</h2>
-            <span class="badge">Select a person and chat</span>
-        </div>
-        <div class="right">
-            <span id="roomTitle" class="badge">No room selected</span>
-        </div>
-    </div>
+<main class="page">
 
-    <p id="msg" class="toast info">Select a chat room from the left.</p>
+    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
+    <div id="navbarMount"></div>
 
-    <div class="chat-shell">
-        <section class="card">
-            <p class="section-title">Chat Rooms</p>
-            <div id="roomsList" class="list"></div>
-        </section>
+    <section class="container">
+        <div class="glass-shell chat-shell">
 
-        <section class="card">
-            <p class="section-title">Messages</p>
+            <!-- ✅ REQUIRED by chat.js -->
+            <p id="msg" class="toast info">Select a room to start chatting.</p>
 
-            <div id="chatBox" class="chat-box"></div>
+            <div class="chat-grid">
 
-            <div class="divider"></div>
+                <!-- LEFT: chat list -->
+                <aside class="glass-card chat-sidebar">
+                    <div class="chat-header" style="margin-bottom:2px;">
+                        <div class="title">
+                            <h3 style="margin:0;">Chats</h3>
+                            <p style="margin:0;">Select a person to open messages</p>
+                        </div>
+                        <span class="badge">Rooms</span>
+                    </div>
 
-            <div class="chat-input">
-                <input id="messageInput" type="text" placeholder="Type a message..." autocomplete="off"/>
-                <button id="sendBtn" class="btn" type="button">Send</button>
+                    <!-- Optional search (pure UI; does not affect JS) -->
+                    <div class="search">
+                        <input type="text" placeholder="Search chats..."
+                               oninput="
+                const q=this.value.toLowerCase();
+                document.querySelectorAll('#roomsList > *').forEach(x=>{
+                  x.style.display = x.innerText.toLowerCase().includes(q) ? '' : 'none';
+                });
+              ">
+                    </div>
+
+                    <!-- ✅ REQUIRED by chat.js -->
+                    <div class="chat-list" id="roomsList"></div>
+                </aside>
+
+                <!-- RIGHT: messages + composer -->
+                <section class="glass-card chat-main">
+
+                    <!-- ✅ REQUIRED by chat.js -->
+                    <div class="chat-header">
+                        <div class="title">
+                            <h3 id="roomTitle">Select a room</h3>
+                            <p>Messages will appear here</p>
+                        </div>
+                        <span class="badge">Live</span>
+                    </div>
+
+                    <!-- ✅ REQUIRED by chat.js -->
+                    <div class="chat-messages" id="chatBox"></div>
+
+                    <!-- Composer -->
+                    <div class="chat-composer">
+                        <div class="row" style="width:100%; gap:10px;">
+                            <input id="messageInput" type="text" placeholder="Type a message..."/>
+                            <input id="imageInput" type="file" accept="image/*" style="max-width:190px;"/>
+                        </div>
+
+                        <div class="row" style="justify-content:flex-end; gap:10px;">
+                            <button id="sendImageBtn" type="button" class="btn secondary">Send Image</button>
+                            <button id="sendBtn" type="button" class="btn">Send</button>
+                        </div>
+                    </div>
+
+                </section>
+
             </div>
+        </div>
+    </section>
 
-            <div class="mt12">
-                <label for="imageInput">Send an image</label>
-                <input id="imageInput" type="file" accept="image/*"/>
-                <div class="row mt12">
-                    <button id="sendImageBtn" class="btn secondary" type="button">Send Image</button>
-                </div>
-            </div>
-        </section>
-    </div>
-
-    <p class="help mt12">
-        If chat rooms are empty → go to Requests → Accept a request first (room gets created then).
-    </p>
 </main>
 
-<!-- REQUIRED for your chat.js (SockJS + STOMP) -->
-<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<!-- ✅ Mount navbar explicitly (guaranteed) -->
+<script type="module">
+    import { mountNavbar } from "/js/navbar.js";
+    mountNavbar();
+</script>
 
+<!-- ✅ Your chat functionality -->
 <script type="module" src="/js/chat.js"></script>
+
 </body>
 </html>
+

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>UniMateLK - Preferences</title>
 
-    <!-- New theme (glass + background) -->
     <link rel="stylesheet" href="/css/theme.css"/>
 </head>
 <body>
@@ -20,24 +19,8 @@
 
 <main class="page">
 
-    <!-- Top bar -->
-    <header class="topbar">
-        <div class="brand">
-            <span class="brand-badge"></span>
-            UniMateLK
-        </div>
-
-        <nav class="navlinks">
-            <a href="/profile.html">Profile</a>
-            <a href="/matches.html">Matches</a>
-            <a href="/requests.html">Requests</a>
-            <a href="/chat.html">Chat</a>
-        </nav>
-
-        <div class="top-actions">
-            <a class="btn ghost" href="/logout">Logout</a>
-        </div>
-    </header>
+    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
+    <div id="navbarMount"></div>
 
     <section class="container">
         <div class="glass-shell">
@@ -129,8 +112,16 @@
         </div>
     </section>
 
-    <!-- IMPORTANT: keep the same script (functionality unchanged) -->
-    <script type="module" src="/js/preferences.js"></script>
 </main>
+
+<!-- ✅ Mount navbar explicitly (guaranteed) -->
+<script type="module">
+    import { mountNavbar } from "/js/navbar.js";
+    mountNavbar();
+</script>
+
+<!-- ✅ Keep your existing JS file (functionality unchanged) -->
+<script type="module" src="/js/preferences.js"></script>
+
 </body>
 </html>
