@@ -1,203 +1,161 @@
-import { apiFetch, initCsrf } from "./api.js";
-
-const $ = (id) => document.getElementById(id);
-
-function toast(text, type = "info") {
-    const el = $("msg");
-    if (!el) return;
-    el.className = "toast " + type;
-    el.textContent = text || "";
+function getCookie(name){
+    const m = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+    return m ? decodeURIComponent(m[2]) : null;
 }
 
-function esc(s) {
+function setCsrf(headers){
+    const token = getCookie("XSRF-TOKEN");
+    if (token) headers.set("X-XSRF-TOKEN", token);
+}
+
+async function api(url, options = {}) {
+    const headers = new Headers(options.headers || {});
+    headers.set("Accept", "application/json");
+    headers.set("X-Requested-With", "XMLHttpRequest"); // ✅ helps avoid redirects
+    if (options.body && !headers.has("Content-Type")) {
+        headers.set("Content-Type", "application/json");
+    }
+    setCsrf(headers);
+
+    const res = await fetch(url, {
+        credentials: "same-origin",
+        ...options,
+        headers
+    });
+
+    // read body safely (json or text)
+    const contentType = res.headers.get("content-type") || "";
+    const raw = await res.text();
+
+    if (!res.ok) {
+        throw new Error(`${res.status} ${res.statusText}\n${raw.substring(0, 250)}`);
+    }
+
+    if (contentType.includes("application/json")) {
+        return raw ? JSON.parse(raw) : null;
+    }
+
+    // if backend returns HTML accidentally
+    return raw;
+}
+
+function showMsg(text, type="info"){
+    const box = document.getElementById("adminMsg");
+    box.className = `toast ${type}`;
+    box.textContent = text;
+    box.style.display = "block";
+}
+
+function hideMsg(){
+    const box = document.getElementById("adminMsg");
+    box.style.display = "none";
+}
+
+function escapeHtml(s){
     return String(s ?? "")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;");
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
-function showUsersTab() {
-    $("usersSection").style.display = "";
-    $("reportsSection").style.display = "none";
-    $("tabUsers").className = "btn";
-    $("tabReports").className = "btn secondary";
+function fmtDate(v){
+    try { return v ? new Date(v).toLocaleString() : ""; }
+    catch { return String(v || ""); }
 }
 
-function showReportsTab() {
-    $("usersSection").style.display = "none";
-    $("reportsSection").style.display = "";
-    $("tabUsers").className = "btn secondary";
-    $("tabReports").className = "btn";
-}
+let current = null;
 
-function userRow(u) {
-    return `
-    <tr>
-      <td>${u.id}</td>
-      <td>${esc(u.name)}</td>
-      <td>${esc(u.email)}</td>
-      <td>${esc(u.role)}</td>
-      <td>${esc(u.status)}</td>
-      <td style="display:flex; gap:6px; flex-wrap:wrap;">
-        <button class="btn secondary" data-action="makeAdmin" data-id="${u.id}">Make ADMIN</button>
-        <button class="btn secondary" data-action="makeStudent" data-id="${u.id}">Make STUDENT</button>
-        <button class="btn secondary" data-action="active" data-id="${u.id}">ACTIVE</button>
-        <button class="btn secondary" data-action="temp" data-id="${u.id}">TEMP_BLOCKED</button>
-        <button class="btn secondary" data-action="ban" data-id="${u.id}">BANNED</button>
-      </td>
-    </tr>
-  `;
-}
+function renderList(items){
+    const list = document.getElementById("reportsList");
+    const badge = document.getElementById("countBadge");
+    list.innerHTML = "";
+    badge.textContent = String(items.length);
 
-function reportRow(r) {
-    return `
-    <tr>
-      <td>${r.id}</td>
-      <td>${esc(r.reporterEmail || r.reporterName || r.reporterUserId)}</td>
-      <td>${esc(r.reportedEmail || r.reportedName || r.reportedUserId)}</td>
-      <td>${esc(r.reason)}</td>
-      <td>${esc(r.details)}</td>
-      <td>${esc(r.status)}</td>
-      <td>
-        ${
-        String(r.status).toUpperCase() === "OPEN"
-            ? `<button class="btn secondary" data-action="resolveReport" data-id="${r.id}">Resolve</button>`
-            : `<span class="muted">—</span>`
-    }
-      </td>
-    </tr>
-  `;
-}
-
-async function loadUsers() {
-    const q = ($("userQuery").value || "").trim();
-    const data = await apiFetch(`/api/admin/users?query=${encodeURIComponent(q)}&page=0&size=50`);
-
-    $("usersBody").innerHTML = (data.items || []).map(userRow).join("");
-    $("usersMeta").textContent = `Showing ${data.items?.length ?? 0} users`;
-}
-
-async function loadReports() {
-    const status = $("reportStatus").value;
-    const q = ($("reportQuery").value || "").trim();
-
-    const data = await apiFetch(
-        `/api/admin/reports?status=${encodeURIComponent(status)}&query=${encodeURIComponent(q)}&page=0&size=50`
-    );
-
-    $("reportsBody").innerHTML = (data.items || []).map(reportRow).join("");
-    $("reportsMeta").textContent = `Showing ${data.items?.length ?? 0} reports`;
-}
-
-async function updateUserRole(userId, role) {
-    await apiFetch(`/api/admin/users/${userId}/role`, {
-        method: "PATCH",
-        body: JSON.stringify({ role })
-    });
-}
-
-async function updateUserStatus(userId, status) {
-    await apiFetch(`/api/admin/users/${userId}/status`, {
-        method: "PATCH",
-        body: JSON.stringify({ status })
-    });
-}
-
-async function resolveReport(reportId) {
-    await apiFetch(`/api/admin/reports/${reportId}/resolve`, {
-        method: "POST"
-    });
-}
-
-async function refreshAll() {
-    try {
-        toast("Loading admin data…", "info");
-        await loadUsers();
-        await loadReports();
-        toast("✅ Admin data loaded", "success");
-    } catch (e) {
-        toast("❌ " + (e.message || "Failed to load admin data"), "error");
-    }
-}
-
-document.addEventListener("DOMContentLoaded", async () => {
-    // ✅ CSRF init first (your backend uses CSRF)
-    await initCsrf();
-
-    // ✅ STEP 3: Check role from /api/me before loading admin dashboard
-    // If not ADMIN, show clean message and stop.
-    let me;
-    try {
-        me = await apiFetch("/api/me");
-    } catch (e) {
-        document.body.innerHTML = `
-      <div style="padding:24px;font-family:Arial">
-        <h2>Not logged in</h2>
-        <p>Please login first, then open <b>/admin.html</b></p>
-        <a href="/index.html">Go Home</a>
-      </div>
-    `;
+    if (!items.length){
+        list.innerHTML = `<div class="muted">No OPEN reports found.</div>`;
         return;
     }
 
-    if ((me.role || "").toUpperCase() !== "ADMIN") {
-        document.body.innerHTML = `
-      <div style="padding:24px;font-family:Arial">
-        <h2>403 - Admin only</h2>
-        <p>You are logged in as <b>${esc(me.email || "")}</b> with role <b>${esc(me.role || "")}</b>.</p>
-        <p>To access admin panel, your role must be <b>ADMIN</b>.</p>
-        <a href="/index.html">Go Home</a>
+    for (const r of items){
+        const el = document.createElement("div");
+        el.className = "list-item";
+        el.style.cursor = "pointer";
+        el.innerHTML = `
+      <div class="row">
+        <div style="font-weight:700;">${escapeHtml(r.reason || "No reason")}</div>
+        <span class="right badge">${escapeHtml(r.status || "OPEN")}</span>
       </div>
+      <div class="help">
+        Reported: <b>${escapeHtml(r.reportedEmail || "-")}</b> •
+        Reporter: <b>${escapeHtml(r.reporterEmail || "-")}</b>
+      </div>
+      <div class="help">${escapeHtml(fmtDate(r.createdAt))}</div>
     `;
-        return;
+        el.addEventListener("click", () => selectReport(r));
+        list.appendChild(el);
     }
+}
 
-    // ✅ Normal admin dashboard setup
-    $("tabUsers").addEventListener("click", showUsersTab);
-    $("tabReports").addEventListener("click", showReportsTab);
-    $("refreshBtn").addEventListener("click", refreshAll);
-    $("searchUsersBtn").addEventListener("click", loadUsers);
-    $("searchReportsBtn").addEventListener("click", loadReports);
+function selectReport(r){
+    current = r;
+    document.getElementById("detailsHint").style.display = "none";
+    document.getElementById("detailsBox").style.display = "block";
 
-    // User actions
-    $("usersBody").addEventListener("click", async (e) => {
-        const btn = e.target.closest("button");
-        if (!btn) return;
+    document.getElementById("d_reason").textContent = r.reason || "Reason";
+    document.getElementById("d_status").textContent = r.status || "OPEN";
+    document.getElementById("d_meta").textContent = `Created: ${fmtDate(r.createdAt)}`;
+    document.getElementById("d_reporter").textContent = r.reporterEmail || "-";
+    document.getElementById("d_reported").textContent = r.reportedEmail || "-";
+    document.getElementById("d_details").textContent = r.details || "(no details)";
+    document.getElementById("actionMsg").textContent = "";
+}
 
-        const action = btn.dataset.action;
-        const id = btn.dataset.id;
+async function loadReports(){
+    hideMsg();
+    const q = (document.getElementById("search")?.value || "").trim();
 
-        try {
-            if (action === "makeAdmin") await updateUserRole(id, "ADMIN");
-            if (action === "makeStudent") await updateUserRole(id, "STUDENT");
-            if (action === "active") await updateUserStatus(id, "ACTIVE");
-            if (action === "temp") await updateUserStatus(id, "TEMP_BLOCKED");
-            if (action === "ban") await updateUserStatus(id, "BANNED");
+    try{
+        const data = await api(`/api/admin/reports?status=OPEN&query=${encodeURIComponent(q)}`);
 
-            toast("✅ Updated user", "success");
-            await loadUsers();
-        } catch (err) {
-            toast("❌ " + (err.message || "Update failed"), "error");
-        }
+        // expect: {items:[...]}
+        const items = data.items || data.reports || [];
+        renderList(items);
+
+    }catch(e){
+        console.error(e);
+        showMsg("Failed to load reports:\n" + e.message, "error");
+        document.getElementById("reportsList").innerHTML = `<div class="muted">Error loading reports.</div>`;
+        document.getElementById("countBadge").textContent = "0";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("refreshBtn")?.addEventListener("click", loadReports);
+    document.getElementById("search")?.addEventListener("input", () => {
+        clearTimeout(window.__t);
+        window.__t = setTimeout(loadReports, 250);
     });
 
-    // Report actions
-    $("reportsBody").addEventListener("click", async (e) => {
-        const btn = e.target.closest("button");
-        if (!btn) return;
+    document.getElementById("resolveBtn")?.addEventListener("click", async () => {
+        if (!current) return;
 
-        if (btn.dataset.action !== "resolveReport") return;
+        const msg = document.getElementById("actionMsg");
+        msg.textContent = "Resolving...";
 
-        try {
-            await resolveReport(btn.dataset.id);
-            toast("✅ Report resolved", "success");
+        try{
+            await api(`/api/admin/reports/${current.id}/resolve`, { method: "POST" });
+            msg.textContent = "✅ Resolved.";
+            current = null;
+            document.getElementById("detailsBox").style.display = "none";
+            document.getElementById("detailsHint").style.display = "block";
             await loadReports();
-        } catch (err) {
-            toast("❌ " + (err.message || "Resolve failed"), "error");
+        }catch(e){
+            console.error(e);
+            msg.textContent = "❌ Failed: " + e.message;
         }
     });
 
-    // Default tab + initial load
-    showUsersTab();
-    await refreshAll();
+    loadReports();
 });

@@ -1,4 +1,4 @@
-/* UniMateLK - improved UI (keeps your existing IDs working) */
+/* UniMateLK - Clean UI (keeps your IDs & classes working) */
 
 :root{
     --bg:#f6f7fb;
@@ -19,6 +19,7 @@
 
 *{ box-sizing:border-box; }
 html, body{ height:100%; }
+
 body{
     margin:0;
     font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
@@ -26,15 +27,18 @@ body{
     color: var(--text);
 }
 
-a{ color: inherit; text-decoration:none; }
+/* Links (so they won't be purple/underlined if CSS loads) */
+a{ color: var(--primary); text-decoration:none; }
 a:hover{ text-decoration: underline; }
 
+/* Layout */
 .container{
     max-width: 1100px;
     margin: 0 auto;
     padding: 18px 16px 60px;
 }
 
+/* Top bar */
 .topbar{
     position: sticky;
     top:0;
@@ -56,6 +60,7 @@ a:hover{ text-decoration: underline; }
     display:flex;
     align-items:center;
     gap:10px;
+    color:#fff;
 }
 .brand-badge{
     width:10px;
@@ -78,7 +83,6 @@ a:hover{ text-decoration: underline; }
     gap: 8px;
     flex-wrap: wrap;
 }
-
 .navlinks a{
     display:inline-flex;
     align-items:center;
@@ -86,7 +90,6 @@ a:hover{ text-decoration: underline; }
     padding: 8px 10px;
     border-radius: 10px;
     color:#fff;
-    text-decoration:none;
     border: 1px solid rgba(255,255,255,.15);
     background: rgba(255,255,255,.06);
 }
@@ -95,6 +98,7 @@ a:hover{ text-decoration: underline; }
     text-decoration:none;
 }
 
+/* Pills */
 .pill{
     display:inline-flex;
     align-items:center;
@@ -105,8 +109,10 @@ a:hover{ text-decoration: underline; }
     border: 1px solid rgba(255,255,255,.14);
     font-size: 13px;
     white-space: nowrap;
+    color:#fff;
 }
 
+/* Grids */
 .grid{
     display:grid;
     grid-template-columns: 1fr;
@@ -117,6 +123,7 @@ a:hover{ text-decoration: underline; }
     .grid.three{ grid-template-columns: 1fr 1fr 1fr; }
 }
 
+/* Cards */
 .card{
     background: var(--card);
     border: 1px solid var(--line);
@@ -124,10 +131,7 @@ a:hover{ text-decoration: underline; }
     padding: 16px;
     box-shadow: var(--shadow2);
 }
-
-.card h2, .card h3{
-    margin: 0 0 10px;
-}
+.card h2, .card h3{ margin: 0 0 10px; }
 .card p{ margin: 8px 0; color: var(--muted); }
 
 .section-title{
@@ -138,6 +142,7 @@ a:hover{ text-decoration: underline; }
     margin: 0 0 10px;
 }
 
+/* Toolbar */
 .toolbar{
     display:flex;
     align-items:center;
@@ -153,6 +158,7 @@ a:hover{ text-decoration: underline; }
     flex-wrap: wrap;
 }
 
+/* Buttons */
 button, .btn, .btnlink{
     border:0;
     cursor:pointer;
@@ -203,6 +209,7 @@ button:active, .btn:active{ transform: translateY(1px); }
     box-shadow: 0 6px 16px rgba(22,163,74,.18);
 }
 
+/* Forms */
 input, select, textarea{
     width: 100%;
     padding: 11px 12px;
@@ -234,10 +241,9 @@ label{
     .form-row.three{ grid-template-columns: 1fr 1fr 1fr; }
 }
 
-.help{
-    font-size: 12px;
+.help, .muted{
+    font-size: 13px;
     color: var(--muted);
-    margin-top: 6px;
 }
 
 .divider{
@@ -246,6 +252,7 @@ label{
     margin: 14px 0;
 }
 
+/* Badges */
 .badge{
     display:inline-flex;
     align-items:center;
@@ -261,34 +268,7 @@ label{
 .badge.warn{ border-color: rgba(245,158,11,.35); background: rgba(245,158,11,.10); }
 .badge.danger{ border-color: rgba(185,28,28,.35); background: rgba(185,28,28,.08); }
 
-.kbd{
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    font-size: 12px;
-    padding: 4px 8px;
-    border-radius: 8px;
-    border: 1px solid var(--line);
-    background: #f8fafc;
-    color: var(--text);
-}
-
-.toast{
-    padding: 10px 12px;
-    border-radius: 12px;
-    border: 1px solid var(--line);
-    background: #fff;
-    color: var(--text);
-}
-.toast.success{ border-color: rgba(22,163,74,.35); background: rgba(22,163,74,.08); }
-.toast.error{ border-color: rgba(185,28,28,.35); background: rgba(185,28,28,.08); }
-.toast.info{ border-color: rgba(37,99,235,.35); background: rgba(37,99,235,.08); }
-
-.profile-head{
-    display:flex;
-    align-items:center;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-}
+/* Avatars */
 .avatar{
     width: 56px;
     height: 56px;
@@ -297,15 +277,8 @@ label{
     border: 2px solid rgba(37,99,235,.22);
     background:#e2e8f0;
 }
-.cover{
-    width:100%;
-    height: 160px;
-    border-radius: var(--radius);
-    object-fit: cover;
-    border: 1px solid var(--line);
-    background:#e2e8f0;
-}
 
+/* Lists */
 .list{
     display:flex;
     flex-direction: column;
@@ -319,13 +292,7 @@ label{
     box-shadow: var(--shadow2);
 }
 
-.match-title{
-    display:flex;
-    align-items:center;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-}
+/* Progress */
 .progress{
     width: 180px;
     height: 10px;
@@ -340,6 +307,7 @@ label{
     background: linear-gradient(90deg, #60a5fa, #22c55e);
 }
 
+/* Chat */
 .chat-shell{
     display:grid;
     grid-template-columns: 1fr;
@@ -362,6 +330,7 @@ label{
     align-items:center;
 }
 .chat-input input[type="text"]{ flex: 1; }
+
 .chat-msg{
     padding: 10px 12px;
     border-radius: 14px;
@@ -378,14 +347,35 @@ label{
     color: var(--muted);
     margin-bottom: 6px;
 }
-.chat-msg img{
-    max-width: 240px;
-    border-radius: 12px;
+
+/* Tables (Admin / Reports) */
+.table-wrap{ overflow-x:auto; width:100%; }
+.table{
+    width:100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+    background:#fff;
     border: 1px solid var(--line);
-    margin-top: 8px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+.table th, .table td{
+    padding: 10px;
+    border-bottom: 1px solid var(--line);
+    text-align:left;
+    vertical-align: top;
+}
+.table th{
+    background: #f8fafc;
+    color: var(--text);
+    font-weight: 700;
+}
+.table tr:hover td{
+    background: rgba(37,99,235,.03);
 }
 
-/* small helpers */
+/* Helpers */
 .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
 .right{ margin-left:auto; }
 .m0{ margin:0; }
