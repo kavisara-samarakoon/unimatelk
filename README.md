@@ -1,76 +1,51 @@
-# UniMateLK (XAMPP + MySQL)
+# UniMateLK — Roommate Matching & Chat Platform
 
-This is a **Spring Boot + HTML/CSS/JS** full‑stack project:
-- Backend: Spring Boot (Maven), Spring Security (Google OAuth2), Spring Data JPA, Flyway, WebSocket (STOMP)
-- Frontend: Plain HTML/CSS/JS (served by Spring Boot from `/src/main/resources/static`)
-- DB: **MySQL via XAMPP + phpMyAdmin**
+UniMateLK is a roommate matching web application built with **Spring Boot + MySQL**.  
+Users log in with **Google OAuth**, complete a **Profile** + **Preferences**, view **Suggested Matches**, send/accept **Match Requests**, and then chat in real time using **WebSockets (STOMP + SockJS)**. Image sharing in chat is supported.
+
+---
+
+## Tech Stack
+
+- **Backend:** Java (JDK 25), Spring Boot, Spring Security (OAuth2), JPA/Hibernate
+- **Database:** MySQL (XAMPP)
+- **Migrations:** Flyway (`src/main/resources/db/migration/V1__init.sql`)
+- **Frontend:** HTML + CSS + Vanilla JS
+- **Realtime Chat:** WebSocket `/ws` (SockJS) + STOMP
+
+---
+
+## Features
+
+✅ Google Login (OAuth2)  
+✅ Profile creation/update  
+✅ Preferences creation/update  
+✅ Match suggestions feed (based on preferences + filters)  
+✅ Match requests (send / accept / reject / cancel)  
+✅ Chat rooms unlocked only after acceptance  
+✅ Realtime chat (text) + image upload  
+✅ Basic safety tools (block/report) and admin moderation (if enabled)
+
+---
 
 ## Prerequisites
-- **JDK 25** configured in IntelliJ
-- XAMPP installed (Apache + MySQL)
-- Internet access (first time only) for Maven dependency downloads and Google OAuth
 
-## 1) Database setup (XAMPP + phpMyAdmin)
-1. Open XAMPP Control Panel
-2. Start **Apache** and **MySQL**
-3. Open phpMyAdmin: `http://localhost/phpmyadmin`
-4. Create a DB:
-   - Database name: `unimatelk`
-5. Create a DB user (recommended):
-   - Username: `unimatelk`
-   - Password: `unimatelkpass`
-   - Grant **ALL** privileges on DB `unimatelk`
+1. **JDK 25** installed and configured in IntelliJ
+2. **XAMPP** installed (MySQL running)
+3. **Maven** (IntelliJ includes it by default)
 
-> If you prefer using root with no password (default XAMPP), update `application.properties` accordingly.
+---
 
-## 2) Configure `application.properties`
-File: `src/main/resources/application.properties`
-- Ensure these match your MySQL settings:
+## Database Setup (XAMPP MySQL)
 
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/unimatelk?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-spring.datasource.username=unimatelk
-spring.datasource.password=unimatelkpass
-```
+1. Open **XAMPP Control Panel**
+2. Start:
+    - ✅ Apache (optional, for phpMyAdmin)
+    - ✅ MySQL
 
-## 3) Configure Google OAuth2
-You must create Google OAuth Client credentials:
-- Authorized redirect URI should include:
-  - `http://localhost:8080/login/oauth2/code/google`
+### Option A (Recommended): Let Flyway create tables automatically
+Your project uses Flyway migrations, so the tables are created on first run.
 
-Set environment variables (recommended) or fill them in `application.properties`:
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET`
-
-## 4) Set an admin email
-In `application.properties`:
-```properties
-app.admin-emails=YOUR_ADMIN_GMAIL@gmail.com
-```
-When you login with that Google account, your role is set to **ADMIN**.
-
-## 5) Run the app
-### IntelliJ
-1. Open the project folder in IntelliJ
-2. Set Project SDK = JDK 25
-3. Run `UnimatelkApplication`
-
-Open:
-- App: `http://localhost:8080/`
-- Swagger UI: `http://localhost:8080/swagger-ui.html`
-
-## 6) Features
-- Google login (session/cookies)
-- Profile + photo upload
-- Preferences + validation
-- Match feed with score + reasons + filters + pagination
-- Match requests (mutual match gate)
-- WebSocket chat (text + emojis) + image attachments
-- Report/block + auto temp-block at 5 unique reports (7‑day window)
-- Admin moderation dashboard: unblock / ban + resolution notes
-
-## 7) Troubleshooting
-- **Flyway checksum error**: use a fresh DB (drop and recreate) or run Flyway repair.
-- **Login works but API calls fail with CSRF**: refresh the page; `api.js` fetches `/api/csrf`.
-- **Chat doesn't receive messages**: open browser devtools and verify `/ws` connection.
-
+### Option B: Create DB manually (phpMyAdmin → SQL)
+```sql
+CREATE DATABASE IF NOT EXISTS unimatelk;
