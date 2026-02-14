@@ -1,294 +1,192 @@
 /* =========================================================
-   Chat Page (FINAL) - UniMateLK Glass Theme
-   Design ONLY (keeps chat.js working)
-   Works with IDs: msg, roomsList, roomTitle, chatBox,
-                   messageInput, sendBtn, imageInput, sendImageBtn
+   chat.css (FINAL)
+   Responsive chat layout: 2 columns -> 1 column
+   Glass theme friendly
    ========================================================= */
 
-/* Main shell sits under topbar */
-.chat-shell{
-    margin-top: 12px;
-    height: calc(100vh - 140px); /* topbar + padding */
-    min-height: 560px;
-}
-
-/* 2-column layout */
-.chat-grid{
+/* Main layout */
+.chat-layout{
     display: grid;
     grid-template-columns: 340px 1fr;
-    gap: 14px;
-    height: 100%;
+    gap: 12px;
+    align-items: stretch;
 }
 
-/* ---------------- Sidebar ---------------- */
+/* Sidebar */
 .chat-sidebar{
-    height: 100%;
+    min-height: 520px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.sidebar-head .title{
+    font-weight: 900;
+    color: rgba(255,255,255,0.96);
+}
+
+.sidebar-tools{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+}
+
+.sidebar-tools input{
+    flex: 1;
+}
+
+/* Conversation list */
+.thread-list{
+    margin-top: 12px;
     display: grid;
-    grid-template-rows: auto auto 1fr;
-    gap: 12px;
-}
-
-.chat-sidebar .search{
-    display: grid;
-    gap: 8px;
-}
-
-.chat-sidebar .search input{
-    width: 100%;
-}
-
-/* Rooms list container (chat.js fills #roomsList with .list-item) */
-.chat-list{
+    gap: 10px;
     overflow: auto;
     padding-right: 6px;
 }
 
-/* Scrollbar */
-.chat-list::-webkit-scrollbar{ width: 8px; }
-.chat-list::-webkit-scrollbar-thumb{
-    background: rgba(255,255,255,0.18);
-    border-radius: 999px;
-}
-.chat-list::-webkit-scrollbar-track{ background: transparent; }
-
-/* Room card (chat.js uses .list-item) + fallback generic selectors */
-.list-item,
-.chat-item,
-.room-item,
-.thread-item,
-.chat-list > div{
-    border-radius: 18px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.14);
+/* Each thread item */
+.thread-item{
+    border-radius: 16px;
     padding: 12px;
-    margin-bottom: 10px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(10,14,30,0.22);
     cursor: pointer;
-    transition: transform .15s ease, border-color .15s ease, background .15s ease;
+    transition: transform .15s ease, border-color .15s ease;
 }
 
-.list-item:hover,
-.chat-item:hover,
-.room-item:hover,
-.thread-item:hover,
-.chat-list > div:hover{
-    transform: translateY(-1px);
+.thread-item:hover{
+    transform: translateY(-2px);
     border-color: rgba(255,255,255,0.30);
+}
+
+.thread-item .name{
+    font-weight: 900;
+    color: rgba(255,255,255,0.96);
+}
+
+.thread-item .preview{
+    margin-top: 6px;
+    color: rgba(255,255,255,0.78);
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+/* Active thread */
+.thread-item.active{
+    border-color: rgba(255,255,255,0.45);
     background: rgba(255,255,255,0.10);
 }
 
-/* If you later add "active/selected" class via JS */
-.active, .selected{
-    border-color: rgba(0,212,255,0.55) !important;
-    box-shadow: 0 0 0 3px rgba(0,212,255,0.12);
-}
-
-/* Room card content built by roomCardHtml() */
-.list-item .row{
+/* Chat panel */
+.chat-panel{
+    min-height: 520px;
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
 }
 
-.avatar{
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.18);
-    overflow: hidden;
-    display: block;
-}
-.avatar img{
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+/* Top bar inside chat panel */
+.chat-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
 }
 
-/* ---------------- Main Chat ---------------- */
-.chat-main{
-    height: 100%;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    gap: 12px;
+.chat-head .who{
+    font-weight: 900;
+    color: rgba(255,255,255,0.96);
 }
 
-/* Header */
-.chat-header{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+.chat-head .sub{
+    margin-top: 4px;
+    color: rgba(255,255,255,0.75);
+    font-size: 13px;
 }
 
-.chat-header .title{
-    display: grid;
-    gap: 3px;
-}
-
-.chat-header h3{
-    margin: 0;
-    font-size: 18px;
-    color: rgba(255,255,255,0.97);
-}
-
-.chat-header p{
-    margin: 0;
-    font-size: 12px;
-    color: rgba(255,255,255,0.72);
-}
-
-/* Messages container (#chatBox) */
-.chat-messages{
+/* Messages area */
+.messages{
+    margin-top: 12px;
+    flex: 1;
     overflow: auto;
     padding-right: 6px;
     display: grid;
     gap: 10px;
-    align-content: start;
-    scroll-behavior: smooth;
 }
 
-/* Scrollbar */
-.chat-messages::-webkit-scrollbar{ width: 8px; }
-.chat-messages::-webkit-scrollbar-thumb{
-    background: rgba(255,255,255,0.18);
-    border-radius: 999px;
-}
-.chat-messages::-webkit-scrollbar-track{ background: transparent; }
-
-/* =========================================================
-   MESSAGE BUBBLES (IMPORTANT: matches chat.js output)
-   chat.js creates: <div class="chat-msg [me]"> ... </div>
-   ========================================================= */
-.chat-msg{
+/* Message bubbles */
+.msg{
     max-width: 78%;
     padding: 10px 12px;
-    border-radius: 18px;
-    border: 1px solid rgba(255,255,255,0.16);
-    background: rgba(255,255,255,0.10);
-    color: rgba(255,255,255,0.93);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(10,14,30,0.22);
+    color: rgba(255,255,255,0.92);
     line-height: 1.35;
-    word-wrap: break-word;
-    overflow-wrap: anywhere;
-    justify-self: start; /* default left */
+    font-size: 14px;
 }
 
-/* my messages align right */
-.chat-msg.me{
-    justify-self: end;
-    background: linear-gradient(90deg, rgba(124,77,255,0.45), rgba(0,212,255,0.35));
+.msg.me{
+    margin-left: auto;
+    background: rgba(255,255,255,0.12);
     border-color: rgba(255,255,255,0.22);
 }
 
-/* sender + time meta line */
-.chat-msg .meta{
-    font-size: 11px;
-    color: rgba(255,255,255,0.70);
-    margin-bottom: 6px;
+.msg .meta{
+    margin-top: 6px;
+    color: rgba(255,255,255,0.65);
+    font-size: 12px;
 }
 
-/* image message */
-.chat-msg img{
-    max-width: 360px;
-    width: 100%;
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.18);
-    display: block;
-}
-
-/* ---------------- Composer ---------------- */
-.chat-composer{
-    display: grid;
-    gap: 10px;
-}
-
-.chat-composer .row{
+/* Composer */
+.composer{
+    margin-top: 12px;
     display: flex;
     gap: 10px;
     align-items: center;
-    flex-wrap: wrap;
 }
 
-/* Inputs (works with theme.css too) */
-#messageInput{
+.composer input, .composer textarea{
     flex: 1;
-    min-width: 220px;
 }
 
-#imageInput{
-    flex: 0 0 auto;
-    min-width: 180px;
-    color: rgba(255,255,255,0.85);
+.composer button{
+    width: 160px;
 }
 
-/* Buttons */
-#sendBtn,
-#sendImageBtn{
-    padding: 10px 14px;
-    border-radius: 999px;
-    cursor: pointer;
-    font-weight: 900;
-    border: none;
-    color: white;
-    background: linear-gradient(90deg, #7c4dff, #00d4ff);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
-}
-
-#sendBtn:hover,
-#sendImageBtn:hover{
-    transform: translateY(-1px);
-}
-
-/* Secondary style for Send Image (optional) */
-#sendImageBtn.btn.secondary,
-#sendImageBtn.secondary{
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.18);
-    color: rgba(255,255,255,0.92);
-    box-shadow: none;
-}
-
-/* If you didn't add "secondary" class in HTML,
-   force Send Image to look slightly different anyway */
-#sendImageBtn{
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.18);
-    color: rgba(255,255,255,0.92);
-    box-shadow: none;
-}
-
-/* Make file input button match theme a bit */
-#imageInput::file-selector-button{
-    padding: 8px 10px;
-    border-radius: 999px;
-    border: 1px solid rgba(255,255,255,0.18);
-    background: rgba(255,255,255,0.10);
-    color: rgba(255,255,255,0.92);
-    cursor: pointer;
-    margin-right: 10px;
-}
-
-/* ---------------- Responsive ---------------- */
-@media (max-width: 980px){
-    .chat-shell{
-        height: auto;
-        min-height: auto;
-    }
-
-    .chat-grid{
+/* =========================================================
+   ✅ RESPONSIVE FIX (the change you asked)
+   2 columns -> 1 column on small screens
+   ========================================================= */
+@media (max-width: 950px){
+    .chat-layout{
         grid-template-columns: 1fr;
-        height: auto;
     }
 
-    .chat-main{
-        min-height: 560px;
+    .composer button{
+        width: 100%;
     }
 
-    .chat-messages{
-        min-height: 360px;
+    .composer{
+        flex-direction: column;
+        align-items: stretch;
     }
 
-    #imageInput{
-        min-width: 240px;
+    .msg{
+        max-width: 92%;
+    }
+}
+
+/* Small phones */
+@media (max-width: 420px){
+    .chat-sidebar, .chat-panel{
+        min-height: auto;
     }
 }

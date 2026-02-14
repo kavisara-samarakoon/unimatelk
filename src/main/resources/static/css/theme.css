@@ -272,3 +272,84 @@ input:focus, select:focus, textarea:focus{
     .topbar{ flex-direction: column; align-items: stretch; }
     .top-actions{ justify-content: space-between; }
 }
+/* =========================================================
+   GLOBAL RESPONSIVE FOUNDATION (paste at END of theme.css)
+   Makes all pages responsive without breaking JS
+   ========================================================= */
+
+/* Prevent horizontal overflow issues */
+html, body { max-width: 100%; overflow-x: hidden; }
+
+/* Use fluid type scale (nice on mobile + desktop) */
+h1 { font-size: clamp(28px, 3.2vw, 44px); }
+h2 { font-size: clamp(20px, 2.6vw, 30px); }
+h3 { font-size: clamp(16px, 2.1vw, 22px); }
+p, label, input, select, textarea, button {
+    font-size: clamp(13px, 1.25vw, 15px);
+}
+
+/* Make containers fluid */
+.container {
+    width: min(1100px, 95vw);
+    margin: 0 auto;
+}
+
+/* Make glass shells/cards fluid */
+.glass-shell {
+    width: 100%;
+    height: auto;            /* IMPORTANT: don't lock height */
+    min-height: auto;
+}
+
+/* Make topbar adapt instead of hiding content */
+.topbar {
+    gap: 10px;
+    flex-wrap: wrap;         /* IMPORTANT: allows wrapping */
+}
+
+/* Make navlinks never disappear */
+.navlinks {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Small screens: nav becomes scrollable instead of hiding */
+@media (max-width: 720px) {
+    .navlinks {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        white-space: nowrap;
+        width: 100%;
+        justify-content: flex-start;
+        padding-bottom: 8px;
+        -webkit-overflow-scrolling: touch;
+    }
+    .navlinks a { flex: 0 0 auto; }
+}
+
+/* Make your .grid helpers properly responsive */
+.grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+@media (max-width: 950px) {
+    .grid.three { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 650px) {
+    .grid.two, .grid.three { grid-template-columns: 1fr; }
+}
+
+/* Inputs & buttons full width on small devices */
+@media (max-width: 650px) {
+    input, select, textarea { width: 100%; }
+    .row { gap: 10px; }
+    .btn, .btn.secondary, .btn.ghost { width: 100%; }
+}
+
+/* Keep page padding comfortable on mobile */
+@media (max-width: 650px) {
+    .page { padding: 12px; }
+}
+
