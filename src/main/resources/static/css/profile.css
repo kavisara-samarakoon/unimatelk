@@ -1,0 +1,54 @@
+/* Profile page only (design-only) */
+
+.avatar-wrap{
+    display: grid;
+    place-items: center;
+    gap: 10px;
+    padding: 10px 0 4px;
+}
+
+.avatar{
+    width: 120px;
+    height: 120px;
+    border-radius: 999px;
+    object-fit: cover;
+    border: 1px solid rgba(255,255,255,0.20);
+    background: rgba(255,255,255,0.08);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+}
+
+.upload-box{
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.08);
+    border: 1px dashed rgba(255,255,255,0.22);
+    cursor: pointer;
+}
+.upload-box:hover{
+    border-color: rgba(255,255,255,0.40);
+}
+
+.upload-ico{
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.16);
+}
+
+.upload-title{
+    font-weight: 900;
+    margin-bottom: 2px;
+}
+
+.tips{
+    margin: 8px 0 0;
+    padding-left: 18px;
+    color: rgba(255,255,255,0.75);
+}
+.tips li{ margin: 6px 0; }
