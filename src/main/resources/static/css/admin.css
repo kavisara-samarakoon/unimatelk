@@ -1,0 +1,95 @@
+/* =========================================================
+   Admin Page Styles (Design-only)
+   Works with your current admin.html + admin.js
+   ========================================================= */
+
+.admin-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+}
+
+.admin-grid{
+    margin-top:12px;
+    display:grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap:12px;
+}
+
+/* Search + refresh block */
+.admin-tools{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:12px;
+}
+
+.admin-tools-left{
+    flex: 1;
+    min-width: 260px;
+}
+
+.admin-tools-right{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+/* Reports list items (your JS uses .list-item already) */
+.list{
+    display:grid;
+    gap:10px;
+    margin-top:10px;
+}
+
+.list-item{
+    border-radius: 16px;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(10,14,30,0.22);
+    transition: transform .15s ease, border-color .15s ease;
+}
+
+.list-item:hover{
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.30);
+}
+
+/* details card */
+.details-card{
+    border-radius: 18px;
+    padding: 14px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(10,14,30,0.22);
+}
+
+.details-title{
+    font-weight: 900;
+    font-size: 18px;
+    color: rgba(255,255,255,0.96);
+}
+
+/* details text */
+.details-text{
+    white-space: pre-wrap;
+    line-height: 1.45;
+    color: rgba(255,255,255,0.88);
+}
+
+/* Make report status look nicer */
+.status-pill{
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.18);
+}
+
+/* Responsive */
+@media (max-width: 950px){
+    .admin-grid{
+        grid-template-columns: 1fr;
+    }
+}
