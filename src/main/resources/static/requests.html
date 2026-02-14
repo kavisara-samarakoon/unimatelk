@@ -5,14 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>UniMateLK - Requests</title>
 
-    <!-- Theme used on Preferences/Login style -->
     <link rel="stylesheet" href="/css/theme.css"/>
-    <!-- Requests-specific design only -->
     <link rel="stylesheet" href="/css/requests.css"/>
 </head>
 <body>
 
-<!-- Background (same as login theme) -->
+<!-- Background -->
 <div class="bg">
     <div class="blob b1"></div>
     <div class="blob b2"></div>
@@ -22,24 +20,8 @@
 
 <main class="page">
 
-    <!-- Topbar -->
-    <header class="topbar">
-        <div class="brand">
-            <span class="brand-badge"></span>
-            UniMateLK
-        </div>
-
-        <nav class="navlinks">
-            <a href="/profile.html">Profile</a>
-            <a href="/matches.html">Matches</a>
-            <a href="/requests.html">Requests</a>
-            <a href="/chat.html">Chat</a>
-        </nav>
-
-        <div class="top-actions">
-            <a class="btn ghost" href="/logout">Logout</a>
-        </div>
-    </header>
+    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
+    <div id="navbarMount"></div>
 
     <section class="container">
         <div class="glass-shell">
@@ -54,7 +36,7 @@
                 <span class="badge">Connections</span>
             </div>
 
-            <!-- IMPORTANT: Keep id="msg" (your JS probably writes status here) -->
+            <!-- IMPORTANT: Keep id="msg" (requests.js uses it) -->
             <p id="msg" class="toast info">Loading requests…</p>
 
             <div class="req-layout">
@@ -71,7 +53,6 @@
 
                     <!-- IMPORTANT: Keep id="incoming" -->
                     <div id="incoming" class="req-list">
-                        <!-- JS will render items here -->
                         <div class="req-empty">No incoming requests yet.</div>
                     </div>
                 </div>
@@ -88,7 +69,6 @@
 
                     <!-- IMPORTANT: Keep id="outgoing" -->
                     <div id="outgoing" class="req-list">
-                        <!-- JS will render items here -->
                         <div class="req-empty">No outgoing requests yet.</div>
                     </div>
                 </div>
@@ -98,9 +78,16 @@
         </div>
     </section>
 
-    <!-- IMPORTANT: keep your existing JS file (functionality unchanged) -->
-    <script type="module" src="/js/requests.js"></script>
 </main>
+
+<!-- ✅ Mount navbar explicitly (guaranteed) -->
+<script type="module">
+    import { mountNavbar } from "/js/navbar.js";
+    mountNavbar();
+</script>
+
+<!-- ✅ Requests functionality -->
+<script type="module" src="/js/requests.js"></script>
 
 </body>
 </html>
