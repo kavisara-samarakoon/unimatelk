@@ -1,8 +1,3 @@
-/* =========================================================
-   Admin Page Styles (Design-only)
-   Works with your current admin.html + admin.js
-   ========================================================= */
-
 .admin-head{
     display:flex;
     justify-content:space-between;
@@ -19,7 +14,6 @@
     gap:12px;
 }
 
-/* Search + refresh block */
 .admin-tools{
     display:flex;
     align-items:flex-end;
@@ -40,7 +34,6 @@
     gap:10px;
 }
 
-/* Reports list items (your JS uses .list-item already) */
 .list{
     display:grid;
     gap:10px;
@@ -60,7 +53,6 @@
     border-color: rgba(255,255,255,0.30);
 }
 
-/* details card */
 .details-card{
     border-radius: 18px;
     padding: 14px;
@@ -74,20 +66,17 @@
     color: rgba(255,255,255,0.96);
 }
 
-/* details text */
 .details-text{
     white-space: pre-wrap;
     line-height: 1.45;
     color: rgba(255,255,255,0.88);
 }
 
-/* Make report status look nicer */
 .status-pill{
     background: rgba(255,255,255,0.14);
     border: 1px solid rgba(255,255,255,0.18);
 }
 
-/* Responsive */
 @media (max-width: 950px){
     .admin-grid{
         grid-template-columns: 1fr;
