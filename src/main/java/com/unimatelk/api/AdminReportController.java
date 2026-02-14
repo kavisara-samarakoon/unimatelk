@@ -75,11 +75,12 @@ public class AdminReportController {
 
         final String finalEmail = email;
 
-        return userRepo.findByEmailIgnoreCase(finalEmail)
+        userRepo.findByEmail(finalEmail.toLowerCase())
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.UNAUTHORIZED,
                         "User not found in DB for: " + finalEmail
                 ));
+        return null;
     }
 
     private void requireAdmin(AppUser me) {
@@ -88,6 +89,7 @@ public class AdminReportController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Admin only");
         }
     }
+
 
     private Map<String, Object> toDto(Report r) {
         Map<String, Object> m = new LinkedHashMap<>();

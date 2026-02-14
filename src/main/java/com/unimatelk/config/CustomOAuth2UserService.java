@@ -1,4 +1,4 @@
-package com.unimatelk.service;
+package com.unimatelk.config;
 
 import com.unimatelk.domain.AppUser;
 import com.unimatelk.repo.AppUserRepository;
