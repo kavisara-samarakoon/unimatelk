@@ -1,0 +1,147 @@
+/* Requests Page - Design Only (works with existing JS) */
+
+.req-layout{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 12px;
+}
+
+.req-column{
+    display: grid;
+    gap: 12px;
+}
+
+.req-header{
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.req-title{
+    margin: 0;
+    font-size: 16px;
+    letter-spacing: 0.2px;
+}
+
+.req-sub{
+    margin: 6px 0 0 0;
+    font-size: 13px;
+    color: rgba(255,255,255,0.78);
+}
+
+.req-list{
+    display: grid;
+    gap: 10px;
+}
+
+/* JS will likely inject rows/cards inside #incoming and #outgoing.
+   These styles apply to common patterns without breaking anything. */
+.req-item,
+.request-item,
+.card,
+.list-item{
+    border-radius: 18px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.16);
+    padding: 14px;
+}
+
+.req-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* User info block */
+.req-user{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 220px;
+}
+
+.req-avatar{
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.18);
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+    color: rgba(255,255,255,0.92);
+    overflow: hidden;
+}
+
+.req-avatar img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.req-name{
+    font-weight: 900;
+    color: rgba(255,255,255,0.95);
+    margin: 0;
+}
+
+.req-meta{
+    margin: 3px 0 0;
+    font-size: 12px;
+    color: rgba(255,255,255,0.78);
+}
+
+/* Buttons area */
+.req-actions{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* If your JS adds buttons without classes, these still help */
+.req-actions button,
+.req-item button,
+#incoming button,
+#outgoing button{
+    padding: 9px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 800;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.10);
+    color: rgba(255,255,255,0.92);
+}
+
+.req-actions button:hover,
+.req-item button:hover,
+#incoming button:hover,
+#outgoing button:hover{
+    border-color: rgba(255,255,255,0.40);
+    transform: translateY(-1px);
+}
+
+/* Optional semantic classes if your JS already uses them */
+.btn-accept{ background: linear-gradient(90deg, rgba(0,255,180,0.55), rgba(0,212,255,0.45)); }
+.btn-reject{ background: linear-gradient(90deg, rgba(255,80,160,0.55), rgba(124,77,255,0.45)); }
+.btn-cancel{ background: rgba(255,255,255,0.10); }
+
+/* Empty state */
+.req-empty{
+    padding: 16px;
+    border-radius: 18px;
+    background: rgba(0,0,0,0.25);
+    border: 1px dashed rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.78);
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 980px){
+    .req-layout{ grid-template-columns: 1fr; }
+}

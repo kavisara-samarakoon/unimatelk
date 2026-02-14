@@ -2,35 +2,105 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>UniMateLK - Requests</title>
-    <link rel="stylesheet" href="/css/style.css"/>
+
+    <!-- Theme used on Preferences/Login style -->
+    <link rel="stylesheet" href="/css/theme.css"/>
+    <!-- Requests-specific design only -->
+    <link rel="stylesheet" href="/css/requests.css"/>
 </head>
 <body>
 
-<header class="topbar">
-    <h1 class="brand"><span class="brand-badge"></span>UniMateLK</h1>
-    <div class="top-actions">
-        <a class="btn secondary" href="/matches.html">Matches</a>
-        <a class="btn secondary" href="/chat.html">Chat</a>
-    </div>
-</header>
+<!-- Background (same as login theme) -->
+<div class="bg">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="grain"></div>
+</div>
 
-<main class="container">
-    <h2>Match Requests</h2>
-    <p id="msg" class="muted"></p>
+<main class="page">
 
-    <div class="card">
-        <h3>Incoming Requests</h3>
-        <div id="incoming"></div>
-    </div>
+    <!-- Topbar -->
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand-badge"></span>
+            UniMateLK
+        </div>
 
-    <div class="card" style="margin-top:12px;">
-        <h3>Outgoing Requests</h3>
-        <div id="outgoing"></div>
-    </div>
+        <nav class="navlinks">
+            <a href="/profile.html">Profile</a>
+            <a href="/matches.html">Matches</a>
+            <a href="/requests.html">Requests</a>
+            <a href="/chat.html">Chat</a>
+        </nav>
+
+        <div class="top-actions">
+            <a class="btn ghost" href="/logout">Logout</a>
+        </div>
+    </header>
+
+    <section class="container">
+        <div class="glass-shell">
+
+            <div class="row" style="justify-content: space-between; align-items:flex-start;">
+                <div>
+                    <h2 style="margin:0;">Requests</h2>
+                    <p class="muted" style="margin:6px 0 0;">
+                        Manage connection requests. Accept to start chatting, or reject/cancel.
+                    </p>
+                </div>
+                <span class="badge">Connections</span>
+            </div>
+
+            <!-- IMPORTANT: Keep id="msg" (your JS probably writes status here) -->
+            <p id="msg" class="toast info">Loading requests…</p>
+
+            <div class="req-layout">
+
+                <!-- Incoming -->
+                <div class="req-column">
+                    <div class="glass-card req-header">
+                        <div>
+                            <h3 class="req-title">Incoming Requests</h3>
+                            <p class="req-sub">People who want to connect with you.</p>
+                        </div>
+                        <span class="badge">Incoming</span>
+                    </div>
+
+                    <!-- IMPORTANT: Keep id="incoming" -->
+                    <div id="incoming" class="req-list">
+                        <!-- JS will render items here -->
+                        <div class="req-empty">No incoming requests yet.</div>
+                    </div>
+                </div>
+
+                <!-- Outgoing -->
+                <div class="req-column">
+                    <div class="glass-card req-header">
+                        <div>
+                            <h3 class="req-title">Outgoing Requests</h3>
+                            <p class="req-sub">Requests you sent to others.</p>
+                        </div>
+                        <span class="badge">Outgoing</span>
+                    </div>
+
+                    <!-- IMPORTANT: Keep id="outgoing" -->
+                    <div id="outgoing" class="req-list">
+                        <!-- JS will render items here -->
+                        <div class="req-empty">No outgoing requests yet.</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- IMPORTANT: keep your existing JS file (functionality unchanged) -->
+    <script type="module" src="/js/requests.js"></script>
 </main>
 
-<script type="module" src="/js/requests.js"></script>
 </body>
 </html>
