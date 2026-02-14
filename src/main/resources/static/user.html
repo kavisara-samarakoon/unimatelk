@@ -4,83 +4,47 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>UniMateLK - User</title>
-
-    <!-- Keep your existing styles -->
-    <link rel="stylesheet" href="/css/theme.css">
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
-<!-- Background (glass theme) -->
-<div class="bg">
-    <div class="blob b1"></div>
-    <div class="blob b2"></div>
-    <div class="blob b3"></div>
-    <div class="grain"></div>
-</div>
+<header class="topbar">
+    <h1 class="brand"><span class="brand-badge"></span>UniMateLK</h1>
+    <div class="top-actions">
+        <a class="btn secondary" href="/matches.html">Matches</a>
+        <a class="btn secondary" href="/requests.html">Requests</a>
+        <a class="btn secondary" href="/chat.html">Chat</a>
+    </div>
+</header>
 
-<main class="page">
-
-    <!-- ✅ Navbar must be INSIDE .page -->
-    <div id="navbarMount"></div>
-
-    <section class="container">
-        <div class="glass-shell" style="height:auto;">
-
-            <div class="row" style="justify-content:space-between; align-items:flex-start;">
-                <div>
-                    <h2 id="title" style="margin:0;">User Profile</h2>
-                    <p id="msg" class="muted" style="margin:6px 0 0;"></p>
-                </div>
-                <span class="badge">Profile View</span>
-            </div>
-
-            <div class="divider"></div>
-
-            <!-- Your JS renders into these -->
-            <div id="profileCard" class="glass-card"></div>
-            <div id="matchCard" class="glass-card" style="margin-top:12px;"></div>
-            <div id="actions" class="glass-card" style="margin-top:12px;"></div>
-            <div id="safety" class="glass-card" style="margin-top:12px;"></div>
-
-            <!-- Report block -->
-            <div class="glass-card" style="margin-top:12px;">
-                <h3 style="margin:0 0 6px;">Report this user</h3>
-                <p class="muted" style="margin:0 0 12px;">Use this if the user violates rules or behaves inappropriately.</p>
-
-                <label for="reportReason">Reason</label>
-                <select id="reportReason">
-                    <option value="">Select reason</option>
-                    <option value="Harassment">Harassment</option>
-                    <option value="Fake profile">Fake profile</option>
-                    <option value="Inappropriate content">Inappropriate content</option>
-                    <option value="Spam">Spam</option>
-                    <option value="Other">Other</option>
-                </select>
-
-                <div class="divider"></div>
-
-                <label for="reportDetails">Details (optional)</label>
-                <textarea id="reportDetails" rows="4" placeholder="Explain what happened..."></textarea>
-
-                <div class="row" style="margin-top:10px; gap:10px; align-items:center;">
-                    <button class="btn secondary" id="reportBtn" type="button">Submit Report</button>
-                    <span id="reportMsg" class="muted"></span>
-                </div>
-            </div>
-
+<main class="container">
+    <h2 id="title">User Profile</h2>
+    <p id="msg" class="muted"></p>
+    <div id="profileCard" class="card"></div>
+    <div id="matchCard" class="card" style="margin-top:12px;"></div>
+    <div id="actions" class="card" style="margin-top:12px;"></div>
+    <div id="safety" class="card" style="margin-top:12px;"></div>
+    <div class="card" style="margin-top:12px;">
+        <h3>Report this user</h3>
+        <p class="muted">Use this if the user violates rules or behaves inappropriately.</p>
+        <label>Reason</label>
+        <select id="reportReason">
+            <option value="">Select reason</option>
+            <option value="Harassment">Harassment</option>
+            <option value="Fake profile">Fake profile</option>
+            <option value="Inappropriate content">Inappropriate content</option>
+            <option value="Spam">Spam</option>
+            <option value="Other">Other</option>
+        </select>
+        <label style="margin-top:10px;">Details (optional)</label>
+        <textarea id="reportDetails" rows="4" placeholder="Explain what happened..."></textarea>
+        <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+            <button class="btn secondary" id="reportBtn" type="button">Submit Report</button>
+            <span id="reportMsg" class="muted"></span>
         </div>
-    </section>
-
+    </div>
 </main>
 
-<!-- ✅ Mount navbar explicitly -->
-<script type="module">
-    import { mountNavbar } from "/js/navbar.js";
-    mountNavbar();
-</script>
-
-<!-- ✅ Your existing scripts (unchanged) -->
 <script type="module" src="/js/user.js"></script>
 <script type="module" src="/js/report.js"></script>
 

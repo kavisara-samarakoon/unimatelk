@@ -10,7 +10,6 @@
 </head>
 <body>
 
-<!-- Background -->
 <div class="bg">
     <div class="blob b1"></div>
     <div class="blob b2"></div>
@@ -20,8 +19,25 @@
 
 <main class="page">
 
-    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
-    <div id="navbarMount"></div>
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand-badge"></span>
+            UniMateLK
+        </div>
+
+        <nav class="navlinks">
+            <a href="/home.html" aria-current="page">Home</a>
+            <a href="/profile.html">Profile</a>
+            <a href="/preferences.html">Preferences</a>
+            <a href="/matches.html">Matches</a>
+            <a href="/requests.html">Requests</a>
+            <a href="/chat.html">Chat</a>
+        </nav>
+
+        <div class="top-actions">
+            <a class="btn ghost" href="/logout">Logout</a>
+        </div>
+    </header>
 
     <section class="container">
         <div class="glass-shell">
@@ -167,14 +183,6 @@
 
         </div>
     </section>
-
 </main>
-
-<!-- ✅ Mount navbar explicitly (guaranteed) -->
-<script type="module">
-    import { mountNavbar } from "/js/navbar.js";
-    mountNavbar();
-</script>
-
 </body>
 </html>

@@ -20,8 +20,26 @@
 
 <main class="page">
 
-    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
-    <div id="navbarMount"></div>
+    <!-- Topbar -->
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand-badge"></span>
+            UniMateLK
+        </div>
+
+        <nav class="navlinks">
+            <a href="/home.html">Home</a>
+            <a href="/profile.html" aria-current="page">Profile</a>
+            <a href="/preferences.html">Preferences</a>
+            <a href="/matches.html">Matches</a>
+            <a href="/requests.html">Requests</a>
+            <a href="/chat.html">Chat</a>
+        </nav>
+
+        <div class="top-actions">
+            <a class="btn ghost" href="/logout">Logout</a>
+        </div>
+    </header>
 
     <section class="container">
         <div class="glass-shell">
@@ -38,7 +56,7 @@
                 <span class="badge">Profile Setup</span>
             </div>
 
-            <!-- IMPORTANT: keep your existing id if profile.js uses it -->
+            <!-- Message area (keep your existing id if profile.js uses it) -->
             <div id="msg" class="toast info">Complete your profile then save.</div>
 
             <div class="grid two">
@@ -47,10 +65,12 @@
                 <div class="glass-card">
                     <p class="section-title">Personal Details</p>
 
-                    <!-- ✅ NOTE:
-                         If your original project had different fields/ids,
-                         keep those SAME ids. Otherwise profile.js won’t save.
+                    <!-- ✅ IMPORTANT:
+                         PASTE YOUR EXISTING PROFILE FORM FIELDS HERE
+                         Keep all input IDs EXACTLY the same as before.
                     -->
+
+                    <!-- Example layout ONLY (replace with your real fields) -->
                     <div class="grid two">
                         <div>
                             <label for="fullName">Full Name</label>
@@ -94,11 +114,11 @@
 
                     <div class="divider"></div>
 
-                    <!-- IMPORTANT: keep id="saveBtn" if profile.js expects it -->
+                    <!-- Save button (KEEP YOUR REAL ID if profile.js expects it) -->
                     <button id="saveBtn" class="btn" type="button">Save Profile</button>
                 </div>
 
-                <!-- RIGHT: Picture + Preview -->
+                <!-- RIGHT: Profile Picture + Preview -->
                 <div class="glass-card">
                     <p class="section-title">Profile Picture</p>
 
@@ -109,6 +129,7 @@
 
                     <div class="divider"></div>
 
+                    <!-- Keep your existing file input ID -->
                     <label for="photo" class="upload-box">
                         <div class="upload-ico">📷</div>
                         <div>
@@ -140,16 +161,8 @@
         </div>
     </section>
 
+    <!-- ✅ Keep your existing JS file exactly -->
+    <script type="module" src="/js/profile.js"></script>
 </main>
-
-<!-- ✅ Mount navbar explicitly (guaranteed) -->
-<script type="module">
-    import { mountNavbar } from "/js/navbar.js";
-    mountNavbar();
-</script>
-
-<!-- ✅ Keep your existing JS file exactly -->
-<script type="module" src="/js/profile.js"></script>
-
 </body>
 </html>

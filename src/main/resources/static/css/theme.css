@@ -272,39 +272,3 @@ input:focus, select:focus, textarea:focus{
     .topbar{ flex-direction: column; align-items: stretch; }
     .top-actions{ justify-content: space-between; }
 }
-/* ===============================
-   Navbar FIX: always visible
-   =============================== */
-
-/* Sticky navbar */
-.nav-sticky{
-    position: sticky;
-    top: 10px;
-    z-index: 50;
-}
-
-/* Allow wrap instead of hiding */
-.nav-always{
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-/* Active nav link style */
-.navlinks a.active{
-    border-color: rgba(255,255,255,0.55) !important;
-    opacity: 1 !important;
-}
-
-/* Small screens: horizontal scroll instead of disappearing */
-@media (max-width: 700px){
-    .navlinks{
-        overflow-x: auto;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 6px;
-        max-width: 92vw;
-    }
-    .navlinks a{
-        flex: 0 0 auto;
-    }
-}

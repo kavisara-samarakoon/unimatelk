@@ -8,7 +8,6 @@
 </head>
 <body>
 
-<!-- Background -->
 <div class="bg">
   <div class="blob b1"></div>
   <div class="blob b2"></div>
@@ -17,10 +16,6 @@
 </div>
 
 <main class="page">
-
-  <!-- ✅ NAVBAR MUST BE INSIDE .page -->
-  <div id="navbarMount"></div>
-
   <div class="glass-shell" style="width:min(520px,96vw); height:auto;">
     <section class="panel" style="position:relative; width:100%;">
       <div class="panel-inner" style="padding:36px;">
@@ -30,12 +25,12 @@
         <form id="resetForm" class="form">
           <label class="field">
             <span>New Password</span>
-            <input id="newPassword" type="password" placeholder="New password"/>
+            <input id="newPassword" type="password" placeholder="New password" />
           </label>
 
           <label class="field">
             <span>Confirm Password</span>
-            <input id="confirmPassword" type="password" placeholder="Confirm password"/>
+            <input id="confirmPassword" type="password" placeholder="Confirm password" />
           </label>
 
           <button class="primary" type="submit">RESET</button>
@@ -51,14 +46,6 @@
   <div class="toast" id="toast"></div>
 </main>
 
-<!-- ✅ Mount navbar explicitly -->
-<script type="module">
-  import { mountNavbar } from "/js/navbar.js";
-  mountNavbar();
-</script>
-
-<!-- ✅ Your reset logic -->
 <script src="/js/reset.js"></script>
-
 </body>
 </html>

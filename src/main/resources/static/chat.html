@@ -20,8 +20,24 @@
 
 <main class="page">
 
-    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
-    <div id="navbarMount"></div>
+    <!-- Topbar -->
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand-badge"></span>
+            UniMateLK
+        </div>
+
+        <nav class="navlinks">
+            <a href="/profile.html">Profile</a>
+            <a href="/matches.html">Matches</a>
+            <a href="/requests.html">Requests</a>
+            <a href="/chat.html">Chat</a>
+        </nav>
+
+        <div class="top-actions">
+            <a class="btn ghost" href="/logout">Logout</a>
+        </div>
+    </header>
 
     <section class="container">
         <div class="glass-shell chat-shell">
@@ -45,11 +61,11 @@
                     <div class="search">
                         <input type="text" placeholder="Search chats..."
                                oninput="
-                const q=this.value.toLowerCase();
-                document.querySelectorAll('#roomsList > *').forEach(x=>{
-                  x.style.display = x.innerText.toLowerCase().includes(q) ? '' : 'none';
-                });
-              ">
+                     const q=this.value.toLowerCase();
+                     document.querySelectorAll('#roomsList > *').forEach(x=>{
+                       x.style.display = x.innerText.toLowerCase().includes(q) ? '' : 'none';
+                     });
+                   ">
                     </div>
 
                     <!-- ✅ REQUIRED by chat.js -->
@@ -73,14 +89,21 @@
 
                     <!-- Composer -->
                     <div class="chat-composer">
+                        <!-- Left: input + image -->
                         <div class="row" style="width:100%; gap:10px;">
                             <input id="messageInput" type="text" placeholder="Type a message..."/>
+
+                            <!-- ✅ REQUIRED by chat.js -->
                             <input id="imageInput" type="file" accept="image/*" style="max-width:190px;"/>
                         </div>
 
+                        <!-- Right: buttons -->
                         <div class="row" style="justify-content:flex-end; gap:10px;">
+                            <!-- ✅ REQUIRED by chat.js -->
                             <button id="sendImageBtn" type="button" class="btn secondary">Send Image</button>
-                            <button id="sendBtn" type="button" class="btn">Send</button>
+
+                            <!-- ✅ REQUIRED by chat.js -->
+                            <button id="sendBtn" type="button">Send</button>
                         </div>
                     </div>
 
@@ -90,16 +113,8 @@
         </div>
     </section>
 
+    <script type="module" src="/js/chat.js"></script>
 </main>
-
-<!-- ✅ Mount navbar explicitly (guaranteed) -->
-<script type="module">
-    import { mountNavbar } from "/js/navbar.js";
-    mountNavbar();
-</script>
-
-<!-- ✅ Your chat functionality -->
-<script type="module" src="/js/chat.js"></script>
 
 </body>
 </html>
