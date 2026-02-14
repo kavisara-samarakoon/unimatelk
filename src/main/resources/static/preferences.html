@@ -4,102 +4,133 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>UniMateLK - Preferences</title>
-    <link rel="stylesheet" href="/css/style.css"/>
+
+    <!-- New theme (glass + background) -->
+    <link rel="stylesheet" href="/css/theme.css"/>
 </head>
 <body>
 
-<header class="topbar">
-    <h1 class="brand"><span class="brand-badge"></span>UniMateLK</h1>
-    <div class="top-actions">
-        <a class="btn ghost" href="/index.html">← Home</a>
+<!-- Background -->
+<div class="bg">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="grain"></div>
+</div>
+
+<main class="page">
+
+    <!-- Top bar -->
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand-badge"></span>
+            UniMateLK
+        </div>
+
         <nav class="navlinks">
             <a href="/profile.html">Profile</a>
             <a href="/matches.html">Matches</a>
             <a href="/requests.html">Requests</a>
             <a href="/chat.html">Chat</a>
         </nav>
-    </div>
-</header>
 
-<main class="container">
-    <div class="toolbar">
-        <div class="left">
-            <h2 class="m0">My Preferences</h2>
-            <span class="badge">All values must be 1–5</span>
+        <div class="top-actions">
+            <a class="btn ghost" href="/logout">Logout</a>
         </div>
-    </div>
+    </header>
 
-    <p id="msg" class="toast info">Fill preferences to improve your match scores.</p>
+    <section class="container">
+        <div class="glass-shell">
 
-    <section class="card">
-        <p class="section-title">Lifestyle scales (1–5)</p>
-
-        <div class="form-row three">
-            <div>
-                <label for="sleep">Sleep Schedule (1–5)</label>
-                <input id="sleep" type="number" min="1" max="5" placeholder="1..5" />
-                <div class="help">1 = early sleeper, 5 = late sleeper</div>
+            <div class="row" style="justify-content: space-between;">
+                <div>
+                    <h2 style="margin:0;">My Preferences</h2>
+                    <p class="muted" style="margin:6px 0 0;">
+                        Fill these to improve your match suggestions. Values must be <b>1–5</b>.
+                    </p>
+                </div>
+                <span class="badge">Lifestyle Matching</span>
             </div>
 
-            <div>
-                <label for="clean">Cleanliness (1–5)</label>
-                <input id="clean" type="number" min="1" max="5" placeholder="1..5" />
+            <!-- IMPORTANT: keep id="msg" (JS uses it) -->
+            <p id="msg" class="toast info">Fill preferences to improve your match scores.</p>
+
+            <div class="glass-card">
+                <p class="section-title">Lifestyle scales (1–5)</p>
+
+                <div class="grid three">
+                    <div>
+                        <label for="sleep">Sleep Schedule (1–5)</label>
+                        <input id="sleep" type="number" min="1" max="5" placeholder="1..5"/>
+                        <div class="help">1 = early sleeper, 5 = late sleeper</div>
+                    </div>
+
+                    <div>
+                        <label for="clean">Cleanliness (1–5)</label>
+                        <input id="clean" type="number" min="1" max="5" placeholder="1..5"/>
+                    </div>
+
+                    <div>
+                        <label for="noise">Noise Tolerance (1–5)</label>
+                        <input id="noise" type="number" min="1" max="5" placeholder="1..5"/>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="grid two">
+                    <div>
+                        <label for="guests">Guest Frequency OK (1–5)</label>
+                        <input id="guests" type="number" min="1" max="5" placeholder="1..5"/>
+                    </div>
+
+                    <div>
+                        <label for="intro">Introvert ↔ Extrovert (1–5)</label>
+                        <input id="intro" type="number" min="1" max="5" placeholder="1..5"/>
+                        <div class="help">1 = introvert, 5 = extrovert</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <p class="section-title">Yes / No</p>
+
+                <div class="grid two">
+                    <div>
+                        <label for="smoking">Smoking OK?</label>
+                        <select id="smoking">
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="drinking">Drinking OK?</label>
+                        <select id="drinking">
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="row">
+                    <!-- IMPORTANT: keep id="saveBtn" (JS uses it) -->
+                    <button id="saveBtn" class="btn" type="button">Save Preferences</button>
+                    <a class="btn secondary" href="/matches.html">View Matches</a>
+                </div>
+
+                <p class="help" style="margin-top:12px;">
+                    If any field is empty or outside 1–5, saving will show an error.
+                </p>
             </div>
 
-            <div>
-                <label for="noise">Noise Tolerance (1–5)</label>
-                <input id="noise" type="number" min="1" max="5" placeholder="1..5" />
-            </div>
         </div>
-
-        <div class="form-row two">
-            <div>
-                <label for="guests">Guest Frequency OK (1–5)</label>
-                <input id="guests" type="number" min="1" max="5" placeholder="1..5" />
-            </div>
-
-            <div>
-                <label for="intro">Introvert ↔ Extrovert (1–5)</label>
-                <input id="intro" type="number" min="1" max="5" placeholder="1..5" />
-                <div class="help">1 = introvert, 5 = extrovert</div>
-            </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <p class="section-title">Yes / No</p>
-
-        <div class="form-row two">
-            <div>
-                <label for="smoking">Smoking OK?</label>
-                <select id="smoking">
-                    <option value="true">Yes</option>
-                    <option value="false">No</option>
-                </select>
-            </div>
-
-            <div>
-                <label for="drinking">Drinking OK?</label>
-                <select id="drinking">
-                    <option value="true">Yes</option>
-                    <option value="false">No</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="row">
-            <button id="saveBtn" class="btn" type="button">Save Preferences</button>
-            <a class="btn ghost" href="/matches.html">View Matches</a>
-        </div>
-
-        <p class="help mt12">
-            If any value is empty or outside 1–5, saving will fail.
-        </p>
     </section>
-</main>
 
-<script type="module" src="/js/preferences.js"></script>
+    <!-- IMPORTANT: keep the same script (functionality unchanged) -->
+    <script type="module" src="/js/preferences.js"></script>
+</main>
 </body>
 </html>
