@@ -2,37 +2,57 @@ package com.unimatelk.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                // ✅ CSRF token cookie for JS (XSRF-TOKEN)
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(org.springframework.security.web.csrf.CookieCsrfTokenRepository.withHttpOnlyFalse())
+                )
+
                 .authorizeHttpRequests(auth -> auth
+                        // ✅ public assets
                         .requestMatchers(
-                                "/", "/index.html",
-                                "/css/**", "/js/**", "/uploads/**", "/favicon.ico",
-                                "/login**", "/oauth2/**"
+                                "/", "/index.html", "/error",
+                                "/css/**", "/js/**", "/images/**", "/favicon.ico"
                         ).permitAll()
 
-                        // ✅ Let admin page load after login
+                        // ✅ admin page needs login
                         .requestMatchers("/admin.html").authenticated()
 
-                        // ✅ Allow calling admin APIs only if logged in (ADMIN check is done in controller using DB)
-                        .requestMatchers("/api/admin/**").authenticated()
+                        // ✅ APIs require login (admin API still checks ADMIN role)
+                        .requestMatchers("/api/**").authenticated()
 
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
-                .oauth2Login(oauth -> oauth.defaultSuccessUrl("/index.html", true))
-                .logout(logout -> logout.logoutSuccessUrl("/index.html"));
+
+                .oauth2Login(Customizer.withDefaults())
+
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/index.html")
+                        .permitAll()
+                )
+
+                // ✅ IMPORTANT: for /api/** return 401 JSON instead of redirect HTML
+                .exceptionHandling(ex -> ex
+                        .defaultAuthenticationEntryPointFor(
+                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                                (RequestMatcher) request -> request.getRequestURI().startsWith("/api/")
+                        )
+                );
 
         return http.build();
     }
