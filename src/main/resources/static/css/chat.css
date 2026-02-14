@@ -1,192 +1,57 @@
 /* =========================================================
-   chat.css (FINAL)
-   Responsive chat layout: 2 columns -> 1 column
-   Glass theme friendly
+   FIX: prevent huge images + broken layout in chat
+   Works for BOTH possible message styles:
+   - .msg (your chat.css bubble class)
+   - .chat-msg (some versions of chat.js render this)
+   Also targets #messages and #chatBox containers
    ========================================================= */
 
-/* Main layout */
-.chat-layout{
-    display: grid;
-    grid-template-columns: 340px 1fr;
-    gap: 12px;
-    align-items: stretch;
-}
-
-/* Sidebar */
-.chat-sidebar{
-    min-height: 520px;
-    display: flex;
-    flex-direction: column;
-}
-
-.sidebar-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    flex-wrap:wrap;
-}
-
-.sidebar-head .title{
-    font-weight: 900;
-    color: rgba(255,255,255,0.96);
-}
-
-.sidebar-tools{
-    display:flex;
-    gap:10px;
-    margin-top:10px;
-}
-
-.sidebar-tools input{
-    flex: 1;
-}
-
-/* Conversation list */
-.thread-list{
-    margin-top: 12px;
-    display: grid;
-    gap: 10px;
+/* Prevent messages area from stretching the whole page */
+.messages, #messages, #chatBox {
     overflow: auto;
-    padding-right: 6px;
+    max-height: 520px;   /* adjust if you want taller */
 }
 
-/* Each thread item */
-.thread-item{
-    border-radius: 16px;
-    padding: 12px;
+/* Make sure message bubbles don't overflow with long text */
+.msg, .chat-msg {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* Limit images inside chat so they never become giant */
+.msg img,
+.chat-msg img,
+#messages img,
+#chatBox img {
+    display: block;
+    max-width: 260px;     /* main size limit */
+    width: 100%;
+    height: auto;
+    max-height: 260px;    /* prevents very tall images */
+    object-fit: contain;
+    border-radius: 12px;
     border: 1px solid rgba(255,255,255,0.14);
-    background: rgba(10,14,30,0.22);
-    cursor: pointer;
-    transition: transform .15s ease, border-color .15s ease;
+    margin-top: 8px;
 }
 
-.thread-item:hover{
-    transform: translateY(-2px);
-    border-color: rgba(255,255,255,0.30);
-}
-
-.thread-item .name{
-    font-weight: 900;
-    color: rgba(255,255,255,0.96);
-}
-
-.thread-item .preview{
-    margin-top: 6px;
-    color: rgba(255,255,255,0.78);
-    font-size: 13px;
-    line-height: 1.35;
-}
-
-/* Active thread */
-.thread-item.active{
-    border-color: rgba(255,255,255,0.45);
-    background: rgba(255,255,255,0.10);
-}
-
-/* Chat panel */
-.chat-panel{
-    min-height: 520px;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Top bar inside chat panel */
-.chat-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    flex-wrap:wrap;
-}
-
-.chat-head .who{
-    font-weight: 900;
-    color: rgba(255,255,255,0.96);
-}
-
-.chat-head .sub{
-    margin-top: 4px;
-    color: rgba(255,255,255,0.75);
-    font-size: 13px;
-}
-
-/* Messages area */
-.messages{
-    margin-top: 12px;
-    flex: 1;
-    overflow: auto;
-    padding-right: 6px;
-    display: grid;
-    gap: 10px;
-}
-
-/* Message bubbles */
-.msg{
-    max-width: 78%;
-    padding: 10px 12px;
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.14);
-    background: rgba(10,14,30,0.22);
-    color: rgba(255,255,255,0.92);
-    line-height: 1.35;
-    font-size: 14px;
-}
-
-.msg.me{
-    margin-left: auto;
-    background: rgba(255,255,255,0.12);
-    border-color: rgba(255,255,255,0.22);
-}
-
-.msg .meta{
-    margin-top: 6px;
-    color: rgba(255,255,255,0.65);
-    font-size: 12px;
-}
-
-/* Composer */
-.composer{
-    margin-top: 12px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.composer input, .composer textarea{
-    flex: 1;
-}
-
-.composer button{
-    width: 160px;
-}
-
-/* =========================================================
-   ✅ RESPONSIVE FIX (the change you asked)
-   2 columns -> 1 column on small screens
-   ========================================================= */
-@media (max-width: 950px){
-    .chat-layout{
-        grid-template-columns: 1fr;
-    }
-
-    .composer button{
-        width: 100%;
-    }
-
-    .composer{
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .msg{
-        max-width: 92%;
+/* On bigger screens allow slightly larger image previews */
+@media (min-width: 900px) {
+    .msg img,
+    .chat-msg img,
+    #messages img,
+    #chatBox img {
+        max-width: 340px;
+        max-height: 340px;
     }
 }
 
-/* Small phones */
-@media (max-width: 420px){
-    .chat-sidebar, .chat-panel{
-        min-height: auto;
+/* On small phones make images smaller so chat stays clean */
+@media (max-width: 420px) {
+    .msg img,
+    .chat-msg img,
+    #messages img,
+    #chatBox img {
+        max-width: 220px;
+        max-height: 220px;
     }
 }
