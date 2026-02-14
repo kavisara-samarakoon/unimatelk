@@ -1,192 +1,183 @@
-/* =========================================================
-   chat.css (FINAL)
-   Responsive chat layout: 2 columns -> 1 column
-   Glass theme friendly
-   ========================================================= */
+/* ========================= */
+/* CHAT LAYOUT FIXED */
+/* ========================= */
 
-/* Main layout */
-.chat-layout{
-    display: grid;
-    grid-template-columns: 340px 1fr;
-    gap: 12px;
-    align-items: stretch;
-}
-
-/* Sidebar */
-.chat-sidebar{
-    min-height: 520px;
+.chat-shell {
+    height: 680px;
     display: flex;
     flex-direction: column;
 }
 
-.sidebar-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    flex-wrap:wrap;
-}
-
-.sidebar-head .title{
-    font-weight: 900;
-    color: rgba(255,255,255,0.96);
-}
-
-.sidebar-tools{
-    display:flex;
-    gap:10px;
-    margin-top:10px;
-}
-
-.sidebar-tools input{
-    flex: 1;
-}
-
-/* Conversation list */
-.thread-list{
-    margin-top: 12px;
+/* Main Layout */
+.chat-grid {
     display: grid;
-    gap: 10px;
-    overflow: auto;
-    padding-right: 6px;
+    grid-template-columns: 300px 1fr;
+    gap: 0;
+    height: 100%;
+    border-radius: 22px;
+    overflow: hidden;
 }
 
-/* Each thread item */
-.thread-item{
-    border-radius: 16px;
+/* ========================= */
+/* LEFT SIDEBAR */
+/* ========================= */
+
+.chat-sidebar {
+    background: rgba(255,255,255,0.08);
+    border-right: 1px solid rgba(255,255,255,0.15);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Sidebar header */
+.chat-sidebar h3 {
+    margin: 0;
+}
+
+.chat-list {
+    margin-top: 14px;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Chat room item */
+.chat-room {
     padding: 12px;
-    border: 1px solid rgba(255,255,255,0.14);
-    background: rgba(10,14,30,0.22);
+    border-radius: 14px;
     cursor: pointer;
-    transition: transform .15s ease, border-color .15s ease;
+    background: rgba(255,255,255,0.06);
+    transition: 0.2s ease;
 }
 
-.thread-item:hover{
-    transform: translateY(-2px);
-    border-color: rgba(255,255,255,0.30);
+.chat-room:hover {
+    background: rgba(255,255,255,0.14);
 }
 
-.thread-item .name{
-    font-weight: 900;
-    color: rgba(255,255,255,0.96);
+.chat-room.active {
+    background: linear-gradient(90deg,#7c4dff,#00d4ff);
+    color: white;
 }
 
-.thread-item .preview{
-    margin-top: 6px;
-    color: rgba(255,255,255,0.78);
-    font-size: 13px;
-    line-height: 1.35;
-}
+/* ========================= */
+/* RIGHT CHAT AREA */
+/* ========================= */
 
-/* Active thread */
-.thread-item.active{
-    border-color: rgba(255,255,255,0.45);
-    background: rgba(255,255,255,0.10);
-}
-
-/* Chat panel */
-.chat-panel{
-    min-height: 520px;
+.chat-main {
     display: flex;
     flex-direction: column;
+    padding: 18px;
 }
 
-/* Top bar inside chat panel */
-.chat-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    flex-wrap:wrap;
+/* Chat header */
+.chat-main .chat-header {
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    padding-bottom: 12px;
+    margin-bottom: 12px;
 }
 
-.chat-head .who{
-    font-weight: 900;
-    color: rgba(255,255,255,0.96);
-}
+/* ========================= */
+/* MESSAGES */
+/* ========================= */
 
-.chat-head .sub{
-    margin-top: 4px;
-    color: rgba(255,255,255,0.75);
-    font-size: 13px;
-}
-
-/* Messages area */
-.messages{
-    margin-top: 12px;
+.chat-messages {
     flex: 1;
-    overflow: auto;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     padding-right: 6px;
-    display: grid;
-    gap: 10px;
 }
 
-/* Message bubbles */
-.msg{
-    max-width: 78%;
-    padding: 10px 12px;
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.14);
-    background: rgba(10,14,30,0.22);
-    color: rgba(255,255,255,0.92);
-    line-height: 1.35;
+/* Message bubble */
+.msg {
+    max-width: 65%;
+    padding: 10px 14px;
+    border-radius: 18px;
     font-size: 14px;
+    line-height: 1.4;
 }
 
-.msg.me{
-    margin-left: auto;
+/* My messages */
+.msg.me {
+    align-self: flex-end;
+    background: linear-gradient(90deg,#7c4dff,#00d4ff);
+    color: white;
+    border-bottom-right-radius: 6px;
+}
+
+/* Other messages */
+.msg.other {
+    align-self: flex-start;
     background: rgba(255,255,255,0.12);
-    border-color: rgba(255,255,255,0.22);
+    color: white;
+    border-bottom-left-radius: 6px;
 }
 
-.msg .meta{
+/* Images inside messages */
+.msg img {
+    max-width: 220px;
+    border-radius: 10px;
     margin-top: 6px;
-    color: rgba(255,255,255,0.65);
-    font-size: 12px;
 }
 
-/* Composer */
-.composer{
+/* ========================= */
+/* COMPOSER */
+/* ========================= */
+
+.chat-composer {
     margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.15);
     display: flex;
     gap: 10px;
     align-items: center;
 }
 
-.composer input, .composer textarea{
+.chat-composer input[type="text"] {
     flex: 1;
+    padding: 10px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.1);
+    color: white;
 }
 
-.composer button{
-    width: 160px;
+.chat-composer input[type="text"]:focus {
+    outline: none;
+    border-color: rgba(255,255,255,0.6);
 }
 
-/* =========================================================
-   ✅ RESPONSIVE FIX (the change you asked)
-   2 columns -> 1 column on small screens
-   ========================================================= */
-@media (max-width: 950px){
-    .chat-layout{
+/* ========================= */
+/* SCROLLBAR */
+/* ========================= */
+
+.chat-messages::-webkit-scrollbar,
+.chat-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb,
+.chat-list::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 10px;
+}
+
+/* ========================= */
+/* RESPONSIVE */
+/* ========================= */
+
+@media (max-width: 900px) {
+    .chat-grid {
         grid-template-columns: 1fr;
     }
 
-    .composer button{
-        width: 100%;
-    }
-
-    .composer{
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .msg{
-        max-width: 92%;
-    }
-}
-
-/* Small phones */
-@media (max-width: 420px){
-    .chat-sidebar, .chat-panel{
-        min-height: auto;
+    .chat-sidebar {
+        height: 220px;
+        border-right: none;
+        border-bottom: 1px solid rgba(255,255,255,0.15);
     }
 }
