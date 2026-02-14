@@ -1,72 +1,89 @@
 package com.unimatelk.api;
 
 import com.unimatelk.domain.AppUser;
-import com.unimatelk.domain.ModerationCase;
-import com.unimatelk.service.AdminService;
-import com.unimatelk.service.CurrentUserService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import com.unimatelk.repo.AppUserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
 
-    private final CurrentUserService current;
-    private final AdminService adminService;
+    private final AppUserRepository userRepo;
 
-    public AdminController(CurrentUserService current, AdminService adminService) {
-        this.current = current;
-        this.adminService = adminService;
+    public AdminController(AppUserRepository userRepo) {
+        this.userRepo = userRepo;
     }
 
-    /** Day 12: Admin review dashboard (moderation cases) */
-    @GetMapping("/cases")
-    public java.util.Map<String, Object> cases(
-            @AuthenticationPrincipal OAuth2User oauth,
-            @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
-        AppUser admin = current.requireUser(oauth);
-        if (page < 0) page = 0;
-        if (size <= 0 || size > 100) size = 20;
+    // ✅ This checks ADMIN from DB for EVERY admin API call
+    private AppUser requireAdmin(OAuth2User oauth) {
+        String email = oauth.getAttribute("email");
+        if (email == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No email in session");
 
-        Page<ModerationCase> p = adminService.listCases(status, PageRequest.of(page, size));
-        List<AdminDtos.ModerationCaseCard> items = p.getContent().stream().map(this::toCard).toList();
-        return java.util.Map.of("items", items, "page", page, "size", size, "total", p.getTotalElements());
+        AppUser me = userRepo.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found in DB"));
+
+        if (!"ADMIN".equalsIgnoreCase(me.getRole())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Admin only");
+        }
+        return me;
     }
 
-    /** Day 12: Resolve case by UNBLOCK or BAN */
-    @PostMapping("/cases/{caseId}/resolve")
-    public AdminDtos.ModerationCaseCard resolve(
-            @AuthenticationPrincipal OAuth2User oauth,
-            @PathVariable Long caseId,
-            @RequestBody AdminDtos.ResolveRequest req
-    ) {
-        AppUser admin = current.requireUser(oauth);
-        ModerationCase c = adminService.resolve(admin, caseId, req != null ? req.action() : null, req != null ? req.note() : null);
-        return toCard(c);
+    // ---------------- USERS ----------------
+    @GetMapping("/users")
+    public Map<String, Object> users(@org.springframework.security.core.annotation.AuthenticationPrincipal OAuth2User oauth,
+                                     @RequestParam(defaultValue = "") String query) {
+        requireAdmin(oauth);
+
+        String q = query.trim().toLowerCase();
+        List<AppUser> all = userRepo.findAll();
+
+        var items = all.stream()
+                .filter(u -> q.isBlank()
+                        || (u.getName() != null && u.getName().toLowerCase().contains(q))
+                        || (u.getEmail() != null && u.getEmail().toLowerCase().contains(q)))
+                .map(u -> Map.of(
+                        "id", u.getId(),
+                        "name", u.getName(),
+                        "email", u.getEmail(),
+                        "role", u.getRole(),
+                        "status", u.getStatus()
+                ))
+                .toList();
+
+        return Map.of("items", items);
     }
 
-    private AdminDtos.ModerationCaseCard toCard(ModerationCase c) {
-        String resolvedBy = c.getResolvedBy() != null ? c.getResolvedBy().getEmail() : null;
-        return new AdminDtos.ModerationCaseCard(
-                c.getId(),
-                c.getReportedUser().getId(),
-                c.getReportedUser().getEmail(),
-                c.getReportedUser().getName(),
-                c.getReportedUser().getStatus(),
-                c.getStatus(),
-                c.getAction(),
-                c.getResolutionNote(),
-                c.getCreatedAt(),
-                c.getResolvedAt(),
-                resolvedBy
-        );
+    @PatchMapping("/users/{id}/role")
+    public Map<String, Object> setRole(@org.springframework.security.core.annotation.AuthenticationPrincipal OAuth2User oauth,
+                                       @PathVariable Long id,
+                                       @RequestBody Map<String, String> body) {
+        requireAdmin(oauth);
+
+        String role = body.get("role");
+        AppUser u = userRepo.findById(id).orElseThrow();
+        u.setRole(role);
+        userRepo.save(u);
+
+        return Map.of("ok", true);
+    }
+
+    @PatchMapping("/users/{id}/status")
+    public Map<String, Object> setStatus(@org.springframework.security.core.annotation.AuthenticationPrincipal OAuth2User oauth,
+                                         @PathVariable Long id,
+                                         @RequestBody Map<String, String> body) {
+        requireAdmin(oauth);
+
+        String status = body.get("status");
+        AppUser u = userRepo.findById(id).orElseThrow();
+        u.setStatus(status);
+        userRepo.save(u);
+
+        return Map.of("ok", true);
     }
 }
