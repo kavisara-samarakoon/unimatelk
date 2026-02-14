@@ -2,10 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>UniMateLK - Chat</title>
 
+    <!-- Global theme -->
     <link rel="stylesheet" href="/css/theme.css"/>
+    <!-- Chat styles -->
     <link rel="stylesheet" href="/css/chat.css"/>
 </head>
 <body>
@@ -20,101 +22,79 @@
 
 <main class="page">
 
-    <!-- Topbar -->
-    <header class="topbar">
-        <div class="brand">
-            <span class="brand-badge"></span>
-            UniMateLK
-        </div>
-
-        <nav class="navlinks">
-            <a href="/profile.html">Profile</a>
-            <a href="/matches.html">Matches</a>
-            <a href="/requests.html">Requests</a>
-            <a href="/chat.html">Chat</a>
-        </nav>
-
-        <div class="top-actions">
-            <a class="btn ghost" href="/logout">Logout</a>
-        </div>
-    </header>
+    <!-- ✅ Shared navbar mount (recommended so nav never disappears) -->
+    <div id="navbarMount"></div>
 
     <section class="container">
-        <div class="glass-shell chat-shell">
+        <div class="glass-shell">
 
-            <!-- ✅ REQUIRED by chat.js -->
-            <p id="msg" class="toast info">Select a room to start chatting.</p>
+            <!-- ✅ REQUIRED CHANGE: wrap 2 columns in .chat-layout -->
+            <div class="chat-layout">
 
-            <div class="chat-grid">
-
-                <!-- LEFT: chat list -->
-                <aside class="glass-card chat-sidebar">
-                    <div class="chat-header" style="margin-bottom:2px;">
-                        <div class="title">
-                            <h3 style="margin:0;">Chats</h3>
-                            <p style="margin:0;">Select a person to open messages</p>
+                <!-- LEFT: Conversations -->
+                <section class="glass-card chat-sidebar">
+                    <div class="sidebar-head">
+                        <div>
+                            <div class="title">Chats</div>
+                            <div class="muted">Select a person to chat</div>
                         </div>
-                        <span class="badge">Rooms</span>
+                        <span class="badge" id="chatCount">0</span>
                     </div>
 
-                    <!-- Optional search (pure UI; does not affect JS) -->
-                    <div class="search">
-                        <input type="text" placeholder="Search chats..."
-                               oninput="
-                     const q=this.value.toLowerCase();
-                     document.querySelectorAll('#roomsList > *').forEach(x=>{
-                       x.style.display = x.innerText.toLowerCase().includes(q) ? '' : 'none';
-                     });
-                   ">
+                    <div class="sidebar-tools">
+                        <!-- Keep id=threadSearch if your JS uses it -->
+                        <input id="threadSearch" type="text" placeholder="Search chats..."/>
+                        <button id="newChatBtn" class="btn secondary" type="button">New</button>
                     </div>
 
-                    <!-- ✅ REQUIRED by chat.js -->
-                    <div class="chat-list" id="roomsList"></div>
-                </aside>
+                    <!-- Keep id=threadList if your JS uses it -->
+                    <div id="threadList" class="thread-list">
+                        <!-- JS fills list -->
+                    </div>
+                </section>
 
-                <!-- RIGHT: messages + composer -->
-                <section class="glass-card chat-main">
-
-                    <!-- ✅ REQUIRED by chat.js -->
-                    <div class="chat-header">
-                        <div class="title">
-                            <h3 id="roomTitle">Select a room</h3>
-                            <p>Messages will appear here</p>
+                <!-- RIGHT: Messages -->
+                <section class="glass-card chat-panel">
+                    <div class="chat-head">
+                        <div>
+                            <div class="who" id="chatWith">No chat selected</div>
+                            <div class="sub" id="chatHint">Pick a user from the left panel</div>
                         </div>
-                        <span class="badge">Live</span>
+                        <span class="badge" id="chatStatus">READY</span>
                     </div>
 
-                    <!-- ✅ REQUIRED by chat.js -->
-                    <div class="chat-messages" id="chatBox"></div>
+                    <!-- Keep id=messages if your JS uses it -->
+                    <div id="messages" class="messages">
+                        <!-- JS fills messages -->
+                    </div>
 
                     <!-- Composer -->
-                    <div class="chat-composer">
-                        <!-- Left: input + image -->
-                        <div class="row" style="width:100%; gap:10px;">
-                            <input id="messageInput" type="text" placeholder="Type a message..."/>
-
-                            <!-- ✅ REQUIRED by chat.js -->
-                            <input id="imageInput" type="file" accept="image/*" style="max-width:190px;"/>
-                        </div>
-
-                        <!-- Right: buttons -->
-                        <div class="row" style="justify-content:flex-end; gap:10px;">
-                            <!-- ✅ REQUIRED by chat.js -->
-                            <button id="sendImageBtn" type="button" class="btn secondary">Send Image</button>
-
-                            <!-- ✅ REQUIRED by chat.js -->
-                            <button id="sendBtn" type="button">Send</button>
-                        </div>
+                    <div class="composer">
+                        <!-- Keep id=messageInput if your JS uses it -->
+                        <input id="messageInput" type="text" placeholder="Type a message..." autocomplete="off"/>
+                        <!-- Keep id=sendBtn if your JS uses it -->
+                        <button id="sendBtn" class="btn" type="button">Send</button>
                     </div>
 
+                    <!-- Optional message area -->
+                    <p id="chatMsg" class="muted" style="margin:10px 0 0;"></p>
                 </section>
 
             </div>
+            <!-- end chat-layout -->
+
         </div>
     </section>
 
-    <script type="module" src="/js/chat.js"></script>
-</main>
+    <!-- Navbar loader (only if you use navbar.js) -->
+    <script type="module">
+        import { mountNavbar } from "/js/navbar.js";
+        mountNavbar();
+    </script>
 
+    <!-- Your existing chat logic -->
+    <script type="module" src="/js/chat.js"></script>
+
+</main>
 </body>
 </html>

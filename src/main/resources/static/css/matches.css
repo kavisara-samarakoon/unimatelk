@@ -1,13 +1,19 @@
-/* Matches page UI helpers (design only) */
+/* =========================================================
+   matches.css (FINAL)
+   Glass theme-friendly + fully responsive
+   Includes the auto-fit responsive grid changes
+   ========================================================= */
 
-/* Filter grid responsive */
+/* Filters grid: auto-fit responsive (works on all resolutions) */
 .filters-grid{
     display: grid;
     gap: 12px;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
+
+/* Let “wide” behave naturally on different widths */
 .filters-grid .wide{
-    grid-column: span 2;
+    grid-column: auto;
 }
 
 /* Results header + pagination */
@@ -24,19 +30,18 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
-/* Match cards grid */
+/* Match cards grid: auto-fit responsive */
 .match-grid{
     margin-top: 14px;
     display: grid;
     gap: 12px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
-/* Card style - your JS will inject items into #list.
-   If your JS creates <div class="card"> or similar, this still looks good.
-   If not, we style generic children safely too. */
+/* Card style - safe for whatever your JS injects into #list */
 .match-grid > *{
     border-radius: 18px;
     background: rgba(10,14,30,0.28);
@@ -46,16 +51,18 @@
     -webkit-backdrop-filter: blur(14px);
     transition: transform .15s ease, border-color .15s ease;
 }
+
 .match-grid > *:hover{
     transform: translateY(-2px);
     border-color: rgba(255,255,255,0.32);
 }
 
-/* Try to improve typical injected content */
+/* Improve typical injected content */
 .match-grid h3, .match-grid h4{
     margin: 0 0 6px;
     color: rgba(255,255,255,0.97);
 }
+
 .match-grid p{
     margin: 0 0 10px;
     color: rgba(255,255,255,0.78);
@@ -63,7 +70,7 @@
     line-height: 1.35;
 }
 
-/* Buttons inside cards */
+/* Buttons inside cards (if your JS injects <button> or <a>) */
 .match-grid button,
 .match-grid a.btnInCard{
     display: inline-flex;
@@ -77,21 +84,34 @@
     cursor: pointer;
     font-weight: 750;
     text-decoration: none;
+    margin-right: 8px;
+    margin-top: 8px;
 }
+
 .match-grid button:hover,
 .match-grid a.btnInCard:hover{
     border-color: rgba(255,255,255,0.35);
 }
 
-/* Responsive */
-@media (max-width: 1000px){
-    .match-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .filters-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .filters-grid .wide{ grid-column: span 2; }
+/* Make filter inputs comfortable on small screens */
+@media (max-width: 650px){
+    .pager{
+        width: 100%;
+        justify-content: flex-start;
+    }
+    #prevBtn, #nextBtn{
+        width: auto;
+    }
 }
 
-@media (max-width: 620px){
-    .match-grid{ grid-template-columns: 1fr; }
-    .filters-grid{ grid-template-columns: 1fr; }
-    .filters-grid .wide{ grid-column: span 1; }
+/* Extra: prevent overflow in match cards */
+.match-grid > *{
+    overflow: hidden;
+}
+
+.match-grid img{
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 14px;
 }
