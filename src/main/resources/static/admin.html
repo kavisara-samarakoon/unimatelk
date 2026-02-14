@@ -4,12 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>UniMateLK - Admin</title>
+
     <link rel="stylesheet" href="/css/theme.css">
     <link rel="stylesheet" href="/css/admin.css">
 </head>
 
 <body>
 
+<!-- Background -->
 <div class="bg">
     <div class="blob b1"></div>
     <div class="blob b2"></div>
@@ -19,21 +21,8 @@
 
 <main class="page">
 
-    <header class="topbar">
-        <div class="brand">
-            <span class="brand-badge"></span>
-            UniMateLK Admin
-        </div>
-        <nav class="navlinks">
-            <a href="/matches.html">Matches</a>
-            <a href="/requests.html">Requests</a>
-            <a href="/chat.html">Chat</a>
-            <a href="/admin.html" style="border-color: rgba(255,255,255,0.5);">Admin</a>
-        </nav>
-        <div class="top-actions">
-            <a class="btn ghost" href="/logout">Logout</a>
-        </div>
-    </header>
+    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
+    <div id="navbarMount"></div>
 
     <section class="container">
         <div class="glass-shell">
@@ -69,6 +58,7 @@
                 <section class="glass-card">
                     <div class="section-title">Actions / Details</div>
                     <p class="muted" id="detailsHint">Select a report to view actions.</p>
+
                     <div id="detailsBox" style="display:none;">
                         <div class="details-card">
                             <div class="row">
@@ -78,21 +68,30 @@
                                 </div>
                                 <span class="right badge status-pill" id="d_status">OPEN</span>
                             </div>
+
                             <div class="divider"></div>
+
                             <div class="help"><b>Reporter:</b> <span id="d_reporter"></span></div>
                             <div class="help"><b>Reported:</b> <span id="d_reported"></span></div>
+
                             <div class="divider"></div>
+
                             <div class="help"><b>Details:</b></div>
                             <div id="d_details" class="details-text"></div>
+
                             <div class="divider"></div>
+
                             <div class="row">
                                 <button id="resolveBtn" class="btn" type="button">Resolve</button>
                                 <button id="openUserBtn" class="btn ghost" type="button">Open User Page</button>
                             </div>
+
                             <p id="actionMsg" class="help" style="margin-top:10px;"></p>
                         </div>
                     </div>
+
                     <div class="divider"></div>
+
                     <div class="list">
                         <div class="list-item">
                             <div style="font-weight:800;">Recommended demo</div>
@@ -110,8 +109,16 @@
         </div>
     </section>
 
-    <script type="module" src="/js/admin.js"></script>
 </main>
+
+<!-- ✅ Mount navbar explicitly (guaranteed) -->
+<script type="module">
+    import { mountNavbar } from "/js/navbar.js";
+    mountNavbar();
+</script>
+
+<!-- ✅ Load admin functionality ONCE -->
+<script type="module" src="/js/admin.js"></script>
 
 </body>
 </html>
