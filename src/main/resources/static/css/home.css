@@ -1,0 +1,125 @@
+/* Home-only styling (design-only) */
+
+.hero{
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 14px;
+}
+
+.hero-title{
+    margin: 12px 0 8px;
+    font-size: 44px;
+    line-height: 1.1;
+}
+
+.grad{
+    background: linear-gradient(90deg, var(--p1), var(--p2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.hero-sub{
+    margin: 0 0 16px;
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 560px;
+}
+
+.hero-actions{ margin: 10px 0 0; }
+
+.mini-stats{
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.stat-title{
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+.stat-value{
+    font-weight: 900;
+    font-size: 16px;
+    margin-top: 4px;
+}
+
+.preview-card{ padding: 16px; }
+
+.quick-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.quick{
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 16px;
+    text-decoration: none;
+    color: var(--text);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+}
+.quick:hover{
+    border-color: rgba(255,255,255,0.32);
+    transform: translateY(-1px);
+}
+.quick-ico{
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.16);
+}
+
+.quick-title{
+    font-weight: 900;
+    margin-bottom: 2px;
+}
+
+.steps{
+    margin: 10px 0 0;
+    padding-left: 18px;
+    color: var(--muted);
+}
+.steps li{ margin: 6px 0; }
+
+.feature-top{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.feature-ico{
+    font-size: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.16);
+}
+.feature-title{ font-weight: 900; }
+
+.footer{
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-top: 6px;
+}
+
+@media (max-width: 950px){
+    .hero{ grid-template-columns: 1fr; }
+    .mini-stats{ grid-template-columns: 1fr; }
+    .quick-grid{ grid-template-columns: 1fr; }
+    .hero-title{ font-size: 38px; }
+}
