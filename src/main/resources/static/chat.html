@@ -1,37 +1,25 @@
+
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>UniMateLK - Chat</title>
-
-    <!-- Global theme -->
     <link rel="stylesheet" href="/css/theme.css"/>
-    <!-- Chat styles -->
     <link rel="stylesheet" href="/css/chat.css"/>
 </head>
 <body>
-
-<!-- Background -->
 <div class="bg">
     <div class="blob b1"></div>
     <div class="blob b2"></div>
     <div class="blob b3"></div>
     <div class="grain"></div>
 </div>
-
 <main class="page">
-
-    <!-- ✅ Shared navbar mount (recommended so nav never disappears) -->
     <div id="navbarMount"></div>
-
     <section class="container">
         <div class="glass-shell">
-
-            <!-- ✅ REQUIRED CHANGE: wrap 2 columns in .chat-layout -->
             <div class="chat-layout">
-
-                <!-- LEFT: Conversations -->
                 <section class="glass-card chat-sidebar">
                     <div class="sidebar-head">
                         <div>
@@ -40,20 +28,12 @@
                         </div>
                         <span class="badge" id="chatCount">0</span>
                     </div>
-
                     <div class="sidebar-tools">
-                        <!-- Keep id=threadSearch if your JS uses it -->
                         <input id="threadSearch" type="text" placeholder="Search chats..."/>
                         <button id="newChatBtn" class="btn secondary" type="button">New</button>
                     </div>
-
-                    <!-- Keep id=threadList if your JS uses it -->
-                    <div id="threadList" class="thread-list">
-                        <!-- JS fills list -->
-                    </div>
+                    <div id="threadList" class="thread-list"></div>
                 </section>
-
-                <!-- RIGHT: Messages -->
                 <section class="glass-card chat-panel">
                     <div class="chat-head">
                         <div>
@@ -62,39 +42,21 @@
                         </div>
                         <span class="badge" id="chatStatus">READY</span>
                     </div>
-
-                    <!-- Keep id=messages if your JS uses it -->
-                    <div id="messages" class="messages">
-                        <!-- JS fills messages -->
-                    </div>
-
-                    <!-- Composer -->
+                    <div id="messages" class="messages"></div>
                     <div class="composer">
-                        <!-- Keep id=messageInput if your JS uses it -->
                         <input id="messageInput" type="text" placeholder="Type a message..." autocomplete="off"/>
-                        <!-- Keep id=sendBtn if your JS uses it -->
                         <button id="sendBtn" class="btn" type="button">Send</button>
                     </div>
-
-                    <!-- Optional message area -->
                     <p id="chatMsg" class="muted" style="margin:10px 0 0;"></p>
                 </section>
-
             </div>
-            <!-- end chat-layout -->
-
         </div>
     </section>
-
-    <!-- Navbar loader (only if you use navbar.js) -->
     <script type="module">
         import { mountNavbar } from "/js/navbar.js";
         mountNavbar();
     </script>
-
-    <!-- Your existing chat logic -->
     <script type="module" src="/js/chat.js"></script>
-
 </main>
 </body>
 </html>
