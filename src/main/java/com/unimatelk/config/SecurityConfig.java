@@ -6,63 +6,33 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final CustomOAuth2UserService customOAuth2UserService;
-
-    public SecurityConfig(CustomOAuth2UserService customOAuth2UserService) {
-        this.customOAuth2UserService = customOAuth2UserService;
-    }
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        // ✅ IMPORTANT: disable XOR masking so cookie token matches header token
-        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .csrfTokenRequestHandler(requestHandler)
-                        .ignoringRequestMatchers(
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/actuator/**",
-                                "/ws/**"
-                        )
-                )
-
+                .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/", "/index.html",
-                                "/css/**", "/js/**", "/images/**", "/uploads/**",
-                                "/error", "/favicon.ico"
+                                "/css/**", "/js/**", "/uploads/**", "/favicon.ico",
+                                "/login**", "/oauth2/**"
                         ).permitAll()
 
-                        .requestMatchers("/oauth2/**", "/login/**").permitAll()
+                        // ✅ Let admin page load after login
+                        .requestMatchers("/admin.html").authenticated()
 
-                        .requestMatchers("/api/me", "/api/csrf").permitAll()
-
-                        .requestMatchers("/admin.html", "/api/admin/**").hasRole("ADMIN")
+                        // ✅ Allow calling admin APIs only if logged in (ADMIN check is done in controller using DB)
+                        .requestMatchers("/api/admin/**").authenticated()
 
                         .anyRequest().authenticated()
                 )
-
-                .oauth2Login(oauth -> oauth
-                        .userInfoEndpoint(u -> u.userService(customOAuth2UserService))
-                )
-
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/index.html?loggedOut=1")
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID", "XSRF-TOKEN")
-                        .permitAll()
-                );
+                .oauth2Login(oauth -> oauth.defaultSuccessUrl("/index.html", true))
+                .logout(logout -> logout.logoutSuccessUrl("/index.html"));
 
         return http.build();
     }
