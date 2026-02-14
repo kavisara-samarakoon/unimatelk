@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>UniMateLK - Profile</title>
     <link rel="stylesheet" href="/css/style.css"/>
 </head>
@@ -11,129 +11,79 @@
 <header class="topbar">
     <h1 class="brand"><span class="brand-badge"></span>UniMateLK</h1>
     <div class="top-actions">
-        <a class="btn ghost" href="/index.html">← Home</a>
-        <nav class="navlinks">
-            <a href="/preferences.html">Preferences</a>
-            <a href="/matches.html">Matches</a>
-            <a href="/requests.html">Requests</a>
-            <a href="/chat.html">Chat</a>
-        </nav>
+        <a class="btn secondary" href="/matches.html">Matches</a>
+        <a class="btn secondary" href="/preferences.html">Preferences</a>
+        <a class="btn secondary" href="/requests.html">Requests</a>
+        <a class="btn secondary" href="/chat.html">Chat</a>
     </div>
 </header>
 
 <main class="container">
-    <div class="toolbar">
-        <div class="left">
-            <h2 class="m0">My Profile</h2>
-            <span class="badge">Fill accurate details for better matches</span>
+    <h2>My Profile</h2>
+    <p id="msg" class="muted"></p>
+
+    <!-- PROFILE FORM -->
+    <div class="card">
+        <h3>Profile Details</h3>
+
+        <div class="grid">
+            <div>
+                <label>Campus</label>
+                <input id="campus" placeholder="e.g. Colombo"/>
+            </div>
+
+            <div>
+                <label>Degree</label>
+                <input id="degree" placeholder="e.g. IT"/>
+            </div>
+
+            <div>
+                <label>Year of Study</label>
+                <input id="yearOfStudy" type="number" min="1" max="6" placeholder="1"/>
+            </div>
+
+            <div>
+                <label>Gender</label>
+                <select id="gender">
+                    <option value="">Select</option>
+                    <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                    <option value="OTHER">Other</option>
+                </select>
+            </div>
+
+            <div class="full">
+                <label>Bio</label>
+                <textarea id="bio" rows="4" placeholder="Tell something about yourself..."></textarea>
+            </div>
+
+            <div class="full">
+                <label>Gender Preference</label>
+                <input id="genderPref" placeholder="Any / Male / Female"/>
+            </div>
+        </div>
+
+        <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button id="saveBtn" class="btn" type="button">Save Profile</button>
+            <a class="btn secondary" href="/matches.html">Find Matches</a>
         </div>
     </div>
 
-    <p id="msg" class="toast info">Tip: Upload a profile photo for higher trust.</p>
-
-    <div class="grid two">
-        <section class="card">
-            <p class="section-title">Basic details</p>
-
-            <div class="form-row two">
-                <div>
-                    <label for="campus">Campus</label>
-                    <input id="campus" placeholder="e.g., Colombo / Kandy" />
-                </div>
-                <div>
-                    <label for="degree">Degree</label>
-                    <input id="degree" placeholder="e.g., Software Engineering" />
-                </div>
-            </div>
-
-            <div class="form-row three">
-                <div>
-                    <label for="yearOfStudy">Year of Study</label>
-                    <input id="yearOfStudy" type="number" min="1" max="10" placeholder="e.g., 2" />
-                </div>
-                <div>
-                    <label for="gender">Gender</label>
-                    <input id="gender" placeholder="e.g., Male / Female" />
-                </div>
-                <div>
-                    <label for="genderPref">Gender Preference</label>
-                    <input id="genderPref" placeholder="e.g., Any / Female" />
-                </div>
-            </div>
-
-            <label for="moveInMonth">Move-in Month</label>
-            <input id="moveInMonth" placeholder="e.g., February 2026" />
-            <p class="help">Use the same format for consistency (month + year).</p>
-
-            <label for="bio">Bio</label>
-            <textarea id="bio" rows="5" placeholder="Short intro: study habits, sleep schedule, cleanliness, hobbies..."></textarea>
-
-            <div class="divider"></div>
-
-            <p class="section-title">Contact (optional)</p>
-            <div class="form-row two">
-                <div>
-                    <label for="phone">Phone</label>
-                    <input id="phone" placeholder="e.g., +94..." />
-                </div>
-                <div>
-                    <label for="facebookUrl">Facebook URL</label>
-                    <input id="facebookUrl" placeholder="https://facebook.com/..." />
-                </div>
-            </div>
-
-            <label for="instagramUrl">Instagram URL</label>
-            <input id="instagramUrl" placeholder="https://instagram.com/..." />
-
-            <div class="divider"></div>
-
-            <div class="row">
-                <button id="saveBtn" class="btn">Save Profile</button>
-                <a class="btn ghost" href="/matches.html">Go to Matches</a>
-            </div>
-
-            <p class="help mt12">
-                If saving fails, check you are logged in and your backend is running.
-            </p>
-        </section>
-
-        <aside class="card">
-            <p class="section-title">Photos</p>
-
-            <div class="list">
-                <div class="list-item">
-                    <h3 class="m0">Profile Photo</h3>
-                    <p class="help">Displayed in match cards and user pages.</p>
-                    <img id="profileImg" class="avatar" style="width:96px;height:96px;display:none" alt="Profile photo preview"/>
-                    <div class="mt12">
-                        <input id="profileFile" type="file" accept="image/*"/>
-                    </div>
-                    <div class="mt12">
-                        <button id="uploadProfileBtn" class="btn">Upload Profile Photo</button>
-                    </div>
-                </div>
-
-                <div class="list-item">
-                    <h3 class="m0">Cover Photo</h3>
-                    <p class="help">Optional: makes your profile look nicer.</p>
-                    <img id="coverImg" class="cover" style="display:none" alt="Cover photo preview"/>
-                    <div class="mt12">
-                        <input id="coverFile" type="file" accept="image/*"/>
-                    </div>
-                    <div class="mt12">
-                        <button id="uploadCoverBtn" class="btn secondary">Upload Cover Photo</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="divider"></div>
-            <p class="help">
-                Safety: Don’t upload sensitive documents (IDs, cards).
-            </p>
-        </aside>
+    <!-- FRIENDS / CONNECTIONS -->
+    <div class="card" style="margin-top:12px;">
+        <h3>Friends / Connections</h3>
+        <p class="muted">These are users you matched with (accepted requests).</p>
+        <p id="friendsMsg" class="muted"></p>
+        <div id="friendsList"></div>
     </div>
+
 </main>
 
+<!-- Your existing profile logic -->
 <script type="module" src="/js/profile.js"></script>
+
+<!-- Friends list logic -->
+<script type="module" src="/js/friends.js"></script>
+
 </body>
 </html>

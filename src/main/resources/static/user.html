@@ -18,15 +18,51 @@
 </header>
 
 <main class="container">
-    <h2 id="title">Profile</h2>
+    <h2 id="title">User Profile</h2>
     <p id="msg" class="muted"></p>
 
+    <!-- User details -->
     <div id="profileCard" class="card"></div>
+
+    <!-- Match explanation -->
     <div id="matchCard" class="card" style="margin-top:12px;"></div>
+
+    <!-- Actions (request/cancel/open chat etc.) -->
     <div id="actions" class="card" style="margin-top:12px;"></div>
+
+    <!-- Safety / other info -->
     <div id="safety" class="card" style="margin-top:12px;"></div>
+
+    <!-- ✅ REPORT THIS USER -->
+    <div class="card" style="margin-top:12px;">
+        <h3>Report this user</h3>
+        <p class="muted">Use this if the user violates rules or behaves inappropriately.</p>
+
+        <label>Reason</label>
+        <select id="reportReason">
+            <option value="">Select reason</option>
+            <option value="Harassment">Harassment</option>
+            <option value="Fake profile">Fake profile</option>
+            <option value="Inappropriate content">Inappropriate content</option>
+            <option value="Spam">Spam</option>
+            <option value="Other">Other</option>
+        </select>
+
+        <label style="margin-top:10px;">Details (optional)</label>
+        <textarea id="reportDetails" rows="4" placeholder="Explain what happened..."></textarea>
+
+        <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+            <button class="btn secondary" id="reportBtn" type="button">Submit Report</button>
+            <span id="reportMsg" class="muted"></span>
+        </div>
+    </div>
 </main>
 
+<!-- Existing user page logic -->
 <script type="module" src="/js/user.js"></script>
+
+<!-- ✅ Report feature logic -->
+<script type="module" src="/js/report.js"></script>
+
 </body>
 </html>
