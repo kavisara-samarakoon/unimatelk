@@ -1,0 +1,97 @@
+/* Matches page UI helpers (design only) */
+
+/* Filter grid responsive */
+.filters-grid{
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.filters-grid .wide{
+    grid-column: span 2;
+}
+
+/* Results header + pagination */
+.results-head{
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.pager{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Match cards grid */
+.match-grid{
+    margin-top: 14px;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Card style - your JS will inject items into #list.
+   If your JS creates <div class="card"> or similar, this still looks good.
+   If not, we style generic children safely too. */
+.match-grid > *{
+    border-radius: 18px;
+    background: rgba(10,14,30,0.28);
+    border: 1px solid rgba(255,255,255,0.16);
+    padding: 14px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: transform .15s ease, border-color .15s ease;
+}
+.match-grid > *:hover{
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.32);
+}
+
+/* Try to improve typical injected content */
+.match-grid h3, .match-grid h4{
+    margin: 0 0 6px;
+    color: rgba(255,255,255,0.97);
+}
+.match-grid p{
+    margin: 0 0 10px;
+    color: rgba(255,255,255,0.78);
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+/* Buttons inside cards */
+.match-grid button,
+.match-grid a.btnInCard{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.10);
+    color: rgba(255,255,255,0.92);
+    cursor: pointer;
+    font-weight: 750;
+    text-decoration: none;
+}
+.match-grid button:hover,
+.match-grid a.btnInCard:hover{
+    border-color: rgba(255,255,255,0.35);
+}
+
+/* Responsive */
+@media (max-width: 1000px){
+    .match-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .filters-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .filters-grid .wide{ grid-column: span 2; }
+}
+
+@media (max-width: 620px){
+    .match-grid{ grid-template-columns: 1fr; }
+    .filters-grid{ grid-template-columns: 1fr; }
+    .filters-grid .wide{ grid-column: span 1; }
+}
