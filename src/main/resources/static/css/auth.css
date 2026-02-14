@@ -1,0 +1,243 @@
+/* -------- Base -------- */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+    margin: 0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    color: #111;
+    overflow: hidden;
+}
+
+/* -------- Background (animated blobs + grain) -------- */
+.bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+            radial-gradient(circle at 20% 20%, rgba(110, 96, 255, 0.35), transparent 40%),
+            radial-gradient(circle at 80% 30%, rgba(0, 255, 200, 0.20), transparent 35%),
+            radial-gradient(circle at 50% 90%, rgba(255, 0, 140, 0.18), transparent 45%),
+            linear-gradient(120deg, #0b1020, #0a1b3a 40%, #07122b);
+}
+
+.blob {
+    position: absolute;
+    width: 380px;
+    height: 380px;
+    filter: blur(30px);
+    opacity: 0.75;
+    border-radius: 50%;
+    animation: float 10s ease-in-out infinite;
+}
+
+.b1 { left: -90px; top: -70px; background: linear-gradient(135deg, #7c4dff, #00d4ff); }
+.b2 { right: -120px; top: 60px; background: linear-gradient(135deg, #00ffb3, #3b82f6); animation-delay: -3s; }
+.b3 { left: 35%; bottom: -140px; background: linear-gradient(135deg, #ff4dd8, #6c63ff); animation-delay: -6s; }
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(20px, -25px) scale(1.06); }
+}
+
+.grain {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+    opacity: 0.25;
+}
+
+/* -------- Layout -------- */
+.page {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+}
+
+.glass-shell {
+    width: min(980px, 96vw);
+    height: 560px;
+    position: relative;
+    border-radius: 28px;
+    overflow: hidden;
+
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.22);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+/* Panels */
+.panel {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    padding: 28px;
+}
+
+.panel-inner { width: min(340px, 100%); }
+
+.form-panel h1 { margin: 0 0 12px; font-size: 40px; color: rgba(255,255,255,0.95); }
+.muted { margin: 8px 0 14px; color: rgba(255,255,255,0.75); font-size: 14px; }
+
+/* Form fields */
+.form { display: grid; gap: 12px; }
+.field span { display:block; margin-bottom: 6px; color: rgba(255,255,255,0.85); font-size: 13px; }
+.field input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.95);
+    outline: none;
+}
+.field input::placeholder { color: rgba(255,255,255,0.55); }
+.field input:focus { border-color: rgba(255,255,255,0.55); }
+
+/* Buttons */
+.primary, .outline {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 999px;
+    border: none;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    cursor: pointer;
+}
+
+.primary {
+    background: linear-gradient(90deg, #7c4dff, #00d4ff);
+    color: white;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+}
+
+.link-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.85);
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    justify-self: start;
+}
+
+.social-row {
+    display: flex;
+    gap: 10px;
+    margin: 12px 0 10px;
+}
+
+.social-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.95);
+    cursor: pointer;
+}
+
+.social-btn.ghost { opacity: 0.7; }
+.icon { font-weight: 800; font-size: 16px; }
+
+.hint {
+    margin-top: 14px;
+    color: rgba(255,255,255,0.70);
+    font-size: 13px;
+}
+
+/* Overlay (right half) */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(120deg, rgba(124,77,255,0.95), rgba(0,212,255,0.85));
+    border-left: 1px solid rgba(255,255,255,0.18);
+    display: grid;
+    place-items: center;
+    transition: transform 0.65s cubic-bezier(.2,.9,.2,1);
+}
+
+.overlay-inner {
+    width: 200%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    transition: transform 0.65s cubic-bezier(.2,.9,.2,1);
+}
+
+.overlay-panel {
+    display: grid;
+    place-items: center;
+    padding: 28px;
+    text-align: center;
+    color: rgba(255,255,255,0.95);
+}
+
+.overlay-panel h2 { font-size: 40px; margin: 0 0 10px; }
+.overlay-panel p { margin: 0 0 18px; color: rgba(255,255,255,0.9); max-width: 320px; }
+
+.outline {
+    width: auto;
+    padding: 12px 22px;
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.85);
+    color: rgba(255,255,255,0.95);
+}
+
+/* Positioning sign-in/sign-up panels */
+.sign-in { left: 0; }
+.sign-up { right: 0; opacity: 0; pointer-events: none; }
+
+#shell.right-active .sign-up { opacity: 1; pointer-events: auto; }
+#shell.right-active .sign-in { opacity: 0; pointer-events: none; }
+
+/* Slide effect */
+#shell.right-active .overlay { transform: translateX(-100%); }
+#shell.right-active .overlay-inner { transform: translateX(-50%); }
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.55);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease;
+    z-index: 5;
+}
+.toast.show { opacity: 1; }
+
+/* Responsive */
+@media (max-width: 860px){
+    .glass-shell { height: 700px; }
+    .panel { width: 100%; }
+    .overlay { display: none; }
+    .sign-up { display: none; }
+    .sign-in { display: grid; }
+
+    /* Mobile: show one form at a time via JS swapping */
+    #shell.right-active .sign-in { display: none; }
+    #shell.right-active .sign-up { display: grid; opacity: 1; pointer-events: auto; left: 0; right: auto; }
+}
