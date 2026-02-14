@@ -158,7 +158,7 @@ body {
     font-size: 13px;
 }
 
-/* Overlay (right half) */
+/* ---------- UPDATED OVERLAY (RIGHT SIDE) ---------- */
 .overlay {
     position: absolute;
     top: 0;
@@ -169,23 +169,28 @@ body {
     border-left: 1px solid rgba(255,255,255,0.18);
     display: grid;
     place-items: center;
+
+    /* prevents both panels showing */
+    overflow: hidden;
+
     transition: transform 0.65s cubic-bezier(.2,.9,.2,1);
 }
 
-.overlay-inner {
-    width: 200%;
-    height: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    transition: transform 0.65s cubic-bezier(.2,.9,.2,1);
+/* Slide overlay to LEFT when signup is active */
+#shell.right-active .overlay {
+    transform: translateX(-100%);
 }
 
+/* Two overlay panels stacked */
 .overlay-panel {
+    position: absolute;
+    inset: 0;
     display: grid;
     place-items: center;
     padding: 28px;
     text-align: center;
     color: rgba(255,255,255,0.95);
+    transition: opacity 0.35s ease;
 }
 
 .overlay-panel h2 { font-size: 40px; margin: 0 0 10px; }
@@ -199,16 +204,20 @@ body {
     color: rgba(255,255,255,0.95);
 }
 
+/* Default (Sign In active): show Hello Friend + SIGN UP */
+.overlay .hello { opacity: 1; pointer-events: auto; }
+.overlay .welcome { opacity: 0; pointer-events: none; }
+
+/* When Sign Up active: show Welcome Back + SIGN IN */
+#shell.right-active .overlay .hello { opacity: 0; pointer-events: none; }
+#shell.right-active .overlay .welcome { opacity: 1; pointer-events: auto; }
+
 /* Positioning sign-in/sign-up panels */
 .sign-in { left: 0; }
 .sign-up { right: 0; opacity: 0; pointer-events: none; }
 
 #shell.right-active .sign-up { opacity: 1; pointer-events: auto; }
 #shell.right-active .sign-in { opacity: 0; pointer-events: none; }
-
-/* Slide effect */
-#shell.right-active .overlay { transform: translateX(-100%); }
-#shell.right-active .overlay-inner { transform: translateX(-50%); }
 
 /* Toast */
 .toast {
