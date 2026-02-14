@@ -1,6 +1,3 @@
-// /src/main/resources/static/js/admin.js
-// FULL CODE (your original + Open User Page button added)
-
 function getCookie(name){
     const m = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
     return m ? decodeURIComponent(m[2]) : null;
@@ -14,7 +11,7 @@ function setCsrf(headers){
 async function api(url, options = {}) {
     const headers = new Headers(options.headers || {});
     headers.set("Accept", "application/json");
-    headers.set("X-Requested-With", "XMLHttpRequest"); // ✅ helps avoid redirects
+    headers.set("X-Requested-With", "XMLHttpRequest");
     if (options.body && !headers.has("Content-Type")) {
         headers.set("Content-Type", "application/json");
     }
@@ -26,7 +23,6 @@ async function api(url, options = {}) {
         headers
     });
 
-    // read body safely (json or text)
     const contentType = res.headers.get("content-type") || "";
     const raw = await res.text();
 
@@ -38,7 +34,6 @@ async function api(url, options = {}) {
         return raw ? JSON.parse(raw) : null;
     }
 
-    // if backend returns HTML accidentally
     return raw;
 }
 
@@ -122,7 +117,6 @@ async function loadReports(){
     try{
         const data = await api(`/api/admin/reports?status=OPEN&query=${encodeURIComponent(q)}`);
 
-        // expect: {items:[...]} OR {reports:[...]}
         const items = data?.items || data?.reports || [];
         renderList(items);
 
@@ -161,14 +155,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // ✅ NEW: Open User Page button
-    // This assumes your user page can accept ?email=...
-    // Example: /user.html?email=test@example.com
     document.getElementById("openUserBtn")?.addEventListener("click", () => {
         if (!current) return;
 
         const email = encodeURIComponent(current.reportedEmail || "");
-        // If your project uses a different page/param, change ONLY this URL format:
         window.location.href = `/user.html?email=${email}`;
     });
 
