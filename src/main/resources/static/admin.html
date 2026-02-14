@@ -4,102 +4,138 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>UniMateLK - Admin</title>
-    <link rel="stylesheet" href="/css/style.css?v=3"/>
+
+    <!-- ✅ Use the same glass theme as other pages -->
+    <link rel="stylesheet" href="/css/theme.css"/>
+    <link rel="stylesheet" href="/css/admin.css"/>
 </head>
 
 <body>
-<header class="topbar">
-    <h1 class="brand"><span class="brand-badge"></span>UniMateLK</h1>
 
-    <div class="top-actions">
-        <a class="btn secondary" href="/matches.html">Matches</a>
-        <a class="btn secondary" href="/requests.html">Requests</a>
-        <a class="btn secondary" href="/chat.html">Chat</a>
-    </div>
-</header>
+<!-- ✅ Animated background (same as login/preferences) -->
+<div class="bg">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="grain"></div>
+</div>
 
-<main class="container">
-    <div class="toolbar">
-        <div class="left">
-            <h2 class="m0">Admin Moderation</h2>
-            <span class="badge">Reports • Blocks • Bans</span>
+<main class="page">
+
+    <!-- ✅ Glass Topbar -->
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand-badge"></span>
+            UniMateLK Admin
         </div>
 
-        <div class="right">
-            <input id="search" placeholder="Search email / reason..." style="max-width:260px"/>
-            <button id="refreshBtn" class="btn secondary" type="button">Refresh</button>
+        <nav class="navlinks">
+            <a href="/matches.html">Matches</a>
+            <a href="/requests.html">Requests</a>
+            <a href="/chat.html">Chat</a>
+            <a href="/admin.html" style="border-color: rgba(255,255,255,0.5);">Admin</a>
+        </nav>
+
+        <div class="top-actions">
+            <a class="btn ghost" href="/logout">Logout</a>
         </div>
-    </div>
+    </header>
 
-    <p class="muted">Resolve reports by reviewing details and marking them resolved.</p>
+    <section class="container">
+        <div class="glass-shell">
 
-    <div class="grid two">
-        <!-- LEFT: report list -->
-        <section class="card">
-            <div class="toolbar">
-                <div class="left">
-                    <div class="section-title">Open Reports</div>
+            <!-- Header -->
+            <div class="admin-head">
+                <div>
+                    <h2 style="margin:0;">Admin Moderation</h2>
+                    <p class="muted" style="margin:6px 0 0;">Reports • Blocks • Bans</p>
                 </div>
-                <div class="right">
-                    <span id="countBadge" class="badge">0</span>
+                <span class="badge">Moderation Panel</span>
+            </div>
+
+            <!-- Search + Refresh -->
+            <div class="admin-tools glass-card">
+                <div class="admin-tools-left">
+                    <label for="search">Search (email / reason)</label>
+                    <input id="search" placeholder="Search email / reason..." />
+                </div>
+
+                <div class="admin-tools-right">
+                    <button id="refreshBtn" class="btn secondary" type="button">Refresh</button>
+                    <span class="badge">Open Reports: <span id="countBadge">0</span></span>
                 </div>
             </div>
 
+            <!-- Optional toast -->
             <div id="adminMsg" class="toast info" style="display:none;"></div>
-            <div id="reportsList" class="list"></div>
-        </section>
 
-        <!-- RIGHT: details/actions -->
-        <section class="card">
-            <div class="section-title">Actions / Details</div>
-            <p class="muted" id="detailsHint">Select a report to view actions.</p>
+            <!-- 2 column layout -->
+            <div class="admin-grid">
 
-            <div id="detailsBox" style="display:none;">
-                <div class="list-item">
-                    <div class="row">
-                        <div>
-                            <div style="font-weight:700" id="d_reason">Reason</div>
-                            <div class="help" id="d_meta"></div>
+                <!-- LEFT -->
+                <section class="glass-card">
+                    <div class="section-title">Open Reports</div>
+                    <div id="reportsList" class="list"></div>
+                </section>
+
+                <!-- RIGHT -->
+                <section class="glass-card">
+                    <div class="section-title">Actions / Details</div>
+                    <p class="muted" id="detailsHint">Select a report to view actions.</p>
+
+                    <div id="detailsBox" style="display:none;">
+                        <div class="details-card">
+                            <div class="row">
+                                <div>
+                                    <div class="details-title" id="d_reason">Reason</div>
+                                    <div class="help" id="d_meta"></div>
+                                </div>
+                                <span class="right badge status-pill" id="d_status">OPEN</span>
+                            </div>
+
+                            <div class="divider"></div>
+
+                            <div class="help"><b>Reporter:</b> <span id="d_reporter"></span></div>
+                            <div class="help"><b>Reported:</b> <span id="d_reported"></span></div>
+
+                            <div class="divider"></div>
+
+                            <div class="help"><b>Details:</b></div>
+                            <div id="d_details" class="details-text"></div>
+
+                            <div class="divider"></div>
+
+                            <div class="row">
+                                <button id="resolveBtn" class="btn" type="button">Resolve</button>
+                                <button id="openUserBtn" class="btn ghost" type="button">Open User Page</button>
+                            </div>
+
+                            <p id="actionMsg" class="help" style="margin-top:10px;"></p>
                         </div>
-                        <span class="right badge" id="d_status">OPEN</span>
                     </div>
 
                     <div class="divider"></div>
 
-                    <div class="help"><b>Reporter:</b> <span id="d_reporter"></span></div>
-                    <div class="help"><b>Reported:</b> <span id="d_reported"></span></div>
-
-                    <div class="divider"></div>
-
-                    <div class="help"><b>Details:</b></div>
-                    <div id="d_details" style="white-space:pre-wrap;"></div>
-
-                    <div class="divider"></div>
-
-                    <div class="row">
-                        <button id="resolveBtn" class="btn success" type="button">Resolve</button>
-                        <button id="openUserBtn" class="btn ghost" type="button">Open User Page</button>
+                    <div class="list">
+                        <div class="list-item">
+                            <div style="font-weight:800;">Recommended demo</div>
+                            <div class="help">Create a report from a user page, then resolve here.</div>
+                        </div>
+                        <div class="list-item">
+                            <div style="font-weight:800;">Tip</div>
+                            <div class="help">If list is empty, check <code>/api/admin/reports?status=OPEN</code>.</div>
+                        </div>
                     </div>
+                </section>
 
-                    <p id="actionMsg" class="help" style="margin-top:10px;"></p>
-                </div>
             </div>
 
-            <div class="list" style="margin-top:12px;">
-                <div class="list-item">
-                    <div style="font-weight:700;">Recommended demo</div>
-                    <div class="help">Create a report from a user page, then resolve here.</div>
-                </div>
-                <div class="list-item">
-                    <div style="font-weight:700;">Tip</div>
-                    <div class="help">If list is empty, check <code>/api/admin/reports?status=OPEN</code> in browser.</div>
-                </div>
-            </div>
-        </section>
-    </div>
+        </div>
+    </section>
+
+    <!-- ✅ KEEP your existing JS (no changes) -->
+    <script type="module" src="/js/admin.js"></script>
 </main>
 
-<!-- IMPORTANT: must be type="module" so imports work -->
-<script type="module" src="/js/admin.js"></script>
 </body>
 </html>

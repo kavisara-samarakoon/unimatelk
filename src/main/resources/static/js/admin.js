@@ -1,3 +1,6 @@
+// /src/main/resources/static/js/admin.js
+// FULL CODE (your original + Open User Page button added)
+
 function getCookie(name){
     const m = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
     return m ? decodeURIComponent(m[2]) : null;
@@ -119,8 +122,8 @@ async function loadReports(){
     try{
         const data = await api(`/api/admin/reports?status=OPEN&query=${encodeURIComponent(q)}`);
 
-        // expect: {items:[...]}
-        const items = data.items || data.reports || [];
+        // expect: {items:[...]} OR {reports:[...]}
+        const items = data?.items || data?.reports || [];
         renderList(items);
 
     }catch(e){
@@ -133,6 +136,7 @@ async function loadReports(){
 
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("refreshBtn")?.addEventListener("click", loadReports);
+
     document.getElementById("search")?.addEventListener("input", () => {
         clearTimeout(window.__t);
         window.__t = setTimeout(loadReports, 250);
@@ -155,6 +159,17 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error(e);
             msg.textContent = "❌ Failed: " + e.message;
         }
+    });
+
+    // ✅ NEW: Open User Page button
+    // This assumes your user page can accept ?email=...
+    // Example: /user.html?email=test@example.com
+    document.getElementById("openUserBtn")?.addEventListener("click", () => {
+        if (!current) return;
+
+        const email = encodeURIComponent(current.reportedEmail || "");
+        // If your project uses a different page/param, change ONLY this URL format:
+        window.location.href = `/user.html?email=${email}`;
     });
 
     loadReports();
