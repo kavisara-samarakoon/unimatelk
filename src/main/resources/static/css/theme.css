@@ -1,9 +1,9 @@
 /* =========================================================
    UniMateLK Theme (Glass + Animated Background)
-   Use this for Home/Profile/Preferences/Matches/Requests/Chat
-   (Design-only, does not change functionality)
+   Safe to use across pages without breaking JS (design only)
    ========================================================= */
 
+/* ---- Base ---- */
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 
@@ -85,7 +85,7 @@ body{
     margin: 0 auto;
 }
 
-/* ---- Topbar ---- */
+/* ---- Topbar (glass) ---- */
 .topbar{
     width: min(1050px, 96vw);
     margin: 0 auto 14px auto;
@@ -178,12 +178,6 @@ body{
     font-size: 12px;
 }
 
-.divider{
-    height: 1px;
-    background: rgba(255,255,255,0.14);
-    margin: 14px 0;
-}
-
 /* ---- Forms ---- */
 label{ display:block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
 input, select, textarea{
@@ -202,7 +196,10 @@ input:focus, select:focus, textarea:focus{
 }
 
 /* ---- Layout helpers ---- */
-.grid{ display: grid; gap: 12px; }
+.grid{
+    display: grid;
+    gap: 12px;
+}
 .grid.two{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .grid.three{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
@@ -211,6 +208,12 @@ input:focus, select:focus, textarea:focus{
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
+}
+
+.divider{
+    height: 1px;
+    background: rgba(255,255,255,0.14);
+    margin: 14px 0;
 }
 
 /* ---- Buttons ---- */
@@ -248,7 +251,7 @@ input:focus, select:focus, textarea:focus{
     box-shadow: none;
 }
 
-/* ---- Toast (safe if your JS uses it) ---- */
+/* ---- Toast messages (JS sets className = "toast " + type) ---- */
 .toast{
     margin: 12px 0;
     padding: 10px 12px;
