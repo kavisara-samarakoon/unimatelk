@@ -17,6 +17,12 @@ public class CurrentUserService {
         this.userRepo = userRepo;
     }
 
+    public AppUser requireUserByEmail(String email) {
+        if (email == null || email.isBlank()) throw new RuntimeException("Unauthorized");
+        return userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Unauthorized"));
+    }
+
     public AppUser requireUser(OAuth2User oauth) {
         if (oauth == null) throw new IllegalArgumentException("Not authenticated");
 
