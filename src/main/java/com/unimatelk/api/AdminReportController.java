@@ -3,113 +3,193 @@ package com.unimatelk.api;
 import com.unimatelk.domain.AppUser;
 import com.unimatelk.domain.Report;
 import com.unimatelk.domain.ReportStatus;
-import com.unimatelk.repo.AppUserRepository;
 import com.unimatelk.repo.ReportRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;   // ✅ IMPORTANT IMPORT
+import com.unimatelk.service.AdminService;
+import com.unimatelk.service.CurrentUserService;
+import org.springframework.data.domain.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admin/reports")
 public class AdminReportController {
 
+    private final CurrentUserService currentUserService;
+    private final AdminService adminService;
     private final ReportRepository reportRepo;
-    private final AppUserRepository userRepo;
 
-    public AdminReportController(ReportRepository reportRepo, AppUserRepository userRepo) {
+    public AdminReportController(CurrentUserService currentUserService,
+                                 AdminService adminService,
+                                 ReportRepository reportRepo) {
+        this.currentUserService = currentUserService;
+        this.adminService = adminService;
         this.reportRepo = reportRepo;
-        this.userRepo = userRepo;
     }
 
-    @GetMapping("/reports")
-    @Transactional(readOnly = true)
-    public List<Map<String, Object>> listReports(
-            @AuthenticationPrincipal OAuth2User oauth,   // ✅ MUST be @AuthenticationPrincipal
+    // ---------- DTOs ----------
+    public static class ReportItem {
+        public Long id;
+
+        public Long reporterUserId;
+        public String reporterEmail;
+
+        public Long reportedUserId;
+        public String reportedEmail;
+
+        public String reason;
+        public String details;
+
+        public String status;
+
+        public Instant createdAt;
+        public Instant resolvedAt;
+        public Long resolvedByUserId;
+    }
+
+    public static class PagedResponse<T> {
+        public List<T> items;
+        public int page;
+        public int size;
+        public long totalItems;
+        public int totalPages;
+
+        public PagedResponse(List<T> items, int page, int size, long totalItems, int totalPages) {
+            this.items = items;
+            this.page = page;
+            this.size = size;
+            this.totalItems = totalItems;
+            this.totalPages = totalPages;
+        }
+    }
+
+    public static class ResolveRequest {
+        public String note;
+    }
+
+    // ---------- Admin guard ----------
+    private AppUser requireAdmin(Authentication auth) {
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new ResponseStatusException(UNAUTHORIZED, "Not logged in");
+        }
+
+        Object principal = auth.getPrincipal();
+
+        AppUser me;
+
+        // Case 1: OAuth2 login
+        if (principal instanceof OAuth2User oauth2User) {
+            me = currentUserService.requireUser(oauth2User);
+        }
+        // Case 2: local login (Spring Security UserDetails)
+        else if (principal instanceof UserDetails userDetails) {
+            // Your CurrentUserService likely has a way to get user by email/username.
+            // We will treat username as email (common in your project).
+            me = currentUserService.requireUserByEmail(userDetails.getUsername());
+        }
+        // Case 3: Sometimes principal is just a String (username)
+        else if (principal instanceof String username) {
+            me = currentUserService.requireUserByEmail(username);
+        }
+        else {
+            throw new ResponseStatusException(UNAUTHORIZED, "Unsupported login type");
+        }
+
+        try {
+            adminService.requireAdmin(me);
+        } catch (RuntimeException e) {
+            throw new ResponseStatusException(FORBIDDEN, "Admin only");
+        }
+
+        return me;
+    }
+
+    // ---------- Endpoints ----------
+    @GetMapping
+    public ResponseEntity<PagedResponse<ReportItem>> list(
+            Authentication auth,
             @RequestParam(defaultValue = "OPEN") String status,
-            @RequestParam(required = false) String query
+            @RequestParam(required = false) String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
     ) {
-        AppUser me = requireUser(oauth);
-        requireAdmin(me);
+        requireAdmin(auth);
 
         ReportStatus st;
         try {
-            st = ReportStatus.valueOf(status.trim().toUpperCase());
+            st = ReportStatus.valueOf(status.toUpperCase(Locale.ROOT));
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status: " + status);
+            st = ReportStatus.OPEN;
         }
 
-        List<Report> reports = reportRepo.findByStatusWithUsers(st);
+        Pageable pageable = PageRequest.of(page, size);
 
-        String q = (query == null) ? "" : query.trim().toLowerCase();
-        if (!q.isEmpty()) {
-            reports.removeIf(r -> {
-                String reporterEmail = (r.getReporter() == null || r.getReporter().getEmail() == null) ? "" : r.getReporter().getEmail().toLowerCase();
-                String reportedEmail = (r.getReported() == null || r.getReported().getEmail() == null) ? "" : r.getReported().getEmail().toLowerCase();
-                String reason = (r.getReason() == null) ? "" : r.getReason().toLowerCase();
-                String details = (r.getDetails() == null) ? "" : r.getDetails().toLowerCase();
-                return !(reporterEmail.contains(q) || reportedEmail.contains(q) || reason.contains(q) || details.contains(q));
-            });
+        Page<Report> result;
+        if (query != null && !query.trim().isEmpty()) {
+            String q = "%" + query.trim().toLowerCase(Locale.ROOT) + "%";
+            result = reportRepo.searchByStatusFetched(st, q, pageable);
+        } else {
+            result = reportRepo.findByStatusFetched(st, pageable);
         }
 
-        List<Map<String, Object>> out = new ArrayList<>();
-        for (Report r : reports) out.add(toDto(r));
-        return out;
+        List<ReportItem> items = result.getContent().stream()
+                .map(this::toItem)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(new PagedResponse<>(
+                items,
+                result.getNumber(),
+                result.getSize(),
+                result.getTotalElements(),
+                result.getTotalPages()
+        ));
     }
 
-    private AppUser requireUser(OAuth2User oauth) {
-        if (oauth == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not logged in");
+    @PostMapping("/{id}/resolve")
+    public ResponseEntity<?> resolve(Authentication auth, @PathVariable Long id,
+                                     @RequestBody(required = false) ResolveRequest body) {
+        AppUser admin = requireAdmin(auth);
 
-        String email = (String) oauth.getAttributes().get("email");
-        if (email == null || email.isBlank()) {
-            Object alt = oauth.getAttributes().get("preferred_username");
-            email = (alt == null) ? null : alt.toString();
-        }
-        if (email == null || email.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email not found in OAuth2User");
-        }
+        Report report = reportRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Report not found"));
 
-        final String finalEmail = email;
+        report.setStatus(ReportStatus.RESOLVED);
+        report.setResolvedAt(Instant.now());
+        report.setResolvedByUserId(admin.getId());
 
-        userRepo.findByEmail(finalEmail.toLowerCase())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.UNAUTHORIZED,
-                        "User not found in DB for: " + finalEmail
-                ));
-        return null;
+        reportRepo.save(report);
+        return ResponseEntity.ok(Map.of("ok", true));
     }
 
-    private void requireAdmin(AppUser me) {
-        String role = (me.getRole() == null) ? "" : me.getRole().toString();
-        if (!"ADMIN".equalsIgnoreCase(role)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Admin only");
+    private ReportItem toItem(Report r) {
+        ReportItem it = new ReportItem();
+        it.id = r.getId();
+
+        if (r.getReporter() != null) {
+            it.reporterUserId = r.getReporter().getId();
+            it.reporterEmail = r.getReporter().getEmail();
         }
-    }
+        if (r.getReported() != null) {
+            it.reportedUserId = r.getReported().getId();
+            it.reportedEmail = r.getReported().getEmail();
+        }
 
+        it.reason = r.getReason();
+        it.details = r.getDetails();
+        it.status = r.getStatus() != null ? r.getStatus().name() : null;
 
-    private Map<String, Object> toDto(Report r) {
-        Map<String, Object> m = new LinkedHashMap<>();
-
-        m.put("id", r.getId());
-
-        m.put("reporterUserId", r.getReporter() == null ? null : r.getReporter().getId());
-        m.put("reporterEmail", r.getReporter() == null ? null : r.getReporter().getEmail());
-
-        m.put("reportedUserId", r.getReported() == null ? null : r.getReported().getId());
-        m.put("reportedEmail", r.getReported() == null ? null : r.getReported().getEmail());
-
-        m.put("reason", r.getReason());
-        m.put("details", r.getDetails());
-
-        m.put("status", r.getStatus() == null ? "OPEN" : r.getStatus().toString());
-        m.put("createdAt", r.getCreatedAt());
-        m.put("resolvedAt", r.getResolvedAt());
-        m.put("resolvedByUserId", r.getResolvedByUserId());
-
-        return m;
+        it.createdAt = r.getCreatedAt();
+        it.resolvedAt = r.getResolvedAt();
+        it.resolvedByUserId = r.getResolvedByUserId();
+        return it;
     }
 }

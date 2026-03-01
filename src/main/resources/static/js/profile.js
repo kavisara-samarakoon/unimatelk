@@ -1,81 +1,171 @@
-import { initCsrf, apiFetch } from "./api.js";
+// src/main/resources/static/js/profile.js
+// FULL FILE - Module script (profile.html uses type="module")
 
 const $ = (id) => document.getElementById(id);
-const msg = (t) => { $("msg").textContent = t || ""; };
 
-function fill(p) {
-    $("campus").value = p.campus || "";
-    $("degree").value = p.degree || "";
-    $("yearOfStudy").value = p.yearOfStudy ?? "";
-    $("gender").value = p.gender || "";
-    $("genderPref").value = p.genderPreference || "";
-    $("moveInMonth").value = p.moveInMonth || "";
-    $("bio").value = p.bio || "";
-    $("phone").value = p.phone || "";
-    $("facebookUrl").value = p.facebookUrl || "";
-    $("instagramUrl").value = p.instagramUrl || "";
-
-    if (p.profilePhotoPath) { $("profileImg").src = p.profilePhotoPath; $("profileImg").style.display = "block"; }
-    if (p.coverPhotoPath) { $("coverImg").src = p.coverPhotoPath; $("coverImg").style.display = "block"; }
+function showMsg(text, type = "info") {
+    const msg = $("msg");
+    if (!msg) return;
+    msg.textContent = text;
+    msg.className = "toast " + type;
 }
 
-async function load() {
-    const p = await apiFetch("/api/profile/me");
-    fill(p);
+const GET_URL = "/api/my/profile";
+const SAVE_URL = "/api/my/profile";
+const UPLOAD_URL = "/api/my/profile/photo";
+
+function goLogin() {
+    window.location.href = "/oauth2/authorization/google";
 }
 
-async function save() {
-    const payload = {
-        campus: $("campus").value,
-        degree: $("degree").value,
-        yearOfStudy: $("yearOfStudy").value ? Number($("yearOfStudy").value) : 1,
-        gender: $("gender").value,
-        genderPreference: $("genderPref").value,
-        moveInMonth: $("moveInMonth").value,
-        bio: $("bio").value,
-        phone: $("phone").value,
-        facebookUrl: $("facebookUrl").value,
-        instagramUrl: $("instagramUrl").value
+async function apiFetch(url, options = {}) {
+    const opts = { ...options };
+    opts.headers = opts.headers ? { ...opts.headers } : {};
+    opts.credentials = "same-origin";
+    opts.redirect = "manual";
+
+    const res = await fetch(url, opts);
+
+    if (res.type === "opaqueredirect" || res.status === 0 || res.status === 401) {
+        throw new Error("LOGIN_REQUIRED");
+    }
+
+    const text = await res.text();
+    let data = text;
+    const ct = (res.headers.get("content-type") || "").toLowerCase();
+    if (ct.includes("application/json")) {
+        try { data = text ? JSON.parse(text) : null; } catch {}
+    }
+
+    if (!res.ok) {
+        const msg =
+            data && data.message ? data.message :
+                typeof data === "string" ? data :
+                    JSON.stringify(data);
+        throw new Error(`HTTP ${res.status}: ${msg}`);
+    }
+
+    return data;
+}
+
+function collectPayload() {
+    return {
+        fullName: $("fullName")?.value?.trim() || "",
+        phone: $("phone")?.value?.trim() || "",
+        university: $("university")?.value?.trim() || "",
+        faculty: $("faculty")?.value?.trim() || "",
+        degree: $("degree")?.value?.trim() || "",
+        year: $("year")?.value ? Number($("year").value) : null,
+        bio: $("bio")?.value?.trim() || ""
     };
-
-    await apiFetch("/api/profile/me", { method: "PUT", body: JSON.stringify(payload) });
-    msg("✅ Saved!");
-    await load();
 }
 
-function getXsrfToken() {
-    const m = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
-    return m ? decodeURIComponent(m[1]) : "";
+function fillForm(p) {
+    if (!p || typeof p !== "object") return;
+
+    if ($("fullName")) $("fullName").value = p.name ?? "";
+    if ($("phone")) $("phone").value = p.phone ?? "";
+    if ($("university")) $("university").value = p.campus ?? "";
+    if ($("faculty")) $("faculty").value = p.faculty ?? "";
+    if ($("degree")) $("degree").value = p.degree ?? "";
+    if ($("year")) $("year").value = p.yearOfStudy ?? "";
+    if ($("bio")) $("bio").value = p.bio ?? "";
+
+    // ✅ Keep photo always
+    if (p.profilePhotoPath && $("avatarPreview")) {
+        $("avatarPreview").src = p.profilePhotoPath;
+    }
 }
 
-async function upload(kind) {
-    const input = kind === "profile" ? $("profileFile") : $("coverFile");
-    if (!input.files || !input.files[0]) return msg("Select an image first");
+async function loadProfile() {
+    try {
+        showMsg("Loading profile...", "info");
+        const data = await apiFetch(GET_URL, { method: "GET" });
+        fillForm(data);
+        showMsg("Profile loaded.", "success");
+    } catch (e) {
+        if (e.message === "LOGIN_REQUIRED") {
+            showMsg("Not logged in. Redirecting...", "error");
+            setTimeout(goLogin, 600);
+            return;
+        }
+        console.error(e);
+        showMsg("❌ Failed to load profile: " + e.message, "error");
+    }
+}
+
+async function saveProfile() {
+    try {
+        showMsg("Saving profile...", "info");
+        const payload = collectPayload();
+
+        const data = await apiFetch(SAVE_URL, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        fillForm(data);
+        showMsg("✅ Profile saved successfully!", "success");
+    } catch (e) {
+        if (e.message === "LOGIN_REQUIRED") {
+            showMsg("Not logged in. Redirecting...", "error");
+            setTimeout(goLogin, 600);
+            return;
+        }
+        console.error(e);
+        showMsg("❌ Profile save failed: " + e.message, "error");
+    }
+}
+
+async function uploadPhoto() {
+    const fileInput = $("photo");
+    if (!fileInput || !fileInput.files || !fileInput.files[0]) {
+        showMsg("❌ Choose an image first.", "error");
+        return;
+    }
+
+    const f = fileInput.files[0];
+    const maxBytes = 10 * 1024 * 1024;
+    if (f.size > maxBytes) {
+        showMsg("❌ Image too large. Choose under 10MB.", "error");
+        return;
+    }
 
     const fd = new FormData();
-    fd.append("file", input.files[0]);
+    fd.append("file", f);
+    fd.append("image", f);
+    fd.append("photo", f);
 
-    const endpoint = kind === "profile"
-        ? "/api/profile/me/profile-photo"
-        : "/api/profile/me/cover-photo";
+    try {
+        showMsg("Uploading image...", "info");
+        const res = await apiFetch(UPLOAD_URL, { method: "POST", body: fd });
 
-    const res = await fetch(endpoint, {
-        method: "POST",
-        credentials: "same-origin",
-        headers: { "X-XSRF-TOKEN": getXsrfToken() },
-        body: fd
-    });
+        if (res && res.url && $("avatarPreview")) {
+            $("avatarPreview").src = res.url;
+        }
 
-    if (!res.ok) throw new Error(await res.text());
-    msg("✅ Uploaded!");
-    await load();
+        showMsg("✅ Image uploaded successfully!", "success");
+    } catch (e) {
+        if (e.message === "LOGIN_REQUIRED") {
+            showMsg("Not logged in. Redirecting...", "error");
+            setTimeout(goLogin, 600);
+            return;
+        }
+        console.error(e);
+        showMsg("❌ Image upload failed: " + e.message, "error");
+    }
+}
+
+function wireEvents() {
+    const saveBtn = $("saveBtn");
+    if (saveBtn) saveBtn.addEventListener("click", saveProfile);
+
+    const photo = $("photo");
+    if (photo) photo.addEventListener("change", uploadPhoto);
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-    await initCsrf();
-    await load();
-
-    $("saveBtn").addEventListener("click", () => save().catch(e => msg(e.message)));
-    $("uploadProfileBtn").addEventListener("click", () => upload("profile").catch(e => msg(e.message)));
-    $("uploadCoverBtn").addEventListener("click", () => upload("cover").catch(e => msg(e.message)));
+    wireEvents();
+    await loadProfile();
 });
