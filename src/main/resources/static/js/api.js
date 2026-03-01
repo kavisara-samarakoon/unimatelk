@@ -1,94 +1,61 @@
-let csrfToken = null;
-let csrfHeaderName = null;
+// src/main/resources/static/js/api.js
+// Global (non-module) helper for fetch + cookies + CSRF
 
-export function getCookie(name) {
-    const parts = document.cookie.split(";").map(v => v.trim());
-    for (const p of parts) {
-        if (p.startsWith(name + "=")) return decodeURIComponent(p.substring(name.length + 1));
+(function () {
+    function getCookie(name) {
+        const match = document.cookie.match(new RegExp("(^|;\\s*)" + name + "=([^;]+)"));
+        return match ? decodeURIComponent(match[2]) : null;
     }
-    return null;
-}
 
-export async function initCsrf() {
-    // Fetch CSRF info from server (token + correct header name)
-    const res = await fetch("/api/csrf", {
-        method: "GET",
-        credentials: "same-origin",
-        cache: "no-store"
-    });
+    function getCsrfToken() {
+        return getCookie("XSRF-TOKEN");
+    }
 
-    const data = await res.json().catch(() => ({}));
+    async function apiFetch(url, options) {
+        const opts = options ? Object.assign({}, options) : {};
+        opts.headers = opts.headers ? Object.assign({}, opts.headers) : {};
 
-    csrfToken = data.token || null;
-    csrfHeaderName = data.headerName || null;
+        // always send session cookies
+        opts.credentials = "same-origin";
 
-    return { csrfToken, csrfHeaderName, data };
-}
+        // attach CSRF for state changing requests
+        const method = (opts.method || "GET").toUpperCase();
+        const csrf = getCsrfToken();
+        if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && csrf) {
+            opts.headers["X-XSRF-TOKEN"] = csrf;
+        }
 
-export async function apiFetch(url, options = {}) {
-    const opts = {
-        credentials: "same-origin",
-        cache: "no-store",
-        ...options
-    };
-
-    // Merge headers safely
-    opts.headers = { ...(options.headers || {}) };
-
-    // ---- Body handling ----
-    const hasBody = opts.body !== undefined && opts.body !== null;
-    const isFormData = (typeof FormData !== "undefined") && (opts.body instanceof FormData);
-    const isString = typeof opts.body === "string";
-
-    if (hasBody && isFormData) {
-        delete opts.headers["Content-Type"];
-        delete opts.headers["content-type"];
-    } else if (hasBody && !isString) {
-        if (!opts.headers["Content-Type"] && !opts.headers["content-type"]) {
+        // JSON for plain objects (not FormData)
+        if (opts.body && !(opts.body instanceof FormData) && typeof opts.body === "object") {
             opts.headers["Content-Type"] = "application/json";
+            opts.body = JSON.stringify(opts.body);
         }
-        opts.body = JSON.stringify(opts.body);
-    } else if (hasBody && isString) {
-        if (!opts.headers["Content-Type"] && !opts.headers["content-type"]) {
-            opts.headers["Content-Type"] = "application/json";
+
+        const res = await fetch(url, opts);
+        const text = await res.text();
+
+        let data = text;
+        const ct = (res.headers.get("content-type") || "").toLowerCase();
+        if (ct.includes("application/json")) {
+            try { data = text ? JSON.parse(text) : null; } catch (e) {}
         }
+
+        if (!res.ok) {
+            const msg =
+                data && data.message ? data.message :
+                    typeof data === "string" ? data :
+                        JSON.stringify(data);
+
+            const err = new Error("HTTP " + res.status + ": " + msg);
+            err.status = res.status;
+            err.data = data;
+            throw err;
+        }
+
+        return data;
     }
 
-    // ---- CSRF header for state-changing requests ----
-    const method = (opts.method || "GET").toUpperCase();
-    if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
-
-        // 1) If we already loaded CSRF from /api/csrf, use the exact header name Spring expects
-        if (csrfToken && csrfHeaderName && !opts.headers[csrfHeaderName]) {
-            opts.headers[csrfHeaderName] = csrfToken;
-        }
-
-        // 2) Fallback: cookie-based token (XSRF-TOKEN -> X-XSRF-TOKEN)
-        const cookieToken = getCookie("XSRF-TOKEN");
-        if (cookieToken && !opts.headers["X-XSRF-TOKEN"]) {
-            opts.headers["X-XSRF-TOKEN"] = cookieToken;
-        }
-
-        // 3) Extra fallback: some configs expect X-CSRF-TOKEN
-        if ((csrfToken || cookieToken) && !opts.headers["X-CSRF-TOKEN"]) {
-            opts.headers["X-CSRF-TOKEN"] = (csrfToken || cookieToken);
-        }
-    }
-
-    const res = await fetch(url, opts);
-
-    const ct = res.headers.get("content-type") || "";
-    const body = ct.includes("application/json")
-        ? await res.json().catch(() => null)
-        : await res.text().catch(() => "");
-
-    if (!res.ok) {
-        const msg =
-            (body && body.message) ? body.message :
-                (typeof body === "string" && body) ? body :
-                    `Request failed (${res.status})`;
-        throw new Error(msg);
-    }
-
-    return body;
-}
+    // expose globally
+    window.getCsrfToken = getCsrfToken;
+    window.apiFetch = apiFetch;
+})();

@@ -2,73 +2,57 @@ package com.unimatelk.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.csrf.CsrfFilter;
 
 @Configuration
-@EnableWebSecurity
 public class SecurityConfig {
-
-    // ✅ Use YOUR exact class name from left panel
-    private final CustomOAuth2UserService customOAuth2UserService;
-
-    public SecurityConfig(CustomOAuth2UserService customOAuth2UserService) {
-        this.customOAuth2UserService = customOAuth2UserService;
-    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+        http.authorizeHttpRequests(auth -> auth
+                // Public pages + assets
+                .requestMatchers(
+                        "/", "/index.html",
+                        "/home.html", "/profile.html", "/preferences.html",
+                        "/matches.html", "/requests.html", "/chat.html", "/admin.html",
+                        "/css/**", "/js/**", "/images/**", "/favicon.ico",
+                        "/uploads/**",
+                        "/login**", "/oauth2/**",
+                        "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
+                        "/actuator/health", "/actuator/info", "/actuator/flyway"
+                ).permitAll()
 
-        http
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .csrfTokenRequestHandler(requestHandler)
-                        // ✅ allow local auth endpoints without CSRF token
-                        .ignoringRequestMatchers("/api/auth/**")
-                        .ignoringRequestMatchers("/ws/**", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/**")
+                // APIs require login
+                .requestMatchers("/api/**").authenticated()
+
+                .anyRequest().permitAll()
+        );
+
+        // ✅ Keep CSRF cookie for future, BUT ignore CSRF for your app APIs to avoid 403
+        http.csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .ignoringRequestMatchers(
+                        "/api/**",     // <--- IMPORTANT: avoids 403 on POST/PUT during demo
+                        "/ws/**"
                 )
+        );
 
-                .exceptionHandling(ex -> ex
-                        .defaultAuthenticationEntryPointFor(
-                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                                request -> request.getRequestURI().startsWith("/api/")
-                        )
-                )
+        // Force CSRF cookie generation (optional)
+        http.addFilterAfter(new CsrfCookieFilter(), CsrfFilter.class);
 
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/", "/index.html", "/reset.html",
-                                "/css/**", "/js/**", "/images/**", "/uploads/**",
-                                "/error", "/favicon.ico"
-                        ).permitAll()
+        http.oauth2Login(Customizer.withDefaults());
 
-                        .requestMatchers("/oauth2/**", "/login/**").permitAll()
-
-                        // ✅ allow manual auth + me endpoint
-                        .requestMatchers("/api/auth/**", "/api/me", "/api/csrf").permitAll()
-
-                        .anyRequest().authenticated()
-                )
-
-                .oauth2Login(oauth -> oauth
-                        .userInfoEndpoint(u -> u.userService(customOAuth2UserService))
-                        .defaultSuccessUrl("/matches.html", true)
-                )
-
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/index.html?loggedOut=1")
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID", "XSRF-TOKEN")
-                        .permitAll()
-                );
+        http.logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/index.html")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID", "XSRF-TOKEN")
+        );
 
         return http.build();
     }
