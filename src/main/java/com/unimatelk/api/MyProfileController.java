@@ -13,9 +13,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/my/profile")
@@ -44,9 +49,12 @@ public class MyProfileController {
         return currentUserService.requireUser(oauth2User);
     }
 
-    // ✅ KEY FIX: always ensure a profile row exists (safe even if already exists)
     private void ensureProfileRow(Long userId) {
-        em.createNativeQuery("INSERT IGNORE INTO profiles (user_id) VALUES (?)")
+        em.createNativeQuery("""
+                INSERT IGNORE INTO profiles
+                (user_id, campus, degree, year_of_study, gender, gender_preference, contact_visible)
+                VALUES (?, '', '', 1, '', '', 0)
+                """)
                 .setParameter(1, userId)
                 .executeUpdate();
     }
@@ -78,7 +86,6 @@ public class MyProfileController {
         AppUser me = requireMe(auth);
         Long userId = me.getId();
 
-        // ensure profile row exists for ALL users
         ensureProfileRow(userId);
 
         Object[] urow = loadUserRow(userId);
@@ -96,6 +103,10 @@ public class MyProfileController {
                 """)
                 .setParameter(1, userId)
                 .getResultList();
+
+        if (rows.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Profile row missing");
+        }
 
         Object[] p = (Object[]) rows.get(0);
 
@@ -188,72 +199,57 @@ public class MyProfileController {
                     .executeUpdate();
         }
 
-        if (req.facebookUrl() != null) {
-            em.createNativeQuery("UPDATE profiles SET facebook_url = ? WHERE user_id = ?")
-                    .setParameter(1, req.facebookUrl().trim())
-                    .setParameter(2, userId)
-                    .executeUpdate();
-        }
-
-        if (req.instagramUrl() != null) {
-            em.createNativeQuery("UPDATE profiles SET instagram_url = ? WHERE user_id = ?")
-                    .setParameter(1, req.instagramUrl().trim())
-                    .setParameter(2, userId)
-                    .executeUpdate();
-        }
-
-        if (req.contactVisible() != null) {
-            em.createNativeQuery("UPDATE profiles SET contact_visible = ? WHERE user_id = ?")
-                    .setParameter(1, req.contactVisible() ? 1 : 0)
-                    .setParameter(2, userId)
-                    .executeUpdate();
-        }
-
-        // ✅ IMPORTANT: do not touch profile_photo_path here, so photo never vanishes.
         return getMyProfile(auth);
     }
 
     @PostMapping("/photo")
     @Transactional
-    public ProfileDtos.UploadResponse uploadProfilePhoto(Authentication auth,
-                                                         @RequestParam(required = false) MultipartFile file,
-                                                         @RequestParam(required = false) MultipartFile image,
-                                                         @RequestParam(required = false) MultipartFile photo) throws Exception {
+    public Map<String, String> uploadProfilePhoto(Authentication auth,
+                                                  @RequestParam(value = "file", required = false) MultipartFile file,
+                                                  @RequestParam(value = "image", required = false) MultipartFile image,
+                                                  @RequestParam(value = "photo", required = false) MultipartFile photo) {
         AppUser me = requireMe(auth);
         Long userId = me.getId();
 
-        MultipartFile f = (file != null && !file.isEmpty()) ? file :
-                (image != null && !image.isEmpty()) ? image :
-                        (photo != null && !photo.isEmpty()) ? photo : null;
-
-        if (f == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No file uploaded");
-
-        Files.createDirectories(Paths.get(uploadsDir));
-
-        String original = (f.getOriginalFilename() == null) ? "upload.jpg" : f.getOriginalFilename();
-        String ext = "";
-        int dot = original.lastIndexOf('.');
-        if (dot >= 0) ext = original.substring(dot);
-
-        String filename = "profile-" + userId + "-" + Instant.now().toEpochMilli() + ext;
-        Path target = Paths.get(uploadsDir).resolve(filename).normalize();
-        Files.copy(f.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
-
-        String url = "/uploads/" + filename;
-
         ensureProfileRow(userId);
 
-        em.createNativeQuery("UPDATE profiles SET profile_photo_path = ? WHERE user_id = ?")
-                .setParameter(1, url)
-                .setParameter(2, userId)
-                .executeUpdate();
+        MultipartFile f = file != null ? file : (image != null ? image : photo);
+        if (f == null || f.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No file uploaded");
+        }
 
-        // optional: keep navbar photo consistent
-        em.createNativeQuery("UPDATE users SET picture_url = ? WHERE id = ?")
-                .setParameter(1, url)
-                .setParameter(2, userId)
-                .executeUpdate();
+        try {
+            Path dir = Paths.get(uploadsDir);
+            Files.createDirectories(dir);
 
-        return new ProfileDtos.UploadResponse(url, filename);
+            String original = f.getOriginalFilename() == null ? "photo" : f.getOriginalFilename();
+            String ext = "";
+            int idx = original.lastIndexOf('.');
+            if (idx >= 0) ext = original.substring(idx).toLowerCase();
+            if (!(ext.equals(".jpg") || ext.equals(".jpeg") || ext.equals(".png") || ext.equals(".webp"))) {
+                ext = ".png";
+            }
+
+            String filename = "profile_" + userId + "_" + UUID.randomUUID() + ext;
+            Path target = dir.resolve(filename);
+
+            Files.copy(f.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+
+            String urlPath = "/uploads/" + filename;
+
+            em.createNativeQuery("UPDATE profiles SET profile_photo_path = ? WHERE user_id = ?")
+                    .setParameter(1, urlPath)
+                    .setParameter(2, userId)
+                    .executeUpdate();
+
+            em.createNativeQuery("UPDATE users SET picture_url = ? WHERE id = ?")
+                    .setParameter(1, urlPath)
+                    .setParameter(2, userId)
+                    .executeUpdate();
+
+            return Map.of("url", urlPath);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Upload failed");
+        }
     }
 }
