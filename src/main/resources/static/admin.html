@@ -1,123 +1,34 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>UniMateLK - Admin</title>
 
-    <link rel="stylesheet" href="/css/theme.css">
-    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/theme.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
 </head>
-
 <body>
 
-<!-- Background -->
-<div class="bg">
-    <div class="blob b1"></div>
-    <div class="blob b2"></div>
-    <div class="blob b3"></div>
-    <div class="grain"></div>
-</div>
+<div id="navbarMount"></div>
 
 <main class="page">
-
-    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
-    <div id="navbarMount"></div>
-
     <section class="container">
-        <div class="glass-shell">
+        <h1 class="page-title">Admin Dashboard</h1>
+        <div id="msg" class="toast"></div>
 
-            <div class="admin-head">
-                <div>
-                    <h2 style="margin:0;">Admin Moderation</h2>
-                    <p class="muted" style="margin:6px 0 0;">Reports • Blocks • Bans</p>
-                </div>
-                <span class="badge">Moderation Panel</span>
-            </div>
-
-            <div class="admin-tools glass-card">
-                <div class="admin-tools-left">
-                    <label for="search">Search (email / reason)</label>
-                    <input id="search" placeholder="Search email / reason...">
-                </div>
-                <div class="admin-tools-right">
-                    <button id="refreshBtn" class="btn secondary" type="button">Refresh</button>
-                    <span class="badge">Open Reports: <span id="countBadge">0</span></span>
-                </div>
-            </div>
-
-            <div id="adminMsg" class="toast info" style="display:none;"></div>
-
-            <div class="admin-grid">
-
-                <section class="glass-card">
-                    <div class="section-title">Open Reports</div>
-                    <div id="reportsList" class="list"></div>
-                </section>
-
-                <section class="glass-card">
-                    <div class="section-title">Actions / Details</div>
-                    <p class="muted" id="detailsHint">Select a report to view actions.</p>
-
-                    <div id="detailsBox" style="display:none;">
-                        <div class="details-card">
-                            <div class="row">
-                                <div>
-                                    <div class="details-title" id="d_reason">Reason</div>
-                                    <div class="help" id="d_meta"></div>
-                                </div>
-                                <span class="right badge status-pill" id="d_status">OPEN</span>
-                            </div>
-
-                            <div class="divider"></div>
-
-                            <div class="help"><b>Reporter:</b> <span id="d_reporter"></span></div>
-                            <div class="help"><b>Reported:</b> <span id="d_reported"></span></div>
-
-                            <div class="divider"></div>
-
-                            <div class="help"><b>Details:</b></div>
-                            <div id="d_details" class="details-text"></div>
-
-                            <div class="divider"></div>
-
-                            <div class="row">
-                                <button id="resolveBtn" class="btn" type="button">Resolve</button>
-                                <button id="openUserBtn" class="btn ghost" type="button">Open User Page</button>
-                            </div>
-
-                            <p id="actionMsg" class="help" style="margin-top:10px;"></p>
-                        </div>
-                    </div>
-
-                    <div class="divider"></div>
-
-                    <div class="list">
-                        <div class="list-item">
-                            <div style="font-weight:800;">Recommended demo</div>
-                            <div class="help">Create a report from a user page, then resolve here.</div>
-                        </div>
-                        <div class="list-item">
-                            <div style="font-weight:800;">Tip</div>
-                            <div class="help">If list is empty, check <code>/api/admin/reports?status=OPEN</code>.</div>
-                        </div>
-                    </div>
-                </section>
-
-            </div>
-
+        <div class="card">
+            <h3 style="margin-top:0;">Open Reports</h3>
+            <div id="reports"></div>
         </div>
     </section>
-
 </main>
 
-<!-- ✅ Mount navbar explicitly (guaranteed) -->
 <script type="module">
     import { mountNavbar } from "/js/navbar.js";
     mountNavbar();
 </script>
 
-<!-- ✅ Load admin functionality ONCE -->
 <script type="module" src="/js/admin.js"></script>
 
 </body>

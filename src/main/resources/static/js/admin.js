@@ -1,56 +1,16 @@
-function getCookie(name){
-    const m = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
-    return m ? decodeURIComponent(m[2]) : null;
+import { apiFetch, initCsrf } from "./api.js";
+
+const el = (id) => document.getElementById(id);
+
+function setMsg(text, type = "") {
+    const m = el("msg");
+    if (!m) return;
+    m.textContent = text || "";
+    m.className = "toast " + type;
 }
 
-function setCsrf(headers){
-    const token = getCookie("XSRF-TOKEN");
-    if (token) headers.set("X-XSRF-TOKEN", token);
-}
-
-async function api(url, options = {}) {
-    const headers = new Headers(options.headers || {});
-    headers.set("Accept", "application/json");
-    headers.set("X-Requested-With", "XMLHttpRequest");
-    if (options.body && !headers.has("Content-Type")) {
-        headers.set("Content-Type", "application/json");
-    }
-    setCsrf(headers);
-
-    const res = await fetch(url, {
-        credentials: "same-origin",
-        ...options,
-        headers
-    });
-
-    const contentType = res.headers.get("content-type") || "";
-    const raw = await res.text();
-
-    if (!res.ok) {
-        throw new Error(`${res.status} ${res.statusText}\n${raw.substring(0, 250)}`);
-    }
-
-    if (contentType.includes("application/json")) {
-        return raw ? JSON.parse(raw) : null;
-    }
-
-    return raw;
-}
-
-function showMsg(text, type="info"){
-    const box = document.getElementById("adminMsg");
-    box.className = `toast ${type}`;
-    box.textContent = text;
-    box.style.display = "block";
-}
-
-function hideMsg(){
-    const box = document.getElementById("adminMsg");
-    box.style.display = "none";
-}
-
-function escapeHtml(s){
-    return String(s ?? "")
+function escapeHtml(str) {
+    return String(str || "")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
@@ -58,109 +18,95 @@ function escapeHtml(s){
         .replaceAll("'", "&#039;");
 }
 
-function fmtDate(v){
-    try { return v ? new Date(v).toLocaleString() : ""; }
-    catch { return String(v || ""); }
+function reportCard(r) {
+    const id = r.id ?? r.reportId ?? "";
+    const reporter = r.reporterName ?? r.reporter ?? "";
+    const reported = r.reportedName ?? r.reported ?? "";
+    const reason = r.reason ?? "";
+    const details = r.details ?? "";
+    const createdAt = r.createdAt ? new Date(r.createdAt).toLocaleString() : "";
+
+    return `
+    <div class="card" style="margin-top:10px;">
+      <div><b>Report #${escapeHtml(String(id))}</b></div>
+      <div style="opacity:0.9; margin-top:6px;">
+        <div><b>Reporter:</b> ${escapeHtml(reporter)}</div>
+        <div><b>Reported:</b> ${escapeHtml(reported)}</div>
+        <div><b>Reason:</b> ${escapeHtml(reason)}</div>
+        ${details ? `<div><b>Details:</b> ${escapeHtml(details)}</div>` : ""}
+        ${createdAt ? `<div><b>Time:</b> ${escapeHtml(createdAt)}</div>` : ""}
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+        <select id="action_${id}">
+          <option value="NO_ACTION">No Action</option>
+          <option value="TEMP_BLOCK">Temp Block</option>
+          <option value="BAN">Ban</option>
+          <option value="UNBLOCK">Unblock</option>
+        </select>
+        <input id="note_${id}" placeholder="Note (optional)" style="flex:1; min-width:220px;">
+        <button class="btn primary" data-id="${id}" data-action="resolve">Resolve</button>
+      </div>
+    </div>
+  `;
 }
 
-let current = null;
+async function loadReports() {
+    const box = el("reports");
+    box.innerHTML = "";
 
-function renderList(items){
-    const list = document.getElementById("reportsList");
-    const badge = document.getElementById("countBadge");
-    list.innerHTML = "";
-    badge.textContent = String(items.length);
-
-    if (!items.length){
-        list.innerHTML = `<div class="muted">No OPEN reports found.</div>`;
+    let reports;
+    try {
+        reports = await apiFetch("/api/admin/reports?status=OPEN");
+    } catch (e) {
+        setMsg("Admin reports API not found or blocked. Check your AdminReportController endpoints.", "error");
         return;
     }
 
-    for (const r of items){
-        const el = document.createElement("div");
-        el.className = "list-item";
-        el.style.cursor = "pointer";
-        el.innerHTML = `
-      <div class="row">
-        <div style="font-weight:700;">${escapeHtml(r.reason || "No reason")}</div>
-        <span class="right badge">${escapeHtml(r.status || "OPEN")}</span>
-      </div>
-      <div class="help">
-        Reported: <b>${escapeHtml(r.reportedEmail || "-")}</b> •
-        Reporter: <b>${escapeHtml(r.reporterEmail || "-")}</b>
-      </div>
-      <div class="help">${escapeHtml(fmtDate(r.createdAt))}</div>
-    `;
-        el.addEventListener("click", () => selectReport(r));
-        list.appendChild(el);
+    if (!Array.isArray(reports) || reports.length === 0) {
+        box.innerHTML = `<div class="toast info">No open reports.</div>`;
+        return;
     }
+
+    box.innerHTML = reports.map(reportCard).join("");
+
+    box.querySelectorAll('button[data-action="resolve"]').forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const id = btn.getAttribute("data-id");
+            const action = el(`action_${id}`).value;
+            const note = el(`note_${id}`).value || "";
+
+            try {
+                await apiFetch(`/api/admin/reports/${id}/resolve`, {
+                    method: "POST",
+                    body: { action, note }
+                });
+                setMsg("Resolved.", "success");
+                await loadReports();
+            } catch (e) {
+                setMsg(e?.message || "Resolve failed", "error");
+            }
+        });
+    });
 }
 
-function selectReport(r){
-    current = r;
-    document.getElementById("detailsHint").style.display = "none";
-    document.getElementById("detailsBox").style.display = "block";
+document.addEventListener("DOMContentLoaded", async () => {
+    await initCsrf();
 
-    document.getElementById("d_reason").textContent = r.reason || "Reason";
-    document.getElementById("d_status").textContent = r.status || "OPEN";
-    document.getElementById("d_meta").textContent = `Created: ${fmtDate(r.createdAt)}`;
-    document.getElementById("d_reporter").textContent = r.reporterEmail || "-";
-    document.getElementById("d_reported").textContent = r.reportedEmail || "-";
-    document.getElementById("d_details").textContent = r.details || "(no details)";
-    document.getElementById("actionMsg").textContent = "";
-}
-
-async function loadReports(){
-    hideMsg();
-    const q = (document.getElementById("search")?.value || "").trim();
-
-    try{
-        const data = await api(`/api/admin/reports?status=OPEN&query=${encodeURIComponent(q)}`);
-
-        const items = data?.items || data?.reports || [];
-        renderList(items);
-
-    }catch(e){
-        console.error(e);
-        showMsg("Failed to load reports:\n" + e.message, "error");
-        document.getElementById("reportsList").innerHTML = `<div class="muted">Error loading reports.</div>`;
-        document.getElementById("countBadge").textContent = "0";
+    let me;
+    try {
+        me = await apiFetch("/api/me");
+    } catch (_) {
+        window.location.href = "/oauth2/authorization/google";
+        return;
     }
-}
 
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("refreshBtn")?.addEventListener("click", loadReports);
+    const role = (me?.role || "").toUpperCase();
+    if (role !== "ADMIN") {
+        window.location.href = "/home.html";
+        return;
+    }
 
-    document.getElementById("search")?.addEventListener("input", () => {
-        clearTimeout(window.__t);
-        window.__t = setTimeout(loadReports, 250);
-    });
-
-    document.getElementById("resolveBtn")?.addEventListener("click", async () => {
-        if (!current) return;
-
-        const msg = document.getElementById("actionMsg");
-        msg.textContent = "Resolving...";
-
-        try{
-            await api(`/api/admin/reports/${current.id}/resolve`, { method: "POST" });
-            msg.textContent = "✅ Resolved.";
-            current = null;
-            document.getElementById("detailsBox").style.display = "none";
-            document.getElementById("detailsHint").style.display = "block";
-            await loadReports();
-        }catch(e){
-            console.error(e);
-            msg.textContent = "❌ Failed: " + e.message;
-        }
-    });
-
-    document.getElementById("openUserBtn")?.addEventListener("click", () => {
-        if (!current) return;
-
-        const email = encodeURIComponent(current.reportedEmail || "");
-        window.location.href = `/user.html?email=${email}`;
-    });
-
-    loadReports();
+    setMsg("Loading reports...", "info");
+    await loadReports();
 });
