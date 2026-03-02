@@ -19,9 +19,9 @@ function escapeHtml(str) {
 }
 
 function reportCard(r) {
-    const id = r.id ?? r.reportId ?? "";
-    const reporter = r.reporterName ?? r.reporter ?? "";
-    const reported = r.reportedName ?? r.reported ?? "";
+    const id = r.id ?? "";
+    const reporter = r.reporterEmail ?? r.reporterName ?? r.reporter ?? "";
+    const reported = r.reportedEmail ?? r.reportedName ?? r.reported ?? "";
     const reason = r.reason ?? "";
     const details = r.details ?? "";
     const createdAt = r.createdAt ? new Date(r.createdAt).toLocaleString() : "";
@@ -55,22 +55,26 @@ async function loadReports() {
     const box = el("reports");
     box.innerHTML = "";
 
-    let reports;
+    let res;
     try {
-        reports = await apiFetch("/api/admin/reports?status=OPEN");
+        // backend returns a paged object (NOT an array)
+        res = await apiFetch("/api/admin/reports?status=OPEN&page=0&size=50");
     } catch (e) {
-        setMsg("Admin reports API not found or blocked. Check your AdminReportController endpoints.", "error");
+        setMsg("Failed to load admin reports: " + (e?.message || ""), "error");
         return;
     }
 
-    if (!Array.isArray(reports) || reports.length === 0) {
+    // Accept both formats: array OR {items:[]}
+    const reports = Array.isArray(res) ? res : (Array.isArray(res?.items) ? res.items : []);
+
+    if (reports.length === 0) {
         box.innerHTML = `<div class="toast info">No open reports.</div>`;
         return;
     }
 
     box.innerHTML = reports.map(reportCard).join("");
 
-    box.querySelectorAll('button[data-action="resolve"]').forEach(btn => {
+    box.querySelectorAll('button[data-action="resolve"]').forEach((btn) => {
         btn.addEventListener("click", async () => {
             const id = btn.getAttribute("data-id");
             const action = el(`action_${id}`).value;
