@@ -18,6 +18,110 @@ function escapeHtml(str) {
         .replaceAll("'", "&#039;");
 }
 
+function getOtherUserId(room) {
+    return (
+        room?.otherUserId ??
+        room?.other_user_id ??
+        room?.otherUserID ??
+        room?.otherId ??
+        room?.other_id ??
+        room?.otherUser?.userId ??
+        room?.otherUser?.id ??
+        null
+    );
+}
+
+let selected = null;
+
+function openSheet(room) {
+    selected = room;
+
+    el("sheetTitle").textContent = room.otherName || "Friend";
+    el("sheetSub").textContent = room.lastMessage ? `Last: ${room.lastMessage}` : "";
+    el("reportArea").style.display = "none";
+    el("reportMsg").textContent = "";
+    el("reportReason").value = "";
+
+    const roomId = room.roomId ?? room.id;
+    el("openChatBtn").href = `/chat.html?room=${encodeURIComponent(roomId)}`;
+
+    const otherId = getOtherUserId(room);
+
+    if (otherId) {
+        const url = `/user.html?id=${encodeURIComponent(otherId)}`;
+        el("viewUserBtn").href = url;
+        el("viewUserBtn").style.pointerEvents = "auto";
+        el("viewUserBtn").style.opacity = "1";
+        el("viewUserBtn").onclick = (e) => {
+            e.preventDefault();
+            window.location.href = url;
+        };
+    } else {
+        el("viewUserBtn").href = "#";
+        el("viewUserBtn").style.pointerEvents = "none";
+        el("viewUserBtn").style.opacity = "0.5";
+        el("viewUserBtn").onclick = null;
+    }
+
+    el("sheetBackdrop").style.display = "flex";
+}
+
+function closeSheet() {
+    selected = null;
+    el("sheetBackdrop").style.display = "none";
+}
+
+async function submitReport() {
+    if (!selected) return;
+
+    const otherId = getOtherUserId(selected);
+    if (!otherId) {
+        el("reportMsg").textContent = "Cannot report here (missing user id).";
+        return;
+    }
+
+    const reason = (el("reportReason").value || "").trim();
+    if (!reason) {
+        el("reportMsg").textContent = "Please write a reason.";
+        return;
+    }
+
+    if (!confirm("Submit report?")) return;
+
+    try {
+        await apiFetch(`/api/safety/report/${otherId}`, {
+            method: "POST",
+            body: { reason }
+        });
+        el("reportMsg").textContent = "Report submitted.";
+        el("reportReason").value = "";
+        setMsg("Report submitted.", "success");
+    } catch (e) {
+        el("reportMsg").textContent = e?.message || "Report failed";
+        setMsg(e?.message || "Report failed", "error");
+    }
+}
+
+async function blockUser() {
+    if (!selected) return;
+
+    const otherId = getOtherUserId(selected);
+    if (!otherId) {
+        setMsg("Cannot block here (missing user id).", "error");
+        return;
+    }
+
+    if (!confirm("Block this user?")) return;
+
+    try {
+        await apiFetch(`/api/safety/block/${otherId}`, { method: "POST" });
+        setMsg("User blocked.", "success");
+        closeSheet();
+    } catch (e) {
+        setMsg(e?.message || "Block failed", "error");
+    }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     await initCsrf();
 
@@ -41,26 +145,46 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (!Array.isArray(rooms) || rooms.length === 0) {
         box.innerHTML = `<div class="toast info">No friends yet. Accept a request first.</div>`;
-        return;
+    } else {
+        rooms.forEach(r => {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.style.marginTop = "10px";
+            card.style.cursor = "pointer";
+
+            const name = r.otherName || "Friend";
+            const last = r.lastMessage || "";
+
+            card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; gap:10px;">
+          <div>
+            <div style="font-weight:700;">${escapeHtml(name)}</div>
+            <div style="opacity:0.85; margin-top:6px;">${escapeHtml(last)}</div>
+          </div>
+          <div class="badge">Options</div>
+        </div>
+      `;
+
+            card.addEventListener("click", () => openSheet(r));
+            box.appendChild(card);
+        });
     }
 
-    rooms.forEach(r => {
-        const roomId = r.roomId ?? r.id;
-        const name = r.otherName ?? "Friend";
-        const last = r.lastMessage ?? "";
-        const card = document.createElement("div");
-        card.className = "card";
-        card.style.marginTop = "10px";
-        card.style.cursor = "pointer";
-        card.innerHTML = `
-      <div><b>${escapeHtml(name)}</b></div>
-      <div style="opacity:0.85; margin-top:6px;">${escapeHtml(last)}</div>
-      <div style="margin-top:10px;">
-        <a class="btn primary" href="/chat.html?room=${encodeURIComponent(roomId)}">Open Chat</a>
-      </div>
-    `;
-        box.appendChild(card);
+    el("sheetCloseBtn").addEventListener("click", closeSheet);
+    el("sheetBackdrop").addEventListener("click", (e) => {
+        if (e.target === el("sheetBackdrop")) closeSheet();
     });
 
-    setMsg("Friends loaded.", "success");
+    el("openReportBtn").addEventListener("click", () => {
+        el("reportArea").style.display = "block";
+    });
+
+    el("cancelReportBtn").addEventListener("click", () => {
+        el("reportArea").style.display = "none";
+        el("reportMsg").textContent = "";
+        el("reportReason").value = "";
+    });
+
+    el("submitReportBtn").addEventListener("click", submitReport);
+    el("blockBtn").addEventListener("click", blockUser);
 });

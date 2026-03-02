@@ -1,6 +1,6 @@
 import { apiFetch, initCsrf } from "./api.js";
 
-function el(id) { return document.getElementById(id); }
+const el = (id) => document.getElementById(id);
 
 function qp(name) {
     const u = new URL(window.location.href);
@@ -31,7 +31,6 @@ function setReportMsg(text) {
 
 async function loadUser(userId) {
     const u = await apiFetch(`/api/users/${userId}`, { method: "GET" });
-
     el("title").textContent = u?.name ? u.name : "User";
 
     el("profileCard").innerHTML = `
@@ -58,7 +57,7 @@ async function sendMatchRequest(userId) {
 }
 
 async function blockUser(userId) {
-    if (!confirm("Block this user? They will disappear from your feed and chat.")) return;
+    if (!confirm("Block this user?")) return;
     try {
         await apiFetch(`/api/safety/block/${userId}`, { method: "POST" });
         setToast("User blocked.", "success");
@@ -69,33 +68,35 @@ async function blockUser(userId) {
 
 async function reportUser(userId) {
     const reason = (el("reportReason")?.value || "").trim();
-    const details = (el("reportDetails")?.value || "").trim();
-
     if (!reason) {
-        setReportMsg("Reason is required.");
+        setReportMsg("Please write a reason.");
         return;
     }
-
     if (!confirm("Submit report?")) return;
 
     try {
         await apiFetch(`/api/safety/report/${userId}`, {
             method: "POST",
-            body: { reason, details }
+            body: { reason }
         });
-
         setReportMsg("Report submitted.");
         el("reportReason").value = "";
-        el("reportDetails").value = "";
         setToast("Report submitted.", "success");
     } catch (e) {
-        setReportMsg(e?.message || "Failed to report");
-        setToast(e?.message || "Failed to report", "error");
+        setReportMsg(e?.message || "Report failed");
+        setToast(e?.message || "Report failed", "error");
     }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
     await initCsrf();
+
+    try {
+        await apiFetch("/api/me");
+    } catch (_) {
+        window.location.href = "/oauth2/authorization/google";
+        return;
+    }
 
     const userId = qp("id");
     if (!userId) {
