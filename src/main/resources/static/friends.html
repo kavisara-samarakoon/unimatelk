@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UniMateLK - Friends</title>
+
+  <link rel="stylesheet" href="/css/theme.css"/>
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body>
+
+<div id="navbarMount"></div>
+
+<main class="page">
+  <section class="container">
+    <h1 class="page-title">Friends</h1>
+    <div id="msg" class="toast"></div>
+
+    <div class="card">
+      <div id="friendsList"></div>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+  import { mountNavbar } from "/js/navbar.js";
+  mountNavbar();
+</script>
+
+<script type="module" src="/js/friends.js"></script>
+
+</body>
+</html>

@@ -6,121 +6,57 @@
     <title>UniMateLK - Preferences</title>
 
     <link rel="stylesheet" href="/css/theme.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
 </head>
 <body>
 
-<!-- Background -->
-<div class="bg">
-    <div class="blob b1"></div>
-    <div class="blob b2"></div>
-    <div class="blob b3"></div>
-    <div class="grain"></div>
-</div>
+<div id="navbarMount"></div>
 
 <main class="page">
-
-    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
-    <div id="navbarMount"></div>
-
     <section class="container">
-        <div class="glass-shell">
+        <h1 class="page-title">Preferences</h1>
+        <div id="msg" class="toast"></div>
 
-            <div class="row" style="justify-content: space-between;">
-                <div>
-                    <h2 style="margin:0;">My Preferences</h2>
-                    <p class="muted" style="margin:6px 0 0;">
-                        Fill these to improve your match suggestions. Values must be <b>1–5</b>.
-                    </p>
-                </div>
-                <span class="badge">Lifestyle Matching</span>
-            </div>
+        <div class="card">
+            <label>Sleep Schedule (1–5)</label>
+            <input id="sleepSchedule" type="number" min="1" max="5">
 
-            <!-- IMPORTANT: keep id="msg" (JS uses it) -->
-            <p id="msg" class="toast info">Fill preferences to improve your match scores.</p>
+            <label style="margin-top:10px;">Cleanliness (1–5)</label>
+            <input id="cleanliness" type="number" min="1" max="5">
 
-            <div class="glass-card">
-                <p class="section-title">Lifestyle scales (1–5)</p>
+            <label style="margin-top:10px;">Noise Tolerance (1–5)</label>
+            <input id="noiseTolerance" type="number" min="1" max="5">
 
-                <div class="grid three">
-                    <div>
-                        <label for="sleep">Sleep Schedule (1–5)</label>
-                        <input id="sleep" type="number" min="1" max="5" placeholder="1..5"/>
-                        <div class="help">1 = early sleeper, 5 = late sleeper</div>
-                    </div>
+            <label style="margin-top:10px;">Guests (1–5)</label>
+            <input id="guests" type="number" min="1" max="5">
 
-                    <div>
-                        <label for="clean">Cleanliness (1–5)</label>
-                        <input id="clean" type="number" min="1" max="5" placeholder="1..5"/>
-                    </div>
+            <label style="margin-top:10px;">Smoking OK</label>
+            <select id="smokingOk">
+                <option value="">Not set</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
 
-                    <div>
-                        <label for="noise">Noise Tolerance (1–5)</label>
-                        <input id="noise" type="number" min="1" max="5" placeholder="1..5"/>
-                    </div>
-                </div>
+            <label style="margin-top:10px;">Drinking OK</label>
+            <select id="drinkingOk">
+                <option value="">Not set</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
 
-                <div class="divider"></div>
+            <label style="margin-top:10px;">Introvert (1–5)</label>
+            <input id="introvert" type="number" min="1" max="5">
 
-                <div class="grid two">
-                    <div>
-                        <label for="guests">Guest Frequency OK (1–5)</label>
-                        <input id="guests" type="number" min="1" max="5" placeholder="1..5"/>
-                    </div>
-
-                    <div>
-                        <label for="intro">Introvert ↔ Extrovert (1–5)</label>
-                        <input id="intro" type="number" min="1" max="5" placeholder="1..5"/>
-                        <div class="help">1 = introvert, 5 = extrovert</div>
-                    </div>
-                </div>
-
-                <div class="divider"></div>
-
-                <p class="section-title">Yes / No</p>
-
-                <div class="grid two">
-                    <div>
-                        <label for="smoking">Smoking OK?</label>
-                        <select id="smoking">
-                            <option value="true">Yes</option>
-                            <option value="false">No</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="drinking">Drinking OK?</label>
-                        <select id="drinking">
-                            <option value="true">Yes</option>
-                            <option value="false">No</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="divider"></div>
-
-                <div class="row">
-                    <!-- IMPORTANT: keep id="saveBtn" (JS uses it) -->
-                    <button id="saveBtn" class="btn" type="button">Save Preferences</button>
-                    <a class="btn secondary" href="/matches.html">View Matches</a>
-                </div>
-
-                <p class="help" style="margin-top:12px;">
-                    If any field is empty or outside 1–5, saving will show an error.
-                </p>
-            </div>
-
+            <button id="saveBtn" class="btn primary" type="button" style="margin-top:14px;">Save</button>
         </div>
     </section>
-
 </main>
 
-<!-- ✅ Mount navbar explicitly (guaranteed) -->
 <script type="module">
     import { mountNavbar } from "/js/navbar.js";
     mountNavbar();
 </script>
 
-<!-- ✅ Keep your existing JS file (functionality unchanged) -->
 <script type="module" src="/js/preferences.js"></script>
 
 </body>
