@@ -6,70 +6,74 @@
   <title>UniMateLK - Friends</title>
 
   <link rel="stylesheet" href="/css/theme.css"/>
-  <link rel="stylesheet" href="/css/style.css"/>
-  <style>
-    #sheetBackdrop{
-      position:fixed; inset:0; background:rgba(0,0,0,0.45);
-      display:none; align-items:flex-end; justify-content:center;
-      padding:16px; z-index:9999;
-    }
-    #sheet{
-      width:min(680px, 100%);
-      background:rgba(20,20,20,0.92);
-      border:1px solid rgba(255,255,255,0.14);
-      border-radius:16px;
-      padding:14px;
-    }
-    #sheetHeader{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom:10px;
-    }
-    #sheetTitle{ font-weight:700; font-size:18px; }
-    #sheetActions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
-    #reportArea{ display:none; margin-top:12px; }
-    #reportReason{ width:100%; }
-  </style>
+  <link rel="stylesheet" href="/css/liquid.css"/>
+  <link rel="stylesheet" href="/css/friends.css"/>
 </head>
-<body>
 
-<div id="navbarMount"></div>
+<body class="liquid">
+
+<!-- Background (same as Home/Profile/Chat) -->
+<div class="bg">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="grain"></div>
+</div>
 
 <main class="page">
-  <section class="container">
-    <h1 class="page-title">Friends</h1>
-    <div id="msg" class="toast"></div>
 
-    <div class="card">
-      <div id="friendsList"></div>
+  <!-- ✅ Navbar inside page -->
+  <div id="navbarMount"></div>
+
+  <section class="container">
+    <div class="glass-shell friends-wrap">
+
+      <div class="row" style="justify-content: space-between;">
+        <div>
+          <h2 style="margin:0;">Friends</h2>
+          <p class="muted" style="margin:6px 0 0;">Manage your friends • Open chat • Block • Report</p>
+        </div>
+        <span class="badge">Connections</span>
+      </div>
+
+      <div id="msg" class="toast info">Loading friends…</div>
+
+      <div class="glass-card friends-card">
+        <div id="friendsList"></div>
+      </div>
+
     </div>
   </section>
 </main>
 
-<div id="sheetBackdrop">
-  <div id="sheet">
+<!-- Bottom Sheet -->
+<div id="sheetBackdrop" aria-hidden="true">
+  <div id="sheet" role="dialog" aria-modal="true">
     <div id="sheetHeader">
       <div>
         <div id="sheetTitle"></div>
-        <div id="sheetSub" style="opacity:0.85; margin-top:4px;"></div>
+        <div id="sheetSub"></div>
       </div>
       <button class="btn secondary" id="sheetCloseBtn" type="button">Close</button>
     </div>
 
     <div id="sheetActions">
-      <a class="btn primary" id="openChatBtn" href="#">Open Chat</a>
+      <a class="btn" id="openChatBtn" href="#">Open Chat</a>
       <a class="btn secondary" id="viewUserBtn" href="#">View User</a>
       <button class="btn secondary" id="blockBtn" type="button">Block</button>
       <button class="btn danger" id="openReportBtn" type="button">Report</button>
     </div>
 
     <div id="reportArea">
-      <label style="display:block; margin-top:10px;">Report reason</label>
+      <label for="reportReason" class="report-label">Report reason</label>
       <textarea id="reportReason" rows="4" placeholder="Explain what happened..."></textarea>
-      <div style="display:flex; gap:10px; margin-top:10px;">
+
+      <div class="report-actions">
         <button class="btn danger" id="submitReportBtn" type="button">Submit Report</button>
         <button class="btn secondary" id="cancelReportBtn" type="button">Cancel</button>
       </div>
-      <div id="reportMsg" style="margin-top:10px;"></div>
+
+      <div id="reportMsg" class="report-msg"></div>
     </div>
   </div>
 </div>

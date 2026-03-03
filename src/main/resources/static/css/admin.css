@@ -1,118 +1,35 @@
-/* =========================================================
-   admin.css (FINAL)
-   Works with your CURRENT admin.html + admin.js (reports list + details)
-   Glass theme-compatible + fully responsive (2 cols -> 1 col)
-   Includes the responsiveness change I told you to add
-   ========================================================= */
-
-/* Header inside the shell */
-.admin-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:12px;
-    flex-wrap:wrap;
-    margin-bottom:12px;
+.admin-report{
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    margin-bottom: 12px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
 }
 
-/* Search + refresh block */
-.admin-tools{
-    display:flex;
-    align-items:flex-end;
-    justify-content:space-between;
-    gap:12px;
-    flex-wrap:wrap;
-    margin-top:12px;
-}
-
-.admin-tools-left{
-    flex: 1;
-    min-width: 260px;
-}
-
-.admin-tools-right{
+.admin-report-head{
     display:flex;
     align-items:center;
+    justify-content: space-between;
     gap:10px;
-    flex-wrap:wrap;
+    margin-bottom: 10px;
 }
 
-/* Two-column admin layout (LEFT list + RIGHT details) */
-.admin-grid{
-    margin-top:12px;
-    display:grid;
-    grid-template-columns: 1.1fr 1fr;
-    gap:12px;
-}
+.admin-report-title{ font-weight: 900; }
 
-/* Reports list container */
-.list{
-    display:grid;
+.admin-report-body{ display:grid; gap: 6px; }
+
+.kv{ display:grid; grid-template-columns: 110px 1fr; gap: 10px; }
+.k{ color: rgba(255,255,255,0.70); font-size: 13px; }
+.v{ color: rgba(255,255,255,0.92); }
+
+.admin-report-actions{
+    display:flex;
     gap:10px;
-    margin-top:10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    align-items: center;
 }
-
-/* Each report item (your JS creates .list-item) */
-.list-item{
-    border-radius: 16px;
-    padding: 12px;
-    border: 1px solid rgba(255,255,255,0.14);
-    background: rgba(10,14,30,0.22);
-    transition: transform .15s ease, border-color .15s ease;
-}
-
-.list-item:hover{
-    transform: translateY(-2px);
-    border-color: rgba(255,255,255,0.30);
-}
-
-/* Details inner card */
-.details-card{
-    border-radius: 18px;
-    padding: 14px;
-    border: 1px solid rgba(255,255,255,0.14);
-    background: rgba(10,14,30,0.22);
-}
-
-.details-title{
-    font-weight: 900;
-    font-size: 18px;
-    color: rgba(255,255,255,0.96);
-}
-
-/* Details content text */
-.details-text{
-    white-space: pre-wrap;
-    line-height: 1.45;
-    color: rgba(255,255,255,0.88);
-}
-
-/* Status pill styling */
-.status-pill{
-    background: rgba(255,255,255,0.14);
-    border: 1px solid rgba(255,255,255,0.18);
-}
-
-/* =========================================================
-   ✅ RESPONSIVE FIX (the change from the step)
-   2 columns → 1 column on smaller screens
-   ========================================================= */
-@media (max-width: 950px){
-    .admin-grid{
-        grid-template-columns: 1fr !important;
-    }
-}
-
-/* Extra small devices: make tools stack nicely */
-@media (max-width: 650px){
-    .admin-tools{
-        align-items: stretch;
-    }
-    .admin-tools-right{
-        width: 100%;
-        justify-content: flex-start;
-    }
-    #refreshBtn{
-        width: 100%;
-    }
-}
+.admin-report-actions select{ min-width: 180px; }
+.admin-report-actions input{ flex:1; min-width: 220px; }

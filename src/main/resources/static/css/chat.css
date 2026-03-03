@@ -1,57 +1,200 @@
-/* =========================================================
-   FIX: prevent huge images + broken layout in chat
-   Works for BOTH possible message styles:
-   - .msg (your chat.css bubble class)
-   - .chat-msg (some versions of chat.js render this)
-   Also targets #messages and #chatBox containers
-   ========================================================= */
+/* Chat page (UI only) — works with theme.css + liquid.css */
 
-/* Prevent messages area from stretching the whole page */
-.messages, #messages, #chatBox {
+.chat-wrap{
+    padding: 18px;
+}
+
+.chat-shell{
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 14px;
+    align-items: stretch;
+}
+
+/* Sidebar */
+.chat-sidebar{
+    padding: 14px;
+    height: 72vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.rooms-scroll{
+    margin-top: 12px;
     overflow: auto;
-    max-height: 520px;   /* adjust if you want taller */
+    padding-right: 6px;
 }
 
-/* Make sure message bubbles don't overflow with long text */
-.msg, .chat-msg {
-    word-break: break-word;
-    overflow-wrap: anywhere;
+/* Room items (whatever chat.js injects under #roomsList) */
+#roomsList > *{
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 10px;
+    transition: transform .15s ease, border-color .15s ease, opacity .15s ease;
+}
+#roomsList > *:hover{
+    transform: translateY(-1px);
+    border-color: rgba(255,255,255,0.28);
 }
 
-/* Limit images inside chat so they never become giant */
-.msg img,
-.chat-msg img,
-#messages img,
-#chatBox img {
-    display: block;
-    max-width: 260px;     /* main size limit */
-    width: 100%;
-    height: auto;
-    max-height: 260px;    /* prevents very tall images */
-    object-fit: contain;
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.14);
+/* Main chat */
+.chat-main{
+    padding: 14px;
+    height: 72vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto auto; /* head, messages, preview, input */
+    overflow: hidden;
+}
+
+.chat-head{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+.room-title{
+    font-weight: 900;
+    font-size: 18px;
+}
+
+.room-sub{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.dot{
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(0,255,180,0.9);
+    box-shadow: 0 0 16px rgba(0,255,180,0.25);
+}
+
+/* Messages area */
+.messages{
+    padding: 14px 8px 14px 2px;
+    overflow: auto;
+}
+
+/* ===== WhatsApp-style bubbles using your existing .chat-msg and .chat-msg.me ===== */
+.chat-msg{
+    max-width: 72%;
+    margin: 10px 0;
+    padding: 10px 12px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.chat-msg.me{
+    margin-left: auto; /* ✅ pushes my messages to the right */
+    background: linear-gradient(90deg, rgba(124,77,255,0.30), rgba(0,212,255,0.22));
+    border-color: rgba(255,255,255,0.18);
+}
+
+.chat-msg .meta{
+    font-size: 12px;
+    color: rgba(255,255,255,0.78);
+    margin-bottom: 6px;
+}
+
+.chat-msg img{
+    max-width: 260px;
+    border-radius: 14px;
+    display:block;
     margin-top: 8px;
+    border: 1px solid rgba(255,255,255,0.16);
 }
 
-/* On bigger screens allow slightly larger image previews */
-@media (min-width: 900px) {
-    .msg img,
-    .chat-msg img,
-    #messages img,
-    #chatBox img {
-        max-width: 340px;
-        max-height: 340px;
+/* ===== Image preview (WhatsApp style) ===== */
+.img-preview{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.img-preview img{
+    width: 78px;
+    height: 78px;
+    border-radius: 14px;
+    object-fit: cover;
+    border: 1px solid rgba(255,255,255,0.16);
+}
+
+.img-preview-actions{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 10px;
+    flex: 1;
+}
+
+/* Composer */
+.chat-input{
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 10px;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+}
+
+.chat-input input[type="text"]{
+    height: 44px;
+}
+
+/* Hide real file input but keep accessible via label */
+.file-hidden{
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.file-btn{
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive */
+@media (max-width: 920px){
+    .chat-shell{
+        grid-template-columns: 1fr;
+    }
+    .chat-sidebar, .chat-main{
+        height: auto;
+        min-height: 360px;
     }
 }
 
-/* On small phones make images smaller so chat stays clean */
-@media (max-width: 420px) {
-    .msg img,
-    .chat-msg img,
-    #messages img,
-    #chatBox img {
-        max-width: 220px;
-        max-height: 220px;
+@media (max-width: 560px){
+    .chat-input{
+        grid-template-columns: 1fr 44px;
+        grid-template-rows: auto auto;
+    }
+    #sendBtn{
+        width: 100%;
+        grid-column: 1 / -1;
     }
 }

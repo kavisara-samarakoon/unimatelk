@@ -1,0 +1,38 @@
+/* Structured profile card layout (for user.js) */
+.user-head{
+    display:flex;
+    gap:14px;
+    align-items:center;
+    flex-wrap: wrap;
+}
+
+.user-avatar{
+    width: 84px;
+    height: 84px;
+    border-radius: 999px;
+    object-fit: cover;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.08);
+    box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+}
+
+.user-info{
+    min-width: 220px;
+    flex: 1;
+}
+
+.user-name{
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 0.2px;
+}
+
+.user-meta{
+    margin-top: 6px;
+    color: rgba(255,255,255,0.78);
+}
+
+.user-bio{
+    color: rgba(255,255,255,0.90);
+    line-height: 1.5;
+}

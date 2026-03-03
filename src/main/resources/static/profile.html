@@ -6,9 +6,10 @@
     <title>UniMateLK - Profile</title>
 
     <link rel="stylesheet" href="/css/theme.css"/>
+    <link rel="stylesheet" href="/css/liquid.css"/>
     <link rel="stylesheet" href="/css/profile.css"/>
 </head>
-<body>
+<body class="liquid">
 
 <!-- Background -->
 <div class="bg">
@@ -38,7 +39,6 @@
                 <span class="badge">Profile Setup</span>
             </div>
 
-            <!-- IMPORTANT: keep your existing id if profile.js uses it -->
             <div id="msg" class="toast info">Complete your profile then save.</div>
 
             <div class="grid two">
@@ -47,40 +47,36 @@
                 <div class="glass-card">
                     <p class="section-title">Personal Details</p>
 
-                    <!-- ✅ NOTE:
-                         If your original project had different fields/ids,
-                         keep those SAME ids. Otherwise profile.js won’t save.
-                    -->
                     <div class="grid two">
                         <div>
                             <label for="fullName">Full Name</label>
-                            <input id="fullName" placeholder="Your name"/>
+                            <input id="fullName" placeholder="Your name" disabled/>
                         </div>
                         <div>
                             <label for="phone">Phone Number</label>
-                            <input id="phone" placeholder="07X-XXXXXXX"/>
+                            <input id="phone" placeholder="07X-XXXXXXX" disabled/>
                         </div>
                     </div>
 
                     <div class="grid two">
                         <div>
                             <label for="university">University</label>
-                            <input id="university" placeholder="eg: University of Colombo"/>
+                            <input id="university" placeholder="eg: University of Colombo" disabled/>
                         </div>
                         <div>
                             <label for="faculty">Faculty</label>
-                            <input id="faculty" placeholder="eg: Computing"/>
+                            <input id="faculty" placeholder="eg: Computing" disabled/>
                         </div>
                     </div>
 
                     <div class="grid two">
                         <div>
                             <label for="degree">Degree Program</label>
-                            <input id="degree" placeholder="eg: Software Engineering"/>
+                            <input id="degree" placeholder="eg: Software Engineering" disabled/>
                         </div>
                         <div>
                             <label for="year">Year</label>
-                            <input id="year" type="number" placeholder="eg: 2"/>
+                            <input id="year" type="number" placeholder="eg: 2" disabled/>
                         </div>
                     </div>
 
@@ -88,14 +84,19 @@
 
                     <div>
                         <label for="bio">Bio</label>
-                        <textarea id="bio" rows="4" placeholder="Write a short bio..."></textarea>
+                        <textarea id="bio" rows="4" placeholder="Write a short bio..." disabled></textarea>
                         <div class="help">Keep it short and friendly.</div>
                     </div>
 
                     <div class="divider"></div>
 
-                    <!-- IMPORTANT: keep id="saveBtn" if profile.js expects it -->
-                    <button id="saveBtn" class="btn" type="button">Save Profile</button>
+                    <!-- View/Edit buttons -->
+                    <div class="profile-actions">
+                        <button id="editBtn" class="btn" type="button">Edit Profile</button>
+
+                        <button id="saveBtn" class="btn" type="button" style="display:none;">Save Profile</button>
+                        <button id="cancelBtn" class="btn secondary" type="button" style="display:none;">Cancel</button>
+                    </div>
                 </div>
 
                 <!-- RIGHT: Picture + Preview -->
@@ -117,7 +118,7 @@
                         </div>
                     </label>
 
-                    <input id="photo" type="file" accept="image/*" style="display:none;"/>
+                    <input id="photo" type="file" accept="image/*" style="display:none;" disabled/>
 
                     <div class="divider"></div>
 
@@ -142,13 +143,13 @@
 
 </main>
 
-<!-- ✅ Mount navbar explicitly (guaranteed) -->
+<!-- Navbar mount -->
 <script type="module">
     import { mountNavbar } from "/js/navbar.js";
     mountNavbar();
 </script>
 
-<!-- ✅ Keep your existing JS file exactly -->
+<!-- Your existing JS (no change) -->
 <script type="module" src="/js/profile.js"></script>
 
 </body>

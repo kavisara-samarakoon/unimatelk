@@ -29,21 +29,52 @@ function setReportMsg(text) {
     m.textContent = text || "";
 }
 
+function safeImg(url) {
+    // your old fallback was /img/default-avatar.png but your project uses /images/ default avatar often
+    const u = String(url || "").trim();
+    if (!u) return "/images/default-avatar.png";
+    return u;
+}
+
+function buildProfileCard(u) {
+    const name = escapeHtml(u?.name || "");
+    const campus = escapeHtml(u?.campus || "");
+    const faculty = escapeHtml(u?.faculty || "");
+    const degree = escapeHtml(u?.degree || "");
+    const bio = escapeHtml(u?.bio || "");
+    const year = u?.yearOfStudy ? `Year ${escapeHtml(String(u.yearOfStudy))}` : "";
+    const pic = safeImg(u?.pictureUrl);
+
+    const meta1 = [campus, year].filter(Boolean).join(" • ");
+    const meta2 = [faculty, degree].filter(Boolean).join(" • ");
+
+    return `
+      <div class="user-head">
+        <img class="user-avatar" src="${escapeHtml(pic)}" alt="avatar"/>
+        <div class="user-info">
+          <div class="user-name">${name || "User"}</div>
+          ${meta1 ? `<div class="user-meta">${meta1}</div>` : ""}
+          ${meta2 ? `<div class="user-meta">${meta2}</div>` : ""}
+        </div>
+      </div>
+
+      ${bio ? `
+        <div class="divider"></div>
+        <div class="user-bio">${bio}</div>
+      ` : `
+        <div class="divider"></div>
+        <div class="user-bio muted">No bio provided.</div>
+      `}
+    `;
+}
+
 async function loadUser(userId) {
     const u = await apiFetch(`/api/users/${userId}`, { method: "GET" });
-    el("title").textContent = u?.name ? u.name : "User";
 
-    el("profileCard").innerHTML = `
-    <div style="display:flex; gap:14px; align-items:center;">
-      <img src="${escapeHtml(u?.pictureUrl || "/img/default-avatar.png")}" alt="avatar" style="width:72px;height:72px;border-radius:50%;object-fit:cover;">
-      <div>
-        <div style="font-size:20px;font-weight:700;">${escapeHtml(u?.name || "")}</div>
-        <div style="opacity:0.85;">${escapeHtml(u?.campus || "")} ${u?.yearOfStudy ? "• Year " + escapeHtml(String(u.yearOfStudy)) : ""}</div>
-        <div style="opacity:0.85;">${escapeHtml(u?.faculty || "")} ${escapeHtml(u?.degree || "")}</div>
-      </div>
-    </div>
-    <div style="margin-top:12px;">${escapeHtml(u?.bio || "")}</div>
-  `;
+    el("title").textContent = u?.name ? u.name : "User";
+    el("profileCard").innerHTML = buildProfileCard(u);
+
+    setToast("User loaded.", "success");
 }
 
 async function sendMatchRequest(userId) {
