@@ -1,0 +1,148 @@
+/* =========================================================
+   liquid.css (NEW)
+   Liquid Glass theme layer on top of theme.css
+   Activate per-page by adding: <body class="liquid">
+   ========================================================= */
+
+.liquid{
+    --lg-blur: 28px;
+    --lg-sat: 170%;
+    --lg-tint-1: rgba(255,255,255,0.16);
+    --lg-tint-2: rgba(255,255,255,0.06);
+    --lg-border: rgba(255,255,255,0.30);
+    --lg-shadow: 0 30px 90px rgba(0,0,0,0.45);
+    --lg-card-shadow: 0 20px 55px rgba(0,0,0,0.28);
+}
+
+/* Stronger liquid shell */
+.liquid .glass-shell,
+.liquid .topbar{
+    position: relative;
+    background: linear-gradient(135deg, var(--lg-tint-1), var(--lg-tint-2));
+    border: 1px solid var(--lg-border);
+    box-shadow: var(--lg-shadow);
+    backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat));
+    -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat));
+    overflow: hidden;
+}
+
+/* Liquid refraction highlights */
+.liquid .glass-shell::before,
+.liquid .topbar::before{
+    content:"";
+    position:absolute;
+    inset:-70px;
+    pointer-events:none;
+    border-radius: inherit;
+    background:
+            radial-gradient(circle at 15% 25%, rgba(255,255,255,0.22), transparent 46%),
+            radial-gradient(circle at 80% 30%, rgba(0,212,255,0.18), transparent 44%),
+            radial-gradient(circle at 55% 85%, rgba(255,0,140,0.12), transparent 55%);
+    filter: blur(18px);
+    opacity: 0.75;
+    animation: lgFloat 10s ease-in-out infinite;
+}
+
+.liquid .glass-shell::after,
+.liquid .topbar::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    border-radius: inherit;
+    background: linear-gradient(
+            115deg,
+            rgba(255,255,255,0.32),
+            rgba(255,255,255,0.08) 28%,
+            rgba(255,255,255,0.00) 55%,
+            rgba(255,255,255,0.14)
+    );
+    opacity: 0.18;
+}
+
+@keyframes lgFloat{
+    0%,100%{ transform: translate(0,0) scale(1); }
+    50%{ transform: translate(22px,-18px) scale(1.06); }
+}
+
+/* Crystal cards */
+.liquid .glass-card{
+    position: relative;
+    background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05));
+    border: 1px solid rgba(255,255,255,0.20);
+    box-shadow: var(--lg-card-shadow);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    overflow: hidden;
+}
+
+.liquid .glass-card::before{
+    content:"";
+    position:absolute;
+    inset:-45px;
+    pointer-events:none;
+    border-radius: inherit;
+    background:
+            radial-gradient(circle at 25% 30%, rgba(255,255,255,0.20), transparent 52%),
+            radial-gradient(circle at 75% 70%, rgba(124,77,255,0.14), transparent 56%);
+    filter: blur(18px);
+    opacity: 0.55;
+}
+
+/* iOS-like inputs */
+.liquid input,
+.liquid select,
+.liquid textarea{
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.22);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+}
+
+.liquid input:focus,
+.liquid select:focus,
+.liquid textarea:focus{
+    border-color: rgba(255,255,255,0.55);
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.10);
+}
+
+/* Liquid pill buttons */
+.liquid .btn{
+    position: relative;
+    overflow: hidden;
+    border-radius: 999px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.30);
+}
+
+.liquid .btn::before{
+    content:"";
+    position:absolute;
+    inset:-40%;
+    pointer-events:none;
+    background:
+            radial-gradient(circle at 30% 40%, rgba(255,255,255,0.35), transparent 45%),
+            radial-gradient(circle at 70% 60%, rgba(255,255,255,0.20), transparent 55%);
+    filter: blur(12px);
+    opacity: 0.55;
+    animation: lgBtn 8s ease-in-out infinite;
+}
+
+@keyframes lgBtn{
+    0%,100%{ transform: translate(0,0); }
+    50%{ transform: translate(12px,-10px); }
+}
+
+.liquid .btn.secondary,
+.liquid .btn.ghost{
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: none;
+}
+
+/* Slightly nicer badge */
+.liquid .badge{
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.22);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}

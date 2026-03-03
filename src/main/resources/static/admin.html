@@ -6,20 +6,81 @@
     <title>UniMateLK - Admin</title>
 
     <link rel="stylesheet" href="/css/theme.css"/>
-    <link rel="stylesheet" href="/css/style.css"/>
+    <link rel="stylesheet" href="/css/liquid.css"/>
+    <link rel="stylesheet" href="/css/admin.css"/>
 </head>
-<body>
+<body class="liquid">
 
-<div id="navbarMount"></div>
+<!-- Background -->
+<div class="bg">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="grain"></div>
+</div>
 
 <main class="page">
-    <section class="container">
-        <h1 class="page-title">Admin Dashboard</h1>
-        <div id="msg" class="toast"></div>
 
-        <div class="card">
-            <h3 style="margin-top:0;">Open Reports</h3>
-            <div id="reports"></div>
+    <!-- ✅ Navbar must be inside .page -->
+    <div id="navbarMount"></div>
+
+    <section class="container">
+        <div class="glass-shell admin-wrap">
+
+            <div class="row" style="justify-content: space-between;">
+                <div>
+                    <h2 style="margin:0;">Admin Dashboard</h2>
+                    <p class="muted" style="margin:6px 0 0;">
+                        Review reports • Resolve issues • Keep the community safe
+                    </p>
+                </div>
+                <span class="badge">Admin</span>
+            </div>
+
+            <div id="msg" class="toast info">Loading reports…</div>
+
+            <!-- Stat cards (UI only, optional) -->
+            <div class="grid three admin-stats">
+                <div class="glass-card stat">
+                    <div class="stat-title">Open Reports</div>
+                    <div class="stat-value" id="statOpen">—</div>
+                    <div class="help">Need admin action</div>
+                </div>
+                <div class="glass-card stat">
+                    <div class="stat-title">Resolved</div>
+                    <div class="stat-value" id="statResolved">—</div>
+                    <div class="help">Handled reports</div>
+                </div>
+                <div class="glass-card stat">
+                    <div class="stat-title">Total</div>
+                    <div class="stat-value" id="statTotal">—</div>
+                    <div class="help">All reports</div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Main reports area -->
+            <div class="glass-card admin-card">
+                <div class="row" style="justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <p class="section-title" style="margin:0;">Open Reports</p>
+                        <div class="help">Click a report to review details and take action.</div>
+                    </div>
+
+                    <!-- Filters (UI only for now) -->
+                    <div class="row admin-filters">
+                        <input id="adminSearch" class="admin-search" placeholder="Search reports…" />
+                        <span class="badge admin-pill">Open</span>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- ✅ Keep this ID exactly (admin.js uses it) -->
+                <div id="reports" class="reports-list"></div>
+            </div>
+
         </div>
     </section>
 </main>
@@ -30,6 +91,24 @@
 </script>
 
 <script type="module" src="/js/admin.js"></script>
+
+<!-- ✅ Small UI-only script to update stats without touching backend logic
+     (it reads what's rendered in #reports) -->
+<script>
+    // optional: try to update stat numbers based on rendered DOM
+    function updateAdminStats(){
+        const reports = document.getElementById("reports");
+        const openCount = reports ? reports.children.length : 0;
+        const statOpen = document.getElementById("statOpen");
+        const statResolved = document.getElementById("statResolved");
+        const statTotal = document.getElementById("statTotal");
+        if (statOpen) statOpen.textContent = String(openCount);
+        if (statResolved) statResolved.textContent = "0";
+        if (statTotal) statTotal.textContent = String(openCount);
+    }
+    // give admin.js time to render
+    setTimeout(updateAdminStats, 800);
+</script>
 
 </body>
 </html>

@@ -1,0 +1,39 @@
+/* Preferences page only */
+
+.prefs-grid{
+    align-items: start;
+}
+
+.prefs-form{
+    display: grid;
+    gap: 12px;
+}
+
+.prefs-field{
+    display: grid;
+    gap: 6px;
+}
+
+.pref-actions{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:14px;
+}
+
+/* Clean view-mode look */
+input:disabled, select:disabled{
+    opacity: 1;
+    cursor: default;
+    color: rgba(255,255,255,0.92);
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.14);
+}
+
+/* Keep tips readable */
+.tips{
+    margin: 8px 0 0;
+    padding-left: 18px;
+    color: rgba(255,255,255,0.75);
+}
+.tips li{ margin: 6px 0; }

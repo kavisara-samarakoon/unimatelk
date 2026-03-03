@@ -1,5 +1,16 @@
 /* Home-only styling (design-only) */
+/* Liquid-glass hero boost (only visual) */
+.liquid .hero{
+    position: relative;
+}
 
+.liquid .hero-left .hero-title{
+    text-shadow: 0 10px 30px rgba(0,0,0,0.30);
+}
+
+.liquid .preview-card{
+    border-radius: 22px;
+}
 .hero{
     display: grid;
     grid-template-columns: 1.15fr 0.85fr;
