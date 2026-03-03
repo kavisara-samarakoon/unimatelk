@@ -52,3 +52,62 @@
     color: rgba(255,255,255,0.75);
 }
 .tips li{ margin: 6px 0; }
+
+/* NEW: View/Edit mode UI */
+.profile-actions{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:10px;
+}
+
+/* Optional: make disabled fields look clean in view mode */
+input:disabled,
+textarea:disabled{
+    opacity: 1;
+    cursor: default;
+    color: rgba(255,255,255,0.92);
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.14);
+}
+
+/* =========================================================
+   LIQUID GLASS POLISH (only when body has class="liquid")
+   ========================================================= */
+.liquid .avatar{
+    border-color: rgba(255,255,255,0.28);
+    box-shadow:
+            0 18px 50px rgba(0,0,0,0.35),
+            0 0 26px rgba(0,212,255,0.12);
+}
+
+.liquid .upload-box{
+    background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
+    border: 1px dashed rgba(255,255,255,0.26);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    position: relative;
+    overflow: hidden;
+}
+
+.liquid .upload-box::before{
+    content:"";
+    position:absolute;
+    inset:-50px;
+    pointer-events:none;
+    background:
+            radial-gradient(circle at 20% 30%, rgba(255,255,255,0.22), transparent 55%),
+            radial-gradient(circle at 80% 70%, rgba(124,77,255,0.14), transparent 60%);
+    filter: blur(16px);
+    opacity: 0.55;
+}
+
+.liquid .upload-ico{
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.22);
+}
+
+/* Make the action buttons feel more “liquid” but keep theme.css buttons */
+.liquid .profile-actions .btn{
+    box-shadow: 0 16px 42px rgba(0,0,0,0.28);
+}

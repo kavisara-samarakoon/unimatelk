@@ -33,6 +33,33 @@ function escapeHtml(str){
         .replaceAll("'", "&#039;");
 }
 
+/* ===== Image preview helpers ===== */
+function showImagePreview(file){
+    const wrap = $("imagePreviewWrap");
+    const img = $("imagePreview");
+    const name = $("imagePreviewName");
+    if (!wrap || !img) return;
+
+    const url = URL.createObjectURL(file);
+    img.src = url;
+    if (name) name.textContent = file.name || "Selected image";
+    wrap.style.display = "flex";
+}
+
+function hideImagePreview(){
+    const wrap = $("imagePreviewWrap");
+    const img = $("imagePreview");
+    const name = $("imagePreviewName");
+
+    if (img && img.src) {
+        try { URL.revokeObjectURL(img.src); } catch (_) {}
+    }
+    if (img) img.removeAttribute("src");
+    if (name) name.textContent = "";
+    if (wrap) wrap.style.display = "none";
+}
+
+/* ===== Render chat message ===== */
 function renderMessage(m){
     const wrap = document.createElement("div");
     const mine = String(m.senderUserId) === String(me.userId || me.id);
@@ -193,7 +220,31 @@ async function sendImage(){
 
     // Message will appear via WebSocket broadcast
     $("imageInput").value = "";
+    hideImagePreview();
     setToast("✅ Image sent!", "success");
+}
+
+/* ✅ WhatsApp one-button behavior */
+async function unifiedSend(){
+    if (!currentRoomId){
+        setToast("Pick a chat room first.", "error");
+        return;
+    }
+
+    const text = ($("messageInput").value || "").trim();
+    const file = $("imageInput").files && $("imageInput").files[0];
+
+    if (!text && !file) return;
+
+    // Send image first if chosen
+    if (file){
+        await sendImage();
+    }
+
+    // Then send text if typed
+    if (text){
+        await sendText();
+    }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -202,10 +253,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await loadRooms();
 
-    $("sendBtn").addEventListener("click", () => {
-        sendText().catch(e => setToast(e.message || "Send failed", "error"));
+    // ✅ Preview when selecting an image
+    $("imageInput").addEventListener("change", () => {
+        const file = $("imageInput").files && $("imageInput").files[0];
+        if (file) showImagePreview(file);
+        else hideImagePreview();
     });
 
+    // ✅ Remove selected image
+    $("removeImageBtn")?.addEventListener("click", () => {
+        $("imageInput").value = "";
+        hideImagePreview();
+    });
+
+    // ✅ One send button for text + image
+    $("sendBtn").addEventListener("click", () => {
+        unifiedSend().catch(e => setToast(e.message || "Send failed", "error"));
+    });
+
+    // ✅ Enter sends text only (WhatsApp style)
     $("messageInput").addEventListener("keydown", (e) => {
         if (e.key === "Enter"){
             e.preventDefault();
@@ -213,7 +279,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    $("sendImageBtn").addEventListener("click", () => {
-        sendImage().catch(e => setToast(e.message || "Image failed", "error"));
-    });
+    // Keep hidden button safe (if it still exists)
+    const imgBtn = $("sendImageBtn");
+    if (imgBtn){
+        imgBtn.addEventListener("click", () => {
+            unifiedSend().catch(e => setToast(e.message || "Send failed", "error"));
+        });
+    }
 });

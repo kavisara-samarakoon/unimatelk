@@ -6,31 +6,77 @@
     <title>UniMateLK - User</title>
 
     <link rel="stylesheet" href="/css/theme.css">
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/liquid.css">
+    <link rel="stylesheet" href="/css/user.css">
 </head>
-<body>
+<body class="liquid">
 
-<div id="navbarMount"></div>
+<!-- Background -->
+<div class="bg">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="grain"></div>
+</div>
 
 <main class="page">
+
+    <!-- ✅ Navbar inside .page -->
+    <div id="navbarMount"></div>
+
     <section class="container">
-        <h1 id="title" class="page-title">User</h1>
-        <div id="msg" class="toast"></div>
+        <div class="glass-shell user-wrap">
 
-        <div id="profileCard" class="card"></div>
-
-        <div class="card" style="margin-top:12px;">
-            <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <button class="btn primary" id="matchBtn" type="button">Send Match Request</button>
-                <button class="btn secondary" id="blockBtn" type="button">Block</button>
+            <div class="row" style="justify-content: space-between;">
+                <div>
+                    <!-- keep same id -->
+                    <h2 id="title" style="margin:0;">User</h2>
+                    <p class="muted" style="margin:6px 0 0;">View profile • Send request • Block • Report</p>
+                </div>
+                <span class="badge">View User</span>
             </div>
 
-            <div style="margin-top:14px;">
-                <label for="reportReason">Report reason</label>
-                <textarea id="reportReason" rows="4" placeholder="Explain what happened..."></textarea>
-                <button class="btn danger" id="reportBtn" type="button" style="margin-top:10px;">Report</button>
-                <div id="reportMsg" style="margin-top:8px;"></div>
+            <div id="msg" class="toast info">Loading user…</div>
+
+            <!-- ✅ Profile card (user.js fills this) -->
+            <div id="profileCard" class="glass-card user-profile"></div>
+
+            <div class="grid two user-actions">
+
+                <!-- Left: Actions -->
+                <div class="glass-card">
+                    <p class="section-title">Actions</p>
+
+                    <div class="row" style="gap:10px;">
+                        <button class="btn" id="matchBtn" type="button">Send Match Request</button>
+                        <button class="btn secondary" id="blockBtn" type="button">Block</button>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <p class="section-title">Safety</p>
+                    <p class="muted" style="margin:0;">
+                        If something feels wrong, report this user. Your report will be reviewed by Admin.
+                    </p>
+                </div>
+
+                <!-- Right: Report -->
+                <div class="glass-card">
+                    <p class="section-title">Report User</p>
+
+                    <label for="reportReason">Report reason</label>
+                    <textarea id="reportReason" rows="4" placeholder="Explain what happened..."></textarea>
+
+                    <div class="row" style="justify-content: space-between; margin-top:10px;">
+                        <button class="btn danger" id="reportBtn" type="button">Report</button>
+                        <span class="muted" style="font-size:12px;">Keep it short & clear</span>
+                    </div>
+
+                    <div id="reportMsg" style="margin-top:8px;"></div>
+                </div>
+
             </div>
+
         </div>
     </section>
 </main>

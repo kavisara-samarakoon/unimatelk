@@ -6,50 +6,119 @@
     <title>UniMateLK - Preferences</title>
 
     <link rel="stylesheet" href="/css/theme.css"/>
-    <link rel="stylesheet" href="/css/style.css"/>
+    <link rel="stylesheet" href="/css/liquid.css"/>
+    <link rel="stylesheet" href="/css/preferences.css"/>
 </head>
-<body>
+<body class="liquid">
 
-<div id="navbarMount"></div>
+<!-- Background (same as Home/Profile) -->
+<div class="bg">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="grain"></div>
+</div>
 
 <main class="page">
+
+    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
+    <div id="navbarMount"></div>
+
     <section class="container">
-        <h1 class="page-title">Preferences</h1>
-        <div id="msg" class="toast"></div>
+        <div class="glass-shell">
 
-        <div class="card">
-            <label>Sleep Schedule (1–5)</label>
-            <input id="sleepSchedule" type="number" min="1" max="5">
+            <div class="row" style="justify-content: space-between;">
+                <div>
+                    <h2 style="margin:0;">Preferences</h2>
+                    <p class="muted" style="margin:6px 0 0;">
+                        Set your lifestyle values (1–5) to improve match accuracy.
+                    </p>
+                </div>
+                <span class="badge">Preferences Setup</span>
+            </div>
 
-            <label style="margin-top:10px;">Cleanliness (1–5)</label>
-            <input id="cleanliness" type="number" min="1" max="5">
+            <div id="msg" class="toast info">View mode.</div>
 
-            <label style="margin-top:10px;">Noise Tolerance (1–5)</label>
-            <input id="noiseTolerance" type="number" min="1" max="5">
+            <div class="grid two prefs-grid">
 
-            <label style="margin-top:10px;">Guests (1–5)</label>
-            <input id="guests" type="number" min="1" max="5">
+                <!-- LEFT: Preferences Form -->
+                <div class="glass-card">
+                    <p class="section-title">Your Preferences</p>
 
-            <label style="margin-top:10px;">Smoking OK</label>
-            <select id="smokingOk">
-                <option value="">Not set</option>
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-            </select>
+                    <div class="prefs-form">
 
-            <label style="margin-top:10px;">Drinking OK</label>
-            <select id="drinkingOk">
-                <option value="">Not set</option>
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-            </select>
+                        <div class="prefs-field">
+                            <label for="sleepSchedule">Sleep Schedule (1–5)</label>
+                            <input id="sleepSchedule" type="number" min="1" max="5" disabled>
+                        </div>
 
-            <label style="margin-top:10px;">Introvert (1–5)</label>
-            <input id="introvert" type="number" min="1" max="5">
+                        <div class="prefs-field">
+                            <label for="cleanliness">Cleanliness (1–5)</label>
+                            <input id="cleanliness" type="number" min="1" max="5" disabled>
+                        </div>
 
-            <button id="saveBtn" class="btn primary" type="button" style="margin-top:14px;">Save</button>
+                        <div class="prefs-field">
+                            <label for="noiseTolerance">Noise Tolerance (1–5)</label>
+                            <input id="noiseTolerance" type="number" min="1" max="5" disabled>
+                        </div>
+
+                        <div class="prefs-field">
+                            <label for="guests">Guests (1–5)</label>
+                            <input id="guests" type="number" min="1" max="5" disabled>
+                        </div>
+
+                        <div class="prefs-field">
+                            <label for="smokingOk">Smoking OK</label>
+                            <select id="smokingOk" disabled>
+                                <option value="">Not set</option>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+
+                        <div class="prefs-field">
+                            <label for="drinkingOk">Drinking OK</label>
+                            <select id="drinkingOk" disabled>
+                                <option value="">Not set</option>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+
+                        <div class="prefs-field">
+                            <label for="introvert">Introvert (1–5)</label>
+                            <input id="introvert" type="number" min="1" max="5" disabled>
+                        </div>
+
+                        <div class="pref-actions">
+                            <button id="editBtn" class="btn" type="button">Edit Preferences</button>
+
+                            <button id="saveBtn" class="btn" type="button" style="display:none;">Save</button>
+                            <button id="cancelBtn" class="btn secondary" type="button" style="display:none;">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Tips / Shortcuts -->
+                <div class="glass-card">
+                    <p class="section-title">Tips</p>
+                    <ul class="tips">
+                        <li>More accurate preferences = better matches</li>
+                        <li>You can update anytime</li>
+                        <li>Profile + Preferences together improve ranking</li>
+                    </ul>
+
+                    <div class="divider"></div>
+
+                    <a class="btn secondary" href="/matches.html" style="width:100%;">View Matches</a>
+                    <a class="btn ghost" href="/profile.html" style="width:100%; margin-top:10px;">Go to Profile</a>
+                </div>
+
+            </div>
+
         </div>
     </section>
+
 </main>
 
 <script type="module">
