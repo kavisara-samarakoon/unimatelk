@@ -31,13 +31,22 @@ function getOtherUserId(room) {
     );
 }
 
+function fmtTime(ts) {
+    if (!ts) return "";
+    try { return new Date(ts).toLocaleString(); } catch (_) { return ""; }
+}
+
 let selected = null;
 
 function openSheet(room) {
     selected = room;
 
     el("sheetTitle").textContent = room.otherName || "Friend";
-    el("sheetSub").textContent = room.lastMessage ? `Last: ${room.lastMessage}` : "";
+    const at = fmtTime(room.lastAt);
+    el("sheetSub").textContent = room.lastMessage
+        ? `Last: ${room.lastMessage}${at ? " • " + at : ""}`
+        : (at ? `Last activity: ${at}` : "");
+
     el("reportArea").style.display = "none";
     el("reportMsg").textContent = "";
     el("reportReason").value = "";
@@ -46,7 +55,6 @@ function openSheet(room) {
     el("openChatBtn").href = `/chat.html?room=${encodeURIComponent(roomId)}`;
 
     const otherId = getOtherUserId(room);
-
     if (otherId) {
         const url = `/user.html?id=${encodeURIComponent(otherId)}`;
         el("viewUserBtn").href = url;
@@ -95,7 +103,7 @@ async function submitReport() {
         });
         el("reportMsg").textContent = "Report submitted.";
         el("reportReason").value = "";
-        setMsg("Report submitted.", "success");
+        setMsg("✅ Report submitted.", "success");
     } catch (e) {
         el("reportMsg").textContent = e?.message || "Report failed";
         setMsg(e?.message || "Report failed", "error");
@@ -115,7 +123,7 @@ async function blockUser() {
 
     try {
         await apiFetch(`/api/safety/block/${otherId}`, { method: "POST" });
-        setMsg("User blocked.", "success");
+        setMsg("✅ User blocked.", "success");
         closeSheet();
     } catch (e) {
         setMsg(e?.message || "Block failed", "error");
@@ -124,6 +132,9 @@ async function blockUser() {
 
 document.addEventListener("DOMContentLoaded", async () => {
     await initCsrf();
+
+    // ✅ always set loading message from JS (not HTML)
+    setMsg("Loading friends...", "info");
 
     try {
         await apiFetch("/api/me");
@@ -145,31 +156,37 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (!Array.isArray(rooms) || rooms.length === 0) {
         box.innerHTML = `<div class="toast info">No friends yet. Accept a request first.</div>`;
+        setMsg("No friends yet.", "info");   // ✅ update toast
     } else {
         rooms.forEach(r => {
             const card = document.createElement("div");
-            card.className = "card";
-            card.style.marginTop = "10px";
-            card.style.cursor = "pointer";
+            card.className = "friend-item";  // ✅ styled by friends.css
 
-            const name = r.otherName || "Friend";
-            const last = r.lastMessage || "";
+            const name = escapeHtml(r.otherName || "Friend");
+            const last = escapeHtml(r.lastMessage || "");
+            const at = fmtTime(r.lastAt);
 
             card.innerHTML = `
-        <div style="display:flex; justify-content:space-between; gap:10px;">
-          <div>
-            <div style="font-weight:700;">${escapeHtml(name)}</div>
-            <div style="opacity:0.85; margin-top:6px;">${escapeHtml(last)}</div>
-          </div>
-          <div class="badge">Options</div>
-        </div>
-      `;
+              <div class="friend-left">
+                <div class="friend-text">
+                  <div class="friend-name">${name}</div>
+                  <div class="friend-last">${last || "No messages yet."}</div>
+                </div>
+              </div>
+              <div class="friend-right">
+                <div class="friend-time">${escapeHtml(at)}</div>
+                <span class="friend-pill">Options</span>
+              </div>
+            `;
 
             card.addEventListener("click", () => openSheet(r));
             box.appendChild(card);
         });
+
+        setMsg("✅ Friends loaded.", "success"); // ✅ update toast
     }
 
+    // Sheet listeners
     el("sheetCloseBtn").addEventListener("click", closeSheet);
     el("sheetBackdrop").addEventListener("click", (e) => {
         if (e.target === el("sheetBackdrop")) closeSheet();

@@ -17,7 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -49,11 +48,18 @@ public class MyProfileController {
         return currentUserService.requireUser(oauth2User);
     }
 
+    /**
+     * IMPORTANT:
+     * Don't mention optional columns here (like contact_visible/faculty),
+     * because some DBs may not have them yet.
+     * We only create the row using columns that exist in the base schema.
+     */
     private void ensureProfileRow(Long userId) {
+        // Use ON DUPLICATE KEY UPDATE instead of INSERT IGNORE (more explicit)
         em.createNativeQuery("""
-                INSERT IGNORE INTO profiles
-                (user_id, campus, degree, year_of_study, gender, gender_preference, contact_visible)
-                VALUES (?, '', '', 1, '', '', 0)
+                INSERT INTO profiles (user_id, campus, degree, year_of_study, gender, gender_preference)
+                VALUES (?, '', '', 1, '', '')
+                ON DUPLICATE KEY UPDATE user_id = user_id
                 """)
                 .setParameter(1, userId)
                 .executeUpdate();
@@ -74,6 +80,7 @@ public class MyProfileController {
 
     private static String s(Object o) { return o == null ? null : String.valueOf(o); }
     private static Integer i(Object o) { return o == null ? null : ((Number) o).intValue(); }
+
     private static boolean b(Object o) {
         if (o == null) return false;
         if (o instanceof Boolean bb) return bb;
@@ -81,7 +88,103 @@ public class MyProfileController {
         return Boolean.parseBoolean(String.valueOf(o));
     }
 
+    private static boolean isUnknownColumn(Exception e) {
+        String msg = String.valueOf(e.getMessage());
+        return msg.contains("Unknown column") || msg.contains("unknown column");
+    }
+
+    /**
+     * Loads profile row with FALLBACKS, so even if some optional columns are missing
+     * (faculty/contact_visible/cover_photo_path/etc.), the endpoint still works.
+     */
+    private Object[] loadProfileRowSafe(Long userId) {
+        // Attempt 1: full schema
+        try {
+            List<?> rows = em.createNativeQuery("""
+                    SELECT campus, faculty, degree, year_of_study, gender, gender_preference, move_in_month,
+                           bio, profile_photo_path, cover_photo_path, contact_visible, phone, facebook_url, instagram_url
+                    FROM profiles
+                    WHERE user_id = ?
+                    LIMIT 1
+                    """)
+                    .setParameter(1, userId)
+                    .getResultList();
+            if (rows.isEmpty()) return null;
+            return (Object[]) rows.get(0);
+        } catch (Exception e) {
+            if (!isUnknownColumn(e)) throw e;
+        }
+
+        // Attempt 2: without faculty + contact_visible
+        try {
+            List<?> rows = em.createNativeQuery("""
+                    SELECT campus, degree, year_of_study, gender, gender_preference, move_in_month,
+                           bio, profile_photo_path, cover_photo_path, phone, facebook_url, instagram_url
+                    FROM profiles
+                    WHERE user_id = ?
+                    LIMIT 1
+                    """)
+                    .setParameter(1, userId)
+                    .getResultList();
+            if (rows.isEmpty()) return null;
+
+            Object[] r = (Object[]) rows.get(0);
+            // Expand to match "full" shape by inserting null/false for missing fields
+            return new Object[] {
+                    r[0],          // campus
+                    null,          // faculty (missing)
+                    r[1],          // degree
+                    r[2],          // year_of_study
+                    r[3],          // gender
+                    r[4],          // gender_preference
+                    r[5],          // move_in_month
+                    r[6],          // bio
+                    r[7],          // profile_photo_path
+                    r[8],          // cover_photo_path
+                    0,             // contact_visible (missing -> false)
+                    r[9],          // phone
+                    r[10],         // facebook_url
+                    r[11]          // instagram_url
+            };
+        } catch (Exception e) {
+            if (!isUnknownColumn(e)) throw e;
+        }
+
+        // Attempt 3: very old schema fallback (no photo columns either)
+        List<?> rows = em.createNativeQuery("""
+                SELECT campus, degree, year_of_study, gender, gender_preference, move_in_month,
+                       bio, phone, facebook_url, instagram_url
+                FROM profiles
+                WHERE user_id = ?
+                LIMIT 1
+                """)
+                .setParameter(1, userId)
+                .getResultList();
+
+        if (rows.isEmpty()) return null;
+
+        Object[] r = (Object[]) rows.get(0);
+        return new Object[] {
+                r[0],     // campus
+                null,     // faculty
+                r[1],     // degree
+                r[2],     // year_of_study
+                r[3],     // gender
+                r[4],     // gender_preference
+                r[5],     // move_in_month
+                r[6],     // bio
+                null,     // profile_photo_path
+                null,     // cover_photo_path
+                0,        // contact_visible
+                r[7],     // phone
+                r[8],     // facebook_url
+                r[9]      // instagram_url
+        };
+    }
+
+    // ✅ GET must be transactional because ensureProfileRow writes
     @GetMapping
+    @Transactional
     public ProfileDtos.MyProfile getMyProfile(Authentication auth) {
         AppUser me = requireMe(auth);
         Long userId = me.getId();
@@ -94,21 +197,10 @@ public class MyProfileController {
         String name = s(urow[0]);
         String userPicture = s(urow[1]);
 
-        List<?> rows = em.createNativeQuery("""
-                SELECT campus, faculty, degree, year_of_study, gender, gender_preference, move_in_month,
-                       bio, profile_photo_path, cover_photo_path, contact_visible, phone, facebook_url, instagram_url
-                FROM profiles
-                WHERE user_id = ?
-                LIMIT 1
-                """)
-                .setParameter(1, userId)
-                .getResultList();
-
-        if (rows.isEmpty()) {
+        Object[] p = loadProfileRowSafe(userId);
+        if (p == null) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Profile row missing");
         }
-
-        Object[] p = (Object[]) rows.get(0);
 
         String campus = s(p[0]);
         String faculty = s(p[1]);
@@ -164,11 +256,16 @@ public class MyProfileController {
                     .executeUpdate();
         }
 
+        // faculty might not exist in some schemas -> ignore only if it's "unknown column"
         if (req.faculty() != null) {
-            em.createNativeQuery("UPDATE profiles SET faculty = ? WHERE user_id = ?")
-                    .setParameter(1, req.faculty().trim())
-                    .setParameter(2, userId)
-                    .executeUpdate();
+            try {
+                em.createNativeQuery("UPDATE profiles SET faculty = ? WHERE user_id = ?")
+                        .setParameter(1, req.faculty().trim())
+                        .setParameter(2, userId)
+                        .executeUpdate();
+            } catch (Exception e) {
+                if (!isUnknownColumn(e)) throw e;
+            }
         }
 
         if (req.degree() != null) {
@@ -237,10 +334,15 @@ public class MyProfileController {
 
             String urlPath = "/uploads/" + filename;
 
-            em.createNativeQuery("UPDATE profiles SET profile_photo_path = ? WHERE user_id = ?")
-                    .setParameter(1, urlPath)
-                    .setParameter(2, userId)
-                    .executeUpdate();
+            // profile_photo_path should exist in your schema, but keep safe anyway
+            try {
+                em.createNativeQuery("UPDATE profiles SET profile_photo_path = ? WHERE user_id = ?")
+                        .setParameter(1, urlPath)
+                        .setParameter(2, userId)
+                        .executeUpdate();
+            } catch (Exception e) {
+                if (!isUnknownColumn(e)) throw e;
+            }
 
             em.createNativeQuery("UPDATE users SET picture_url = ? WHERE id = ?")
                     .setParameter(1, urlPath)

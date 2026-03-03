@@ -1,4 +1,3 @@
-// unimatelk/src/main/resources/static/js/profile.js
 import { apiFetch, initCsrf } from "./api.js";
 
 const $ = (id) => document.getElementById(id);
@@ -13,6 +12,9 @@ function showMsg(text, type = "info") {
 const GET_URL = "/api/my/profile";
 const SAVE_URL = "/api/my/profile";
 const UPLOAD_URL = "/api/my/profile/photo";
+
+let lastLoadedProfile = null; // used for cancel
+let editMode = false;
 
 function goLogin() {
     window.location.href = "/oauth2/authorization/google";
@@ -46,20 +48,51 @@ function fillForm(p) {
     }
 }
 
+function setEditMode(on) {
+    editMode = on;
+
+    // enable/disable inputs
+    const inputs = ["fullName", "phone", "university", "faculty", "degree", "year", "bio"];
+    inputs.forEach((id) => {
+        const el = $(id);
+        if (!el) return;
+        el.disabled = !on;
+        el.readOnly = !on; // for textarea compatibility
+    });
+
+    // enable/disable photo upload
+    const photo = $("photo");
+    if (photo) photo.disabled = !on;
+
+    // toggle buttons
+    if ($("editBtn")) $("editBtn").style.display = on ? "none" : "inline-block";
+    if ($("saveBtn")) $("saveBtn").style.display = on ? "inline-block" : "none";
+    if ($("cancelBtn")) $("cancelBtn").style.display = on ? "inline-block" : "none";
+
+    showMsg(on ? "Edit mode enabled." : "View mode.", "info");
+}
+
 async function loadProfile() {
     try {
         showMsg("Loading profile...", "info");
         const data = await apiFetch(GET_URL, { method: "GET" });
+        lastLoadedProfile = data;
         fillForm(data);
         showMsg("Profile loaded.", "success");
+
+        // default to view mode when loaded
+        setEditMode(false);
     } catch (e) {
-        if (String(e.message || "").includes("401")) {
+        const msg = String(e?.message || "");
+
+        if (msg.includes("401") || msg.includes("Failed to fetch")) {
             showMsg("Not logged in. Redirecting...", "error");
-            setTimeout(goLogin, 600);
+            setTimeout(goLogin, 400);
             return;
         }
+
         console.error(e);
-        showMsg("Failed to load profile: " + e.message, "error");
+        showMsg("Failed to load profile: " + msg, "error");
     }
 }
 
@@ -68,20 +101,27 @@ async function saveProfile() {
         showMsg("Saving profile...", "info");
         const payload = collectPayload();
         const data = await apiFetch(SAVE_URL, { method: "PUT", body: payload });
+
+        lastLoadedProfile = data;
         fillForm(data);
+
         showMsg("Profile saved successfully!", "success");
+        setEditMode(false);
     } catch (e) {
-        if (String(e.message || "").includes("401")) {
+        const msg = String(e?.message || "");
+        if (msg.includes("401") || msg.includes("Failed to fetch")) {
             showMsg("Not logged in. Redirecting...", "error");
-            setTimeout(goLogin, 600);
+            setTimeout(goLogin, 400);
             return;
         }
         console.error(e);
-        showMsg("Profile save failed: " + e.message, "error");
+        showMsg("Profile save failed: " + msg, "error");
     }
 }
 
 async function uploadPhoto() {
+    if (!editMode) return; // upload only in edit mode
+
     const fileInput = $("photo");
     if (!fileInput || !fileInput.files || !fileInput.files[0]) {
         showMsg("Choose an image first.", "error");
@@ -97,8 +137,6 @@ async function uploadPhoto() {
 
     const fd = new FormData();
     fd.append("file", f);
-    fd.append("image", f);
-    fd.append("photo", f);
 
     try {
         showMsg("Uploading image...", "info");
@@ -108,19 +146,30 @@ async function uploadPhoto() {
         }
         showMsg("Image uploaded successfully!", "success");
     } catch (e) {
-        if (String(e.message || "").includes("401")) {
+        const msg = String(e?.message || "");
+        if (msg.includes("401") || msg.includes("Failed to fetch")) {
             showMsg("Not logged in. Redirecting...", "error");
-            setTimeout(goLogin, 600);
+            setTimeout(goLogin, 400);
             return;
         }
         console.error(e);
-        showMsg("Image upload failed: " + e.message, "error");
+        showMsg("Image upload failed: " + msg, "error");
     }
 }
 
 function wireEvents() {
-    const saveBtn = $("saveBtn");
-    if (saveBtn) saveBtn.addEventListener("click", saveProfile);
+    if ($("editBtn")) $("editBtn").addEventListener("click", () => {
+        setEditMode(true);
+        // keep current values; just enable editing
+    });
+
+    if ($("cancelBtn")) $("cancelBtn").addEventListener("click", () => {
+        if (lastLoadedProfile) fillForm(lastLoadedProfile);
+        setEditMode(false);
+        showMsg("Changes canceled.", "info");
+    });
+
+    if ($("saveBtn")) $("saveBtn").addEventListener("click", saveProfile);
 
     const photo = $("photo");
     if (photo) photo.addEventListener("change", uploadPhoto);
@@ -129,5 +178,14 @@ function wireEvents() {
 document.addEventListener("DOMContentLoaded", async () => {
     await initCsrf();
     wireEvents();
+
+    // verify session first
+    try {
+        await apiFetch("/api/me");
+    } catch (_) {
+        goLogin();
+        return;
+    }
+
     await loadProfile();
 });

@@ -6,36 +6,90 @@
     <title>UniMateLK - Chat</title>
 
     <link rel="stylesheet" href="/css/theme.css"/>
+    <link rel="stylesheet" href="/css/liquid.css"/>
     <link rel="stylesheet" href="/css/chat.css"/>
 </head>
 
-<body>
+<body class="liquid">
 
-<div id="navbarMount"></div>
+<!-- Background -->
+<div class="bg">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="grain"></div>
+</div>
 
 <main class="page">
+
+    <!-- Navbar inside page -->
+    <div id="navbarMount"></div>
+
     <section class="container">
-        <h1 class="page-title">Chat</h1>
-        <div id="msg" class="toast info"></div>
+        <div class="glass-shell chat-wrap">
 
-        <div class="chat-shell">
-            <aside class="chat-sidebar">
-                <h3>Rooms</h3>
-                <div id="roomsList"></div>
-            </aside>
-
-            <section class="chat-main">
-                <div id="roomTitle" class="room-title">Select a chat</div>
-
-                <div id="chatBox" class="messages"></div>
-
-                <div class="chat-input">
-                    <input id="messageInput" type="text" placeholder="Type a message..." autocomplete="off"/>
-                    <input id="imageInput" type="file" accept="image/*"/>
-                    <button id="sendBtn" type="button">Send</button>
-                    <button id="sendImageBtn" type="button">Send Image</button>
+            <div class="row" style="justify-content: space-between;">
+                <div>
+                    <h2 style="margin:0;">Chat</h2>
+                    <p class="muted" style="margin:6px 0 0;">Rooms on the left • Messages on the right</p>
                 </div>
-            </section>
+                <span class="badge">Real-time</span>
+            </div>
+
+            <div id="msg" class="toast info">Connecting…</div>
+
+            <div class="chat-shell">
+                <!-- LEFT: Rooms -->
+                <aside class="chat-sidebar glass-card">
+                    <div class="row" style="justify-content: space-between;">
+                        <p class="section-title" style="margin:0;">Rooms</p>
+                        <span class="muted" style="font-size:12px;">Open to chat</span>
+                    </div>
+
+                    <div class="rooms-scroll" id="roomsList"></div>
+                </aside>
+
+                <!-- RIGHT: Chat -->
+                <section class="chat-main glass-card">
+                    <div class="chat-head">
+                        <div>
+                            <div id="roomTitle" class="room-title">Select a chat</div>
+                            <div class="room-sub muted">
+                                <span class="dot"></span>
+                                <span id="connText">Connected</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Messages -->
+                    <div id="chatBox" class="messages"></div>
+
+                    <!-- ✅ Image preview (hidden until selected) -->
+                    <div id="imagePreviewWrap" class="img-preview" style="display:none;">
+                        <img id="imagePreview" alt="preview"/>
+                        <div class="img-preview-actions">
+                            <div class="muted" id="imagePreviewName" style="font-size:12px;"></div>
+                            <button id="removeImageBtn" class="btn secondary" type="button">Remove</button>
+                        </div>
+                    </div>
+
+                    <!-- Composer -->
+                    <div class="chat-input">
+                        <input id="messageInput" type="text" placeholder="Type a message…" autocomplete="off"/>
+
+                        <!-- hidden file input (label opens it) -->
+                        <input id="imageInput" type="file" accept="image/*" class="file-hidden"/>
+                        <label for="imageInput" class="btn secondary file-btn" title="Choose an image">📷</label>
+
+                        <!-- ✅ Only one visible send button -->
+                        <button id="sendBtn" class="btn" type="button">Send</button>
+
+                        <!-- ✅ keep hidden for compatibility -->
+                        <button id="sendImageBtn" class="btn ghost" type="button" style="display:none;">Send Image</button>
+                    </div>
+                </section>
+            </div>
+
         </div>
     </section>
 </main>

@@ -26,13 +26,22 @@ public class MyPreferencesController {
         this.current = current;
     }
 
+    /**
+     * Ensure preferences row exists.
+     * IMPORTANT: This is a write (INSERT), so it must run inside a transaction.
+     */
     private void ensureRow(Long userId) {
-        em.createNativeQuery("INSERT IGNORE INTO preferences (user_id) VALUES (?)")
+        em.createNativeQuery("""
+                INSERT INTO preferences (user_id)
+                VALUES (?)
+                ON DUPLICATE KEY UPDATE user_id = user_id
+                """)
                 .setParameter(1, userId)
                 .executeUpdate();
     }
 
     private static Integer i(Object o) { return o == null ? null : ((Number) o).intValue(); }
+
     private static Boolean bool(Object o) {
         if (o == null) return null;
         if (o instanceof Boolean b) return b;
@@ -50,7 +59,18 @@ public class MyPreferencesController {
             Integer introvert
     ) {}
 
+    public record PrefsReq(
+            Integer sleepSchedule,
+            Integer cleanliness,
+            Integer noiseTolerance,
+            Integer guests,
+            Boolean smokingOk,
+            Boolean drinkingOk,
+            Integer introvert
+    ) {}
+
     @GetMapping
+    @Transactional
     public PrefsDto get(@AuthenticationPrincipal OAuth2User oauth) {
         if (oauth == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not logged in");
         AppUser me = current.requireUser(oauth);
@@ -75,16 +95,6 @@ public class MyPreferencesController {
                 i(r[6])
         );
     }
-
-    public record PrefsReq(
-            Integer sleepSchedule,
-            Integer cleanliness,
-            Integer noiseTolerance,
-            Integer guests,
-            Boolean smokingOk,
-            Boolean drinkingOk,
-            Integer introvert
-    ) {}
 
     @PutMapping
     @Transactional
@@ -120,13 +130,13 @@ public class MyPreferencesController {
         }
         if (req.smokingOk != null) {
             em.createNativeQuery("UPDATE preferences SET smoking_ok=? WHERE user_id=?")
-                    .setParameter(1, req.smokingOk ? 1 : 0)
+                    .setParameter(1, req.smokingOk)
                     .setParameter(2, me.getId())
                     .executeUpdate();
         }
         if (req.drinkingOk != null) {
             em.createNativeQuery("UPDATE preferences SET drinking_ok=? WHERE user_id=?")
-                    .setParameter(1, req.drinkingOk ? 1 : 0)
+                    .setParameter(1, req.drinkingOk)
                     .setParameter(2, me.getId())
                     .executeUpdate();
         }

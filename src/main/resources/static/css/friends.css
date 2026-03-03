@@ -1,0 +1,151 @@
+/* Friends page only — liquid glass UI */
+/* This file also overrides any accidental light styles (like style.css) */
+
+body.liquid{
+    background: var(--bg1) !important;
+    color: var(--text) !important;
+}
+
+/* Main wrapper spacing */
+.friends-wrap{
+    padding: 18px;
+}
+
+.friends-card{
+    margin-top: 12px;
+    padding: 14px;
+}
+
+/* Friends list items: style whatever friends.js injects */
+#friendsList > *:not(.toast){
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    margin-bottom: 12px;
+
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    transition: transform .15s ease, border-color .15s ease;
+}
+
+#friendsList > *:not(.toast):hover{
+    transform: translateY(-1px);
+    border-color: rgba(255,255,255,0.28);
+}
+
+/* Make plain "Options" buttons look good even if friends.js doesn't use .btn */
+#friendsList button{
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.10);
+    color: rgba(255,255,255,0.92);
+    font-weight: 800;
+    cursor: pointer;
+}
+#friendsList button:hover{
+    border-color: rgba(255,255,255,0.35);
+}
+
+/* ---------- Bottom Sheet ---------- */
+#sheetBackdrop{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.50);
+    display: none; /* friends.js will toggle */
+    align-items: flex-end;
+    justify-content: center;
+    padding: 16px;
+    z-index: 9999;
+}
+
+#sheet{
+    width: min(720px, 100%);
+    border-radius: 22px;
+    padding: 16px;
+
+    background: linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
+    border: 1px solid rgba(255,255,255,0.22);
+    box-shadow: 0 30px 90px rgba(0,0,0,0.50);
+
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+
+    animation: sheetIn .18s ease-out;
+}
+
+@keyframes sheetIn{
+    from{ transform: translateY(16px); opacity: 0.6; }
+    to{ transform: translateY(0); opacity: 1; }
+}
+
+#sheetHeader{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#sheetTitle{
+    font-weight: 900;
+    font-size: 18px;
+}
+
+#sheetSub{
+    opacity: 0.80;
+    margin-top: 4px;
+    font-size: 13px;
+}
+
+#sheetActions{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+/* Danger button (theme.css doesn't include it by default) */
+.btn.danger{
+    background: linear-gradient(90deg, rgba(255,80,160,0.95), rgba(255,120,60,0.90));
+    color: white;
+    border: none;
+}
+
+/* Report area */
+#reportArea{
+    display: none;
+    margin-top: 12px;
+}
+
+.report-label{
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 6px;
+    color: rgba(255,255,255,0.72);
+}
+
+.report-actions{
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.report-msg{
+    margin-top: 10px;
+    color: rgba(255,255,255,0.85);
+}
+
+@media (max-width: 720px){
+    #sheetActions a, #sheetActions button{
+        width: 100%;
+    }
+}

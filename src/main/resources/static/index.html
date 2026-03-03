@@ -19,10 +19,8 @@
 
 <main class="page">
 
-    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
-    <div id="navbarMount"></div>
-
-    <div class="glass-shell" id="shell">
+    <!-- ✅ data-continue tells auth.js (or future JS) where to go after login -->
+    <div class="glass-shell" id="shell" data-continue="/home.html">
 
         <!-- LEFT: Sign In -->
         <section class="panel form-panel sign-in">
@@ -30,7 +28,8 @@
                 <h1>Sign in</h1>
 
                 <div class="social-row">
-                    <a class="social-btn" href="/oauth2/authorization/google" title="Continue with Google">
+                    <!-- ✅ Give this an id so we can always use it as the "real login" -->
+                    <a id="googleLoginBtn" class="social-btn" href="/oauth2/authorization/google" title="Continue with Google">
                         <span class="icon">G</span>
                     </a>
 
@@ -45,7 +44,8 @@
 
                 <p class="muted">or use your account</p>
 
-                <form id="signinForm" class="form">
+                <!-- ✅ Prevent unwanted redirects by default; auth.js can still handle if backend exists -->
+                <form id="signinForm" class="form" autocomplete="on">
                     <label class="field">
                         <span>Email</span>
                         <input id="signinEmail" type="email" placeholder="your@email.com" autocomplete="email"/>
@@ -61,8 +61,16 @@
                     <button class="primary" type="submit">SIGN IN</button>
                 </form>
 
-                <p class="hint">
-                    ✅ Working login: <b>Google button</b> (G). <br/>
+                <!-- ✅ NEW: clear “Login with Google” button (takes user to home after OAuth because of SecurityConfig defaultSuccessUrl) -->
+                <div style="margin-top:12px;">
+                    <a class="primary" href="/oauth2/authorization/google"
+                       style="display:block; text-align:center; text-decoration:none;">
+                        SIGN IN WITH GOOGLE
+                    </a>
+                </div>
+
+                <p class="hint" style="margin-top:12px;">
+                    ✅ Recommended login: <b>Google</b>. <br/>
                     Email/password works only if backend endpoints exist.
                 </p>
             </div>
@@ -127,12 +135,6 @@
 
     <div class="toast" id="toast"></div>
 </main>
-
-<!-- ✅ Mount navbar explicitly (guaranteed) -->
-<script type="module">
-    import { mountNavbar } from "/js/navbar.js";
-    mountNavbar();
-</script>
 
 <!-- ✅ Keep your auth logic -->
 <script src="/js/auth.js"></script>
