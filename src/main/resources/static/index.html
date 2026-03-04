@@ -27,24 +27,35 @@
             <div class="panel-inner">
                 <h1>Sign in</h1>
 
-                <div class="social-row">
-                    <!-- ✅ Give this an id so we can always use it as the "real login" -->
-                    <a id="googleLoginBtn" class="social-btn" href="/oauth2/authorization/google" title="Continue with Google">
-                        <span class="icon">G</span>
-                    </a>
+                <p class="muted" style="margin-top:6px;">
+                    Recommended: continue with Google for fastest login.
+                </p>
 
-                    <button class="social-btn ghost" type="button" title="Facebook (UI only)">
+                <!-- ✅ ONE clear Google CTA (no duplicate) -->
+                <a id="googleLoginBtn" class="primary google-btn" href="/oauth2/authorization/google"
+                   style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none;">
+                    <span class="icon" style="font-weight:900;">G</span>
+                    Continue with Google
+                </a>
+
+                <div class="social-row" style="margin-top:12px;">
+                    <!-- Disabled (coming soon) -->
+                    <button class="social-btn ghost disabled" type="button" aria-disabled="true" title="Facebook (Coming soon)">
                         <span class="icon">f</span>
                     </button>
 
-                    <button class="social-btn ghost" type="button" title="LinkedIn (UI only)">
+                    <button class="social-btn ghost disabled" type="button" aria-disabled="true" title="LinkedIn (Coming soon)">
                         <span class="icon">in</span>
                     </button>
                 </div>
 
-                <p class="muted">or use your account</p>
+                <div class="or-row" style="margin:14px 0 10px; display:flex; align-items:center; gap:10px;">
+                    <span style="flex:1; height:1px; background:rgba(255,255,255,0.18);"></span>
+                    <span class="muted" style="font-size:13px;">or use your account</span>
+                    <span style="flex:1; height:1px; background:rgba(255,255,255,0.18);"></span>
+                </div>
 
-                <!-- ✅ Prevent unwanted redirects by default; auth.js can still handle if backend exists -->
+                <!-- ✅ Keep IDs exactly -->
                 <form id="signinForm" class="form" autocomplete="on">
                     <label class="field">
                         <span>Email</span>
@@ -56,21 +67,13 @@
                         <input id="signinPassword" type="password" placeholder="••••••••" autocomplete="current-password"/>
                     </label>
 
+                    <!-- auth.js should show toast (not real reset yet) -->
                     <button class="link-btn" type="button" id="forgotBtn">Forgot your password?</button>
 
                     <button class="primary" type="submit">SIGN IN</button>
                 </form>
 
-                <!-- ✅ NEW: clear “Login with Google” button (takes user to home after OAuth because of SecurityConfig defaultSuccessUrl) -->
-                <div style="margin-top:12px;">
-                    <a class="primary" href="/oauth2/authorization/google"
-                       style="display:block; text-align:center; text-decoration:none;">
-                        SIGN IN WITH GOOGLE
-                    </a>
-                </div>
-
                 <p class="hint" style="margin-top:12px;">
-                    ✅ Recommended login: <b>Google</b>. <br/>
                     Email/password works only if backend endpoints exist.
                 </p>
             </div>
@@ -81,15 +84,31 @@
             <div class="panel-inner">
                 <h1>Create account</h1>
 
-                <div class="social-row">
-                    <a class="social-btn" href="/oauth2/authorization/google" title="Sign up with Google">
-                        <span class="icon">G</span>
-                    </a>
-                    <button class="social-btn ghost" type="button" title="Facebook (UI only)"><span class="icon">f</span></button>
-                    <button class="social-btn ghost" type="button" title="LinkedIn (UI only)"><span class="icon">in</span></button>
+                <p class="muted" style="margin-top:6px;">
+                    Recommended: sign up using Google.
+                </p>
+
+                <!-- ✅ ONE clear Google CTA -->
+                <a class="primary google-btn" href="/oauth2/authorization/google"
+                   style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none;">
+                    <span class="icon" style="font-weight:900;">G</span>
+                    Continue with Google
+                </a>
+
+                <div class="social-row" style="margin-top:12px;">
+                    <button class="social-btn ghost disabled" type="button" aria-disabled="true" title="Facebook (Coming soon)">
+                        <span class="icon">f</span>
+                    </button>
+                    <button class="social-btn ghost disabled" type="button" aria-disabled="true" title="LinkedIn (Coming soon)">
+                        <span class="icon">in</span>
+                    </button>
                 </div>
 
-                <p class="muted">or register with email</p>
+                <div class="or-row" style="margin:14px 0 10px; display:flex; align-items:center; gap:10px;">
+                    <span style="flex:1; height:1px; background:rgba(255,255,255,0.18);"></span>
+                    <span class="muted" style="font-size:13px;">or register with email</span>
+                    <span style="flex:1; height:1px; background:rgba(255,255,255,0.18);"></span>
+                </div>
 
                 <form id="signupForm" class="form">
                     <label class="field">
@@ -111,22 +130,22 @@
                 </form>
 
                 <p class="hint">
-                    ✅ You can also “Sign up” using Google (G).
+                    You can also sign up using Google.
                 </p>
             </div>
         </section>
 
-        <!-- Overlay slider -->
+        <!-- Overlay slider (keep your existing IDs) -->
         <section class="overlay">
             <div class="overlay-panel hello">
-                <h2>Hello, Friend!</h2>
-                <p>Enter your personal details and start your journey with us.</p>
+                <h2>Welcome Back!</h2>
+                <p>To keep connected with us please login with your details.</p>
                 <button class="outline" id="goSignup" type="button">SIGN UP</button>
             </div>
 
             <div class="overlay-panel welcome">
-                <h2>Welcome Back!</h2>
-                <p>To keep connected with us please login with your details.</p>
+                <h2>Hello, Friend!</h2>
+                <p>Share your personal preferences and start your journey with us.</p>
                 <button class="outline" id="goSignin" type="button">SIGN IN</button>
             </div>
         </section>
@@ -136,8 +155,6 @@
     <div class="toast" id="toast"></div>
 </main>
 
-<!-- ✅ Keep your auth logic -->
 <script src="/js/auth.js"></script>
-
 </body>
 </html>
