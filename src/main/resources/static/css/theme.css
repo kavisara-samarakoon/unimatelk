@@ -353,3 +353,24 @@ p, label, input, select, textarea, button {
     .page { padding: 12px; }
 }
 
+/* ================================
+   FIXED NAVBAR (always on top)
+   ================================ */
+
+#navbarMount{
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+}
+
+/* If navbar.js creates a .topbar inside #navbarMount */
+#navbarMount .topbar{
+    position: sticky;
+    top: 12px;              /* keeps your rounded bar floating nicely */
+    z-index: 9999;
+}
+
+/* Give space so page content doesn't hide under navbar */
+.page{
+    padding-top: 18px;
+}
