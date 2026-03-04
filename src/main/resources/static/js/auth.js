@@ -7,7 +7,13 @@ const goSignin = document.getElementById("goSignin");
 const signinForm = document.getElementById("signinForm");
 const signupForm = document.getElementById("signupForm");
 
+function getContinueUrl(){
+    const v = shell?.getAttribute("data-continue");
+    return (v && v.trim()) ? v.trim() : "/home.html";
+}
+
 function showToast(msg){
+    if (!toast) return;
     toast.textContent = msg;
     toast.classList.add("show");
     clearTimeout(showToast._t);
@@ -15,7 +21,7 @@ function showToast(msg){
 }
 
 function setMode(signup){
-    shell.classList.toggle("right-active", !!signup);
+    shell?.classList.toggle("right-active", !!signup);
 }
 
 goSignup?.addEventListener("click", () => setMode(true));
@@ -35,6 +41,14 @@ async function postJson(url, data){
         : await res.text().catch(() => "");
 
     if (!res.ok){
+        // Friendly errors if endpoints are not implemented
+        if (res.status === 404){
+            throw new Error("This feature is not enabled. Please use Google login.");
+        }
+        if (res.status === 401 || res.status === 403){
+            throw new Error("Invalid credentials or not allowed.");
+        }
+
         const msg = (body && body.message) ? body.message :
             (typeof body === "string" && body) ? body :
                 `Request failed (${res.status})`;
@@ -44,70 +58,72 @@ async function postJson(url, data){
     return body;
 }
 
-// ✅ Auto redirect if already logged in (Google or local)
+// ✅ Auto redirect if already logged in
 async function redirectIfLoggedIn(){
     try{
         const res = await fetch("/api/me", { credentials: "same-origin" });
-        const me = await res.json();
+
+        if (!res.ok) return;
+        const me = await res.json().catch(() => null);
+
         if (me && me.authenticated){
-            window.location.href = "/matches.html";
+            window.location.href = getContinueUrl();   // ✅ HOME
         }
     }catch(_){}
 }
 
-signinForm.addEventListener("submit", async (e) => {
+signinForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     try{
-        const email = document.getElementById("signinEmail").value.trim();
-        const password = document.getElementById("signinPassword").value;
+        const email = document.getElementById("signinEmail")?.value?.trim() || "";
+        const password = document.getElementById("signinPassword")?.value || "";
+
+        if (!email || !password){
+            showToast("❌ Enter email and password.");
+            return;
+        }
 
         await postJson("/api/auth/login", { email, password });
         showToast("✅ Signed in!");
-        window.location.href = "/matches.html";
+        window.location.href = getContinueUrl();       // ✅ HOME
     }catch(err){
-        showToast("❌ " + err.message);
+        showToast("❌ " + (err?.message || "Login failed"));
     }
 });
 
-signupForm.addEventListener("submit", async (e) => {
+signupForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     try{
-        const name = document.getElementById("signupName").value.trim();
-        const email = document.getElementById("signupEmail").value.trim();
-        const password = document.getElementById("signupPassword").value;
+        const name = document.getElementById("signupName")?.value?.trim() || "";
+        const email = document.getElementById("signupEmail")?.value?.trim() || "";
+        const password = document.getElementById("signupPassword")?.value || "";
+
+        if (!name || !email || !password){
+            showToast("❌ Please fill all fields.");
+            return;
+        }
 
         await postJson("/api/auth/signup", { name, email, password });
         showToast("✅ Account created!");
-        window.location.href = "/profile.html";
+        window.location.href = "/profile.html";        // profile setup after signup
     }catch(err){
-        showToast("❌ " + err.message);
+        showToast("❌ " + (err?.message || "Signup failed"));
     }
 });
 
-// ✅ Forgot password works now
-document.getElementById("forgotBtn")?.addEventListener("click", async () => {
-    try{
-        const email = prompt("Enter your email to reset password:");
-        if (!email) return;
-
-        const data = await postJson("/api/auth/forgot", { email: email.trim() });
-        showToast("✅ Reset link created!");
-
-        // Go to reset page
-        window.location.href = data.resetUrl;
-    }catch(err){
-        showToast("❌ " + err.message);
-    }
+// ✅ Forgot password (UI safe)
+document.getElementById("forgotBtn")?.addEventListener("click", () => {
+    showToast("ℹ️ Password reset not available yet. Please use Google login.");
 });
 
 // Swipe support
 let startX = null;
-shell.addEventListener("touchstart", (e) => {
+shell?.addEventListener("touchstart", (e) => {
     if (!e.touches || e.touches.length !== 1) return;
     startX = e.touches[0].clientX;
 }, { passive: true });
 
-shell.addEventListener("touchend", (e) => {
+shell?.addEventListener("touchend", (e) => {
     if (startX === null) return;
     const endX = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX : startX;
     const dx = endX - startX;
