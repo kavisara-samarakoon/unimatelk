@@ -9,9 +9,8 @@
     <link rel="stylesheet" href="/css/liquid.css"/>
     <link rel="stylesheet" href="/css/preferences.css"/>
 </head>
-<body class="liquid">
+<body class="liquid preferences-page">
 
-<!-- Background (same as Home/Profile) -->
 <div class="bg">
     <div class="blob b1"></div>
     <div class="blob b2"></div>
@@ -20,105 +19,182 @@
 </div>
 
 <main class="page">
-
-    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
     <div id="navbarMount"></div>
 
-    <section class="container">
-        <div class="glass-shell">
+    <section class="container preferences-container">
+        <div class="glass-shell preferences-shell">
 
-            <div class="row" style="justify-content: space-between;">
+            <div class="preferences-hero">
                 <div>
-                    <h2 style="margin:0;">Preferences</h2>
-                    <p class="muted" style="margin:6px 0 0;">
-                        Set your lifestyle values (1–5) to improve match accuracy.
+                    <h1 class="preferences-title">My Preferences</h1>
+                    <p class="preferences-sub">
+                        Set your lifestyle preferences so UniMateLK can recommend more compatible roommates.
                     </p>
                 </div>
-                <span class="badge">Preferences Setup</span>
+
+                <span class="badge preferences-badge">Matching Setup</span>
             </div>
 
-            <div id="msg" class="toast info">View mode.</div>
+            <div id="msg" class="toast info">Update your preferences and save them.</div>
 
-            <div class="grid two prefs-grid">
+            <div class="preferences-layout">
 
-                <!-- LEFT: Preferences Form -->
-                <div class="glass-card">
-                    <p class="section-title">Your Preferences</p>
+                <form id="preferencesForm" class="glass-card preferences-main-card">
 
-                    <div class="prefs-form">
+                    <div class="section-head">
+                        <p class="section-title">Lifestyle Preferences</p>
+                    </div>
 
-                        <div class="prefs-field">
-                            <label for="sleepSchedule">Sleep Schedule (1–5)</label>
-                            <input id="sleepSchedule" type="number" min="1" max="5" disabled>
-                        </div>
-
-                        <div class="prefs-field">
-                            <label for="cleanliness">Cleanliness (1–5)</label>
-                            <input id="cleanliness" type="number" min="1" max="5" disabled>
-                        </div>
-
-                        <div class="prefs-field">
-                            <label for="noiseTolerance">Noise Tolerance (1–5)</label>
-                            <input id="noiseTolerance" type="number" min="1" max="5" disabled>
-                        </div>
-
-                        <div class="prefs-field">
-                            <label for="guests">Guests (1–5)</label>
-                            <input id="guests" type="number" min="1" max="5" disabled>
-                        </div>
-
-                        <div class="prefs-field">
-                            <label for="smokingOk">Smoking OK</label>
-                            <select id="smokingOk" disabled>
-                                <option value="">Not set</option>
-                                <option value="true">Yes</option>
-                                <option value="false">No</option>
+                    <div class="grid two pref-grid">
+                        <div>
+                            <label for="sleepSchedule">Sleep Schedule</label>
+                            <select id="sleepSchedule">
+                                <option value="">Select</option>
+                                <option value="early">Early sleeper</option>
+                                <option value="normal">Normal</option>
+                                <option value="late">Late sleeper</option>
                             </select>
                         </div>
 
-                        <div class="prefs-field">
-                            <label for="drinkingOk">Drinking OK</label>
-                            <select id="drinkingOk" disabled>
-                                <option value="">Not set</option>
-                                <option value="true">Yes</option>
-                                <option value="false">No</option>
+                        <div>
+                            <label for="cleanliness">Cleanliness</label>
+                            <select id="cleanliness">
+                                <option value="">Select</option>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
                             </select>
-                        </div>
-
-                        <div class="prefs-field">
-                            <label for="introvert">Introvert (1–5)</label>
-                            <input id="introvert" type="number" min="1" max="5" disabled>
-                        </div>
-
-                        <div class="pref-actions">
-                            <button id="editBtn" class="btn" type="button">Edit Preferences</button>
-
-                            <button id="saveBtn" class="btn" type="button" style="display:none;">Save</button>
-                            <button id="cancelBtn" class="btn secondary" type="button" style="display:none;">Cancel</button>
                         </div>
                     </div>
-                </div>
 
-                <!-- RIGHT: Tips / Shortcuts -->
-                <div class="glass-card">
-                    <p class="section-title">Tips</p>
-                    <ul class="tips">
-                        <li>More accurate preferences = better matches</li>
-                        <li>You can update anytime</li>
-                        <li>Profile + Preferences together improve ranking</li>
-                    </ul>
+                    <div class="grid two pref-grid">
+                        <div>
+                            <label for="noiseTolerance">Noise Tolerance</label>
+                            <select id="noiseTolerance">
+                                <option value="">Select</option>
+                                <option value="low">Prefer quiet</option>
+                                <option value="medium">Moderate</option>
+                                <option value="high">Okay with noise</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="studyHabit">Study Habit</label>
+                            <select id="studyHabit">
+                                <option value="">Select</option>
+                                <option value="quiet">Quiet study</option>
+                                <option value="flexible">Flexible</option>
+                                <option value="group">Group study friendly</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid two pref-grid">
+                        <div>
+                            <label for="smoking">Smoking Preference</label>
+                            <select id="smoking">
+                                <option value="">Select</option>
+                                <option value="no">Non-smoking only</option>
+                                <option value="okay">Okay with smoking</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="drinking">Drinking Preference</label>
+                            <select id="drinking">
+                                <option value="">Select</option>
+                                <option value="no">Prefer non-drinking</option>
+                                <option value="okay">Okay with drinking</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid two pref-grid">
+                        <div>
+                            <label for="guestComfort">Guests / Visitors</label>
+                            <select id="guestComfort">
+                                <option value="">Select</option>
+                                <option value="rare">Rarely</option>
+                                <option value="sometimes">Sometimes okay</option>
+                                <option value="often">Often okay</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="personalityStyle">Personality Style</label>
+                            <select id="personalityStyle">
+                                <option value="">Select</option>
+                                <option value="introvert">Introvert</option>
+                                <option value="balanced">Balanced</option>
+                                <option value="extrovert">Extrovert</option>
+                            </select>
+                        </div>
+                    </div>
 
                     <div class="divider"></div>
 
-                    <a class="btn secondary" href="/matches.html" style="width:100%;">View Matches</a>
-                    <a class="btn ghost" href="/profile.html" style="width:100%; margin-top:10px;">Go to Profile</a>
-                </div>
+                    <div>
+                        <label for="additionalNotes">Additional Notes</label>
+                        <textarea id="additionalNotes" rows="6" placeholder="Mention anything important about your ideal roommate or living style..."></textarea>
+                        <div class="help">Optional, but useful for better matching.</div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="preferences-actions">
+                        <button id="saveBtn" class="btn" type="submit">Save Preferences</button>
+                        <button id="resetBtn" class="btn secondary" type="reset">Reset</button>
+                        <a class="btn ghost" href="/matches.html">Go to Matches</a>
+                    </div>
+                </form>
+
+                <aside class="preferences-side">
+                    <div class="glass-card side-block">
+                        <p class="section-title">Why Preferences Matter</p>
+
+                        <div class="side-list">
+                            <div class="side-item">
+                                <span class="side-icon">🎯</span>
+                                <div>
+                                    <div class="side-title">Better Matching</div>
+                                    <div class="help">Your lifestyle details improve the compatibility score.</div>
+                                </div>
+                            </div>
+
+                            <div class="side-item">
+                                <span class="side-icon">🧠</span>
+                                <div>
+                                    <div class="side-title">Smarter Suggestions</div>
+                                    <div class="help">The system compares preferences to rank better roommate results.</div>
+                                </div>
+                            </div>
+
+                            <div class="side-item">
+                                <span class="side-icon">🤝</span>
+                                <div>
+                                    <div class="side-title">Better Fit</div>
+                                    <div class="help">Compatible routines reduce future conflicts in shared living.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card side-block tips-card">
+                        <p class="section-title">Quick Tips</p>
+                        <ul class="tips">
+                            <li>Answer honestly instead of choosing ideal answers.</li>
+                            <li>Keep preferences realistic for daily student life.</li>
+                            <li>Small details like sleep and cleanliness matter a lot.</li>
+                            <li>After saving, check your matches to see updated suggestions.</li>
+                        </ul>
+
+                        <a class="btn secondary full-btn" href="/profile.html">Back to Profile</a>
+                    </div>
+                </aside>
 
             </div>
-
         </div>
     </section>
-
 </main>
 
 <script type="module">
@@ -127,6 +203,5 @@
 </script>
 
 <script type="module" src="/js/preferences.js"></script>
-
 </body>
 </html>
