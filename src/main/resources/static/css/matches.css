@@ -1,24 +1,114 @@
-/* =========================================================
-   matches.css (FINAL)
-   Glass theme-friendly + fully responsive
-   Includes the auto-fit responsive grid changes
-   ========================================================= */
+/* ===== Matches page layout ===== */
 
-/* Filters grid: auto-fit responsive (works on all resolutions) */
-.filters-grid{
-    display: grid;
-    gap: 12px;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+.matches-page .page {
+    min-height: 100vh;
+    padding: 8px 10px 20px;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Let “wide” behave naturally on different widths */
-.filters-grid .wide{
-    grid-column: auto;
+.matches-page .container,
+.matches-page .topbar {
+    width: min(1380px, 98vw);
 }
 
-/* Results header + pagination */
-.results-head{
+.matches-page #navbarMount {
+    margin-bottom: 8px;
+}
+
+.matches-page .matches-container {
+    flex: 1;
+    display: flex;
+}
+
+.matches-page .matches-shell {
+    width: 100%;
+    padding: 22px;
+}
+
+.matches-page .matches-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.matches-page .matches-title {
+    margin: 0;
+    font-size: clamp(42px, 5vw, 60px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-shadow: 0 12px 34px rgba(0,0,0,0.24);
+}
+
+.matches-page .matches-sub {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 17px;
+    line-height: 1.6;
+    max-width: 820px;
+}
+
+.matches-page .matches-badge {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* ===== MAIN FIX HERE ===== */
+/* Make both columns stretch to same height */
+.matches-page .matches-layout {
+    display: flex;
+    align-items: stretch;
+    gap: 18px;
     margin-top: 16px;
+}
+
+.matches-page .matches-main-card {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.matches-page .matches-side {
+    flex: 0 0 36%;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-self: stretch;
+}
+
+.matches-page .side-block {
+    padding: 20px;
+}
+
+/* Make the bottom right card expand and cover the empty space */
+.matches-page .matches-side .side-block:last-child {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.matches-page .filters-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.matches-page .filter-field.wide {
+    grid-column: 1 / -1;
+}
+
+.matches-page .filter-actions {
+    margin-top: 14px;
+    gap: 12px;
+}
+
+.matches-page .results-head {
+    margin-top: 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -26,92 +116,277 @@
     flex-wrap: wrap;
 }
 
-.pager{
+.matches-page .pager {
     display: flex;
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
 }
 
-/* Match cards grid: auto-fit responsive */
-.match-grid{
+.matches-page .match-grid {
     margin-top: 14px;
     display: grid;
-    gap: 12px;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
 }
 
-/* Card style - safe for whatever your JS injects into #list */
-.match-grid > *{
-    border-radius: 18px;
-    background: rgba(10,14,30,0.28);
+.matches-page .match-card {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 16px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.05));
     border: 1px solid rgba(255,255,255,0.16);
-    padding: 14px;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    transition: transform .15s ease, border-color .15s ease;
+    box-shadow: 0 16px 42px rgba(0,0,0,0.22);
+    backdrop-filter: blur(18px) saturate(145%);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+    transition: transform .18s ease, border-color .18s ease;
 }
 
-.match-grid > *:hover{
-    transform: translateY(-2px);
-    border-color: rgba(255,255,255,0.32);
+.matches-page .match-card:hover {
+    border-color: rgba(255,255,255,0.28);
+    transform: translateY(-1px);
 }
 
-/* Improve typical injected content */
-.match-grid h3, .match-grid h4{
-    margin: 0 0 6px;
-    color: rgba(255,255,255,0.97);
+.matches-page .match-media {
+    flex-shrink: 0;
 }
 
-.match-grid p{
-    margin: 0 0 10px;
-    color: rgba(255,255,255,0.78);
-    font-size: 13px;
-    line-height: 1.35;
-}
-
-/* Buttons inside cards (if your JS injects <button> or <a>) */
-.match-grid button,
-.match-grid a.btnInCard{
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 9px 12px;
+.matches-page .match-avatar {
+    width: 82px;
+    height: 82px;
+    object-fit: cover;
     border-radius: 999px;
-    border: 1px solid rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.20);
+    background: rgba(255,255,255,0.08);
+}
+
+.matches-page .match-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.matches-page .match-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.matches-page .match-name {
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 1.15;
+    margin-bottom: 4px;
+}
+
+.matches-page .match-meta {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.matches-page .match-badge {
+    white-space: nowrap;
+    font-weight: 800;
+}
+
+.matches-page .reason-list {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.matches-page .reason-chip {
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: rgba(255,255,255,0.82);
+    font-size: 13px;
+    line-height: 1.2;
+}
+
+.matches-page .match-actions {
+    margin-top: 14px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.matches-page .side-list {
+    display: grid;
+    gap: 12px;
+}
+
+.matches-page .side-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+}
+
+.matches-page .side-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
     background: rgba(255,255,255,0.10);
-    color: rgba(255,255,255,0.92);
-    cursor: pointer;
-    font-weight: 750;
-    text-decoration: none;
-    margin-right: 8px;
-    margin-top: 8px;
+    border: 1px solid rgba(255,255,255,0.14);
+    font-size: 18px;
 }
 
-.match-grid button:hover,
-.match-grid a.btnInCard:hover{
-    border-color: rgba(255,255,255,0.35);
+.matches-page .side-title {
+    font-size: 16px;
+    font-weight: 900;
+    margin-bottom: 3px;
 }
 
-/* Make filter inputs comfortable on small screens */
-@media (max-width: 650px){
-    .pager{
+.matches-page .tips {
+    margin: 6px 0 0;
+    padding-left: 18px;
+    color: rgba(255,255,255,0.78);
+}
+
+.matches-page .tips li {
+    margin: 8px 0;
+    line-height: 1.55;
+}
+
+.matches-page .full-btn {
+    width: 100%;
+    margin-top: auto;
+}
+
+.matches-page .empty-state {
+    padding: 26px 18px;
+    border-radius: 20px;
+    text-align: center;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.14);
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.matches-page .empty-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 12px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: rgba(255,255,255,0.09);
+    border: 1px solid rgba(255,255,255,0.16);
+    font-size: 26px;
+}
+
+.matches-page .empty-state h3 {
+    margin: 0 0 8px;
+    font-size: 22px;
+}
+
+.matches-page .empty-state p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.matches-page .empty-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 1100px) {
+    .matches-page .matches-layout {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .matches-page .matches-side {
+        flex: 1 1 auto;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .matches-page .matches-hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .matches-page .matches-side .side-block:last-child {
+        flex: 0 0 auto;
+    }
+}
+
+@media (max-width: 780px) {
+    .matches-page .page {
+        padding: 8px;
+    }
+
+    .matches-page .container,
+    .matches-page .topbar {
+        width: min(100%, calc(100vw - 16px));
+    }
+
+    .matches-page .matches-shell {
+        padding: 16px;
+    }
+
+    .matches-page .matches-title {
+        font-size: clamp(30px, 10vw, 42px);
+    }
+
+    .matches-page .matches-sub {
+        font-size: 15px;
+    }
+
+    .matches-page .filters-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .matches-page .filter-field.wide {
+        grid-column: auto;
+    }
+
+    .matches-page .match-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .matches-page .match-media {
+        display: flex;
+        justify-content: center;
+    }
+
+    .matches-page .match-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .matches-page .pager {
         width: 100%;
         justify-content: flex-start;
     }
-    #prevBtn, #nextBtn{
-        width: auto;
+
+    .matches-page .filter-actions {
+        flex-direction: column;
+        align-items: stretch;
     }
-}
 
-/* Extra: prevent overflow in match cards */
-.match-grid > *{
-    overflow: hidden;
-}
-
-.match-grid img{
-    max-width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 14px;
+    .matches-page .filter-actions .btn,
+    .matches-page .empty-actions .btn {
+        width: 100%;
+    }
 }
