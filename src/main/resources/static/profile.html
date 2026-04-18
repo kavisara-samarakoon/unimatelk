@@ -9,9 +9,8 @@
     <link rel="stylesheet" href="/css/liquid.css"/>
     <link rel="stylesheet" href="/css/profile.css"/>
 </head>
-<body class="liquid">
+<body class="liquid profile-page">
 
-<!-- Background -->
 <div class="bg">
     <div class="blob b1"></div>
     <div class="blob b2"></div>
@@ -20,34 +19,32 @@
 </div>
 
 <main class="page">
-
-    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
     <div id="navbarMount"></div>
 
-    <section class="container">
-        <div class="glass-shell">
+    <section class="container profile-container">
+        <div class="glass-shell profile-shell">
 
-            <!-- Header -->
-            <div class="row" style="justify-content: space-between;">
+            <div class="profile-hero">
                 <div>
-                    <h2 style="margin:0;">My Profile</h2>
-                    <p class="muted" style="margin:6px 0 0;">
-                        Fill your personal details to improve matching & chat trust.
+                    <h1 class="profile-title">My Profile</h1>
+                    <p class="profile-sub">
+                        Fill your personal details to improve matching quality and build trust before chatting.
                     </p>
                 </div>
 
-                <span class="badge">Profile Setup</span>
+                <span class="badge profile-badge">Profile Setup</span>
             </div>
 
             <div id="msg" class="toast info">Complete your profile then save.</div>
 
-            <div class="grid two">
+            <div class="profile-layout">
 
-                <!-- LEFT: Main Details -->
-                <div class="glass-card">
-                    <p class="section-title">Personal Details</p>
+                <div class="glass-card profile-main-card">
+                    <div class="section-head">
+                        <p class="section-title">Personal Details</p>
+                    </div>
 
-                    <div class="grid two">
+                    <div class="grid two profile-grid">
                         <div>
                             <label for="fullName">Full Name</label>
                             <input id="fullName" placeholder="Your name" disabled/>
@@ -58,7 +55,7 @@
                         </div>
                     </div>
 
-                    <div class="grid two">
+                    <div class="grid two profile-grid">
                         <div>
                             <label for="university">University</label>
                             <input id="university" placeholder="eg: University of Colombo" disabled/>
@@ -69,7 +66,7 @@
                         </div>
                     </div>
 
-                    <div class="grid two">
+                    <div class="grid two profile-grid">
                         <div>
                             <label for="degree">Degree Program</label>
                             <input id="degree" placeholder="eg: Software Engineering" disabled/>
@@ -84,73 +81,64 @@
 
                     <div>
                         <label for="bio">Bio</label>
-                        <textarea id="bio" rows="4" placeholder="Write a short bio..." disabled></textarea>
-                        <div class="help">Keep it short and friendly.</div>
+                        <textarea id="bio" rows="6" placeholder="Write a short bio..." disabled></textarea>
+                        <div class="help">Keep it short, friendly, and genuine.</div>
                     </div>
 
                     <div class="divider"></div>
 
-                    <!-- View/Edit buttons -->
                     <div class="profile-actions">
                         <button id="editBtn" class="btn" type="button">Edit Profile</button>
-
                         <button id="saveBtn" class="btn" type="button" style="display:none;">Save Profile</button>
                         <button id="cancelBtn" class="btn secondary" type="button" style="display:none;">Cancel</button>
                     </div>
                 </div>
 
-                <!-- RIGHT: Picture + Preview -->
-                <div class="glass-card">
-                    <p class="section-title">Profile Picture</p>
+                <aside class="profile-side">
+                    <div class="glass-card side-block">
+                        <p class="section-title">Profile Picture</p>
 
-                    <div class="avatar-wrap">
-                        <img id="avatarPreview" class="avatar" src="/images/default-avatar.png" alt="profile"/>
-                        <div class="help">Upload a clear photo (optional).</div>
+                        <div class="avatar-wrap">
+                            <img id="avatarPreview" class="avatar" src="/images/default-avatar.svg" alt="profile"/>
+                            <div class="help center-help">Upload a clear photo (optional).</div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <label for="photo" class="upload-box">
+                            <div class="upload-ico">📷</div>
+                            <div>
+                                <div class="upload-title">Upload a photo</div>
+                                <div class="help">PNG / JPG recommended</div>
+                            </div>
+                        </label>
+
+                        <input id="photo" type="file" accept="image/*" style="display:none;" disabled/>
                     </div>
 
-                    <div class="divider"></div>
-
-                    <label for="photo" class="upload-box">
-                        <div class="upload-ico">📷</div>
-                        <div>
-                            <div class="upload-title">Upload a photo</div>
-                            <div class="help">PNG / JPG recommended</div>
-                        </div>
-                    </label>
-
-                    <input id="photo" type="file" accept="image/*" style="display:none;" disabled/>
-
-                    <div class="divider"></div>
-
-                    <div class="glass-card" style="padding:14px;">
-                        <p class="section-title">Tips</p>
+                    <div class="glass-card side-block tips-card">
+                        <p class="section-title">Profile Tips</p>
                         <ul class="tips">
-                            <li>Complete profile to get better matches</li>
-                            <li>Use real details for trusted chatting</li>
-                            <li>Add preferences after saving profile</li>
+                            <li>Use your real university and degree details.</li>
+                            <li>Add a short bio so others understand your lifestyle.</li>
+                            <li>A clear profile photo helps build trust faster.</li>
+                            <li>After saving this page, continue to preferences for better matches.</li>
                         </ul>
 
-                        <a class="btn secondary" href="/preferences.html" style="width:100%; margin-top:10px;">
-                            Go to Preferences
-                        </a>
+                        <a class="btn secondary full-btn" href="/preferences.html">Go to Preferences</a>
                     </div>
-                </div>
+                </aside>
 
             </div>
-
         </div>
     </section>
-
 </main>
 
-<!-- Navbar mount -->
 <script type="module">
     import { mountNavbar } from "/js/navbar.js";
     mountNavbar();
 </script>
 
-<!-- Your existing JS (no change) -->
 <script type="module" src="/js/profile.js"></script>
-
 </body>
 </html>
