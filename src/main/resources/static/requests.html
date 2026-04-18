@@ -6,11 +6,11 @@
     <title>UniMateLK - Requests</title>
 
     <link rel="stylesheet" href="/css/theme.css"/>
+    <link rel="stylesheet" href="/css/liquid.css"/>
     <link rel="stylesheet" href="/css/requests.css"/>
 </head>
-<body>
+<body class="liquid requests-page">
 
-<!-- Background -->
 <div class="bg">
     <div class="blob b1"></div>
     <div class="blob b2"></div>
@@ -19,75 +19,68 @@
 </div>
 
 <main class="page">
-
-    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
     <div id="navbarMount"></div>
 
-    <section class="container">
-        <div class="glass-shell">
+    <section class="container requests-container">
+        <div class="glass-shell requests-shell">
 
-            <div class="row" style="justify-content: space-between; align-items:flex-start;">
+            <div class="requests-hero">
                 <div>
-                    <h2 style="margin:0;">Requests</h2>
-                    <p class="muted" style="margin:6px 0 0;">
-                        Manage connection requests. Accept to start chatting, or reject/cancel.
+                    <h1 class="requests-title">Requests</h1>
+                    <p class="requests-sub">
+                        Manage connection requests. Accept to unlock chat, or reject and cancel when needed.
                     </p>
                 </div>
-                <span class="badge">Connections</span>
+
+                <span class="badge requests-badge">Connections</span>
             </div>
 
-            <!-- IMPORTANT: Keep id="msg" (requests.js uses it) -->
-            <p id="msg" class="toast info">Loading requests…</p>
+            <div id="msg" class="toast info">Loading requests…</div>
 
             <div class="req-layout">
 
-                <!-- Incoming -->
                 <div class="req-column">
-                    <div class="glass-card req-header">
-                        <div>
-                            <h3 class="req-title">Incoming Requests</h3>
-                            <p class="req-sub">People who want to connect with you.</p>
+                    <div class="glass-card req-panel">
+                        <div class="req-header">
+                            <div>
+                                <h3 class="req-title">Incoming Requests</h3>
+                                <p class="req-subtitle">People who want to connect with you.</p>
+                            </div>
+                            <span class="badge">Incoming</span>
                         </div>
-                        <span class="badge">Incoming</span>
-                    </div>
 
-                    <!-- IMPORTANT: Keep id="incoming" -->
-                    <div id="incoming" class="req-list">
-                        <div class="req-empty">No incoming requests yet.</div>
+                        <div id="incoming" class="req-list">
+                            <div class="req-empty">No incoming requests yet.</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Outgoing -->
                 <div class="req-column">
-                    <div class="glass-card req-header">
-                        <div>
-                            <h3 class="req-title">Outgoing Requests</h3>
-                            <p class="req-sub">Requests you sent to others.</p>
+                    <div class="glass-card req-panel">
+                        <div class="req-header">
+                            <div>
+                                <h3 class="req-title">Outgoing Requests</h3>
+                                <p class="req-subtitle">Requests you sent to other students.</p>
+                            </div>
+                            <span class="badge">Outgoing</span>
                         </div>
-                        <span class="badge">Outgoing</span>
-                    </div>
 
-                    <!-- IMPORTANT: Keep id="outgoing" -->
-                    <div id="outgoing" class="req-list">
-                        <div class="req-empty">No outgoing requests yet.</div>
+                        <div id="outgoing" class="req-list">
+                            <div class="req-empty">No outgoing requests yet.</div>
+                        </div>
                     </div>
                 </div>
 
             </div>
-
         </div>
     </section>
-
 </main>
 
-<!-- ✅ Mount navbar explicitly (guaranteed) -->
 <script type="module">
     import { mountNavbar } from "/js/navbar.js";
     mountNavbar();
 </script>
 
-<!-- ✅ Requests functionality -->
 <script type="module" src="/js/requests.js"></script>
-
 </body>
 </html>
