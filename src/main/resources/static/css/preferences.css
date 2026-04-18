@@ -1,244 +1,39 @@
-/* ===== Preferences page layout ===== */
+/* Preferences page only */
 
-.preferences-page .page {
-    min-height: 100vh;
-    padding: 8px 10px 20px;
-    display: flex;
-    flex-direction: column;
+.prefs-grid{
+    align-items: start;
 }
 
-.preferences-page .container,
-.preferences-page .topbar {
-    width: min(1380px, 98vw);
-}
-
-.preferences-page #navbarMount {
-    margin-bottom: 8px;
-}
-
-.preferences-page .preferences-container {
-    flex: 1;
-    display: flex;
-}
-
-.preferences-page .preferences-shell {
-    width: 100%;
-    padding: 22px;
-}
-
-.preferences-page .preferences-hero {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 16px;
-}
-
-.preferences-page .preferences-title {
-    margin: 0;
-    font-size: clamp(42px, 5vw, 60px);
-    line-height: 1.02;
-    letter-spacing: -0.03em;
-    text-shadow: 0 12px 34px rgba(0,0,0,0.24);
-}
-
-.preferences-page .preferences-sub {
-    margin: 8px 0 0;
-    color: var(--muted);
-    font-size: 17px;
-    line-height: 1.6;
-    max-width: 760px;
-}
-
-.preferences-page .preferences-badge {
-    flex-shrink: 0;
-    margin-top: 2px;
-}
-
-/* ===== MAIN FIX HERE ===== */
-/* stretch both columns so right side reaches full height */
-.preferences-page .preferences-layout {
-    display: flex;
-    align-items: stretch;
-    gap: 18px;
-    margin-top: 16px;
-}
-
-.preferences-page .preferences-main-card {
-    flex: 1 1 auto;
-    min-width: 0;
-    padding: 20px;
-}
-
-/* right side now fills the same full height */
-.preferences-page .preferences-side {
-    flex: 0 0 36%;
-    max-width: 520px;
-    display: grid;
-    grid-template-rows: auto 1fr;
-    gap: 18px;
-    align-self: stretch;
-}
-
-/* keep top card normal */
-.preferences-page .side-block {
-    padding: 20px;
-    height: auto;
-}
-
-/* make quick tips card fill the remaining height */
-.preferences-page .tips-card {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    min-height: 0;
-    padding: 18px 20px;
-}
-
-.preferences-page .pref-grid {
-    gap: 14px;
-    margin-bottom: 10px;
-}
-
-.preferences-page .section-head {
-    margin-bottom: 10px;
-}
-
-.preferences-page .section-title {
-    margin: 0 0 12px;
-    font-size: 15px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: rgba(255,255,255,0.82);
-}
-
-.preferences-page select,
-.preferences-page textarea {
-    width: 100%;
-}
-
-.preferences-page textarea {
-    resize: vertical;
-    min-height: 140px;
-}
-
-.preferences-page .preferences-actions {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-}
-
-.preferences-page .preferences-actions .btn {
-    box-shadow: 0 16px 42px rgba(0,0,0,0.24);
-}
-
-.preferences-page .side-list {
+.prefs-form{
     display: grid;
     gap: 12px;
 }
 
-.preferences-page .side-item {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    padding: 12px;
-    border-radius: 16px;
+.prefs-field{
+    display: grid;
+    gap: 6px;
+}
+
+.pref-actions{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:14px;
+}
+
+/* Clean view-mode look */
+input:disabled, select:disabled{
+    opacity: 1;
+    cursor: default;
+    color: rgba(255,255,255,0.92);
     background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.14);
 }
 
-.preferences-page .side-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    flex-shrink: 0;
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.14);
-    font-size: 18px;
-}
-
-.preferences-page .side-title {
-    font-size: 16px;
-    font-weight: 900;
-    margin-bottom: 3px;
-}
-
-.preferences-page .tips {
-    margin: 6px 0 0;
+/* Keep tips readable */
+.tips{
+    margin: 8px 0 0;
     padding-left: 18px;
-    color: rgba(255,255,255,0.78);
-    flex: 1 1 auto;
+    color: rgba(255,255,255,0.75);
 }
-
-.preferences-page .tips li {
-    margin: 8px 0;
-    line-height: 1.55;
-}
-
-.preferences-page .full-btn {
-    width: 100%;
-    margin-top: auto;
-}
-
-@media (max-width: 1100px) {
-    .preferences-page .preferences-layout {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .preferences-page .preferences-side {
-        flex: 1 1 auto;
-        max-width: 100%;
-        width: 100%;
-        grid-template-rows: auto auto;
-    }
-
-    .preferences-page .preferences-hero {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .preferences-page .tips-card {
-        height: auto;
-    }
-
-    .preferences-page .full-btn {
-        margin-top: 14px;
-    }
-}
-
-@media (max-width: 780px) {
-    .preferences-page .page {
-        padding: 8px;
-    }
-
-    .preferences-page .container,
-    .preferences-page .topbar {
-        width: min(100%, calc(100vw - 16px));
-    }
-
-    .preferences-page .preferences-shell {
-        padding: 16px;
-    }
-
-    .preferences-page .preferences-title {
-        font-size: clamp(30px, 10vw, 42px);
-    }
-
-    .preferences-page .preferences-sub {
-        font-size: 15px;
-    }
-
-    .preferences-page .preferences-actions {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .preferences-page .preferences-actions .btn {
-        width: 100%;
-    }
-}
+.tips li{ margin: 6px 0; }
