@@ -6,11 +6,11 @@
     <title>UniMateLK - Matches</title>
 
     <link rel="stylesheet" href="/css/theme.css"/>
+    <link rel="stylesheet" href="/css/liquid.css"/>
     <link rel="stylesheet" href="/css/matches.css"/>
 </head>
-<body>
+<body class="liquid matches-page">
 
-<!-- Background -->
 <div class="bg">
     <div class="blob b1"></div>
     <div class="blob b2"></div>
@@ -19,98 +19,143 @@
 </div>
 
 <main class="page">
-
-    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
     <div id="navbarMount"></div>
 
-    <section class="container">
-        <div class="glass-shell">
+    <section class="container matches-container">
+        <div class="glass-shell matches-shell">
 
-            <div class="row" style="justify-content: space-between; align-items:flex-start;">
+            <div class="matches-hero">
                 <div>
-                    <h2 style="margin:0;">Suggested Matches</h2>
-                    <p class="muted" style="margin:6px 0 0;">
-                        Find users that fit your profile + preferences.
+                    <h1 class="matches-title">Suggested Matches</h1>
+                    <p class="matches-sub">
+                        Find users that fit your profile and lifestyle preferences more accurately.
                     </p>
                 </div>
-                <span class="badge">Smart Matching</span>
+
+                <span class="badge matches-badge">Smart Matching</span>
             </div>
 
-            <p id="msg" class="toast info" style="margin-top:12px;">
+            <div id="msg" class="toast info">
                 Use filters to refine your suggestions.
-            </p>
-
-            <div class="glass-card" style="margin-top:12px;">
-                <p class="section-title">Filters</p>
-
-                <div class="filters-grid">
-                    <div>
-                        <label for="campus">Campus</label>
-                        <input id="campus" type="text" placeholder="e.g. Colombo"/>
-                    </div>
-
-                    <div>
-                        <label for="degree">Degree</label>
-                        <input id="degree" type="text" placeholder="e.g. IT / SE"/>
-                    </div>
-
-                    <div>
-                        <label for="year">Year</label>
-                        <input id="year" type="number" placeholder="e.g. 2"/>
-                    </div>
-
-                    <div>
-                        <label for="genderPref">Gender Preference</label>
-                        <select id="genderPref">
-                            <option value="">Any</option>
-                            <option value="MALE">Male</option>
-                            <option value="FEMALE">Female</option>
-                            <option value="OTHER">Other</option>
-                        </select>
-                    </div>
-
-                    <div class="wide">
-                        <label for="keyword">Keyword</label>
-                        <input id="keyword" type="text" placeholder="Search by name / hobby / bio keyword"/>
-                    </div>
-                </div>
-
-                <div class="row" style="margin-top:12px;">
-                    <button id="searchBtn" class="btn" type="button">Search</button>
-                    <button class="btn secondary" type="button" id="resetFiltersBtn">Reset</button>
-                </div>
             </div>
 
-            <div class="results-head">
-                <p class="section-title" style="margin:0;">Results</p>
+            <div class="matches-layout">
 
-                <div class="pager">
-                    <button id="prevBtn" class="btn secondary" type="button">Prev</button>
-                    <span id="pageText" class="badge">Page 1</span>
-                    <button id="nextBtn" class="btn secondary" type="button">Next</button>
+                <div class="glass-card matches-main-card">
+                    <p class="section-title">Filters</p>
+
+                    <div class="filters-grid">
+                        <div class="filter-field">
+                            <label for="campus">Campus</label>
+                            <input id="campus" type="text" placeholder="e.g. Colombo"/>
+                        </div>
+
+                        <div class="filter-field">
+                            <label for="degree">Degree</label>
+                            <input id="degree" type="text" placeholder="e.g. IT / SE"/>
+                        </div>
+
+                        <div class="filter-field">
+                            <label for="year">Year</label>
+                            <input id="year" type="number" placeholder="e.g. 2"/>
+                        </div>
+
+                        <div class="filter-field">
+                            <label for="genderPref">Gender Preference</label>
+                            <select id="genderPref">
+                                <option value="">Any</option>
+                                <option value="MALE">Male</option>
+                                <option value="FEMALE">Female</option>
+                                <option value="OTHER">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-field wide">
+                            <label for="keyword">Keyword</label>
+                            <input id="keyword" type="text" placeholder="Search by name / hobby / bio keyword"/>
+                        </div>
+                    </div>
+
+                    <div class="row filter-actions">
+                        <button id="searchBtn" class="btn" type="button">Search</button>
+                        <button class="btn secondary" type="button" id="resetFiltersBtn">Reset</button>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="results-head">
+                        <p class="section-title">Results</p>
+
+                        <div class="pager">
+                            <button id="prevBtn" class="btn secondary" type="button">Prev</button>
+                            <span id="pageText" class="badge">Page 1</span>
+                            <button id="nextBtn" class="btn secondary" type="button">Next</button>
+                        </div>
+                    </div>
+
+                    <div id="list" class="match-grid"></div>
                 </div>
+
+                <aside class="matches-side">
+                    <div class="glass-card side-block">
+                        <p class="section-title">Why Preferences Matter</p>
+
+                        <div class="side-list">
+                            <div class="side-item">
+                                <span class="side-icon">🎯</span>
+                                <div>
+                                    <div class="side-title">Better Matching</div>
+                                    <div class="help">Your lifestyle details improve the compatibility score.</div>
+                                </div>
+                            </div>
+
+                            <div class="side-item">
+                                <span class="side-icon">🧠</span>
+                                <div>
+                                    <div class="side-title">Smarter Suggestions</div>
+                                    <div class="help">The system compares preferences to rank better roommate results.</div>
+                                </div>
+                            </div>
+
+                            <div class="side-item">
+                                <span class="side-icon">🤝</span>
+                                <div>
+                                    <div class="side-title">Better Fit</div>
+                                    <div class="help">Compatible routines reduce future conflicts in shared living.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card side-block">
+                        <p class="section-title">Quick Tips</p>
+
+                        <ul class="tips">
+                            <li>Use filters if you want more focused match results.</li>
+                            <li>Keep your profile and preferences updated for better suggestions.</li>
+                            <li>If no results appear, broaden your filters and try again.</li>
+                            <li>Once connected, you can continue through requests and chat.</li>
+                        </ul>
+
+                        <a class="btn secondary full-btn" href="/preferences.html">Back to Preferences</a>
+                    </div>
+                </aside>
+
             </div>
-
-            <div id="list" class="match-grid"></div>
-
         </div>
     </section>
-
 </main>
 
-<!-- ✅ Mount navbar explicitly (guaranteed) -->
 <script type="module">
     import { mountNavbar } from "/js/navbar.js";
     mountNavbar();
 </script>
 
-<!-- ✅ Your matches functionality -->
 <script type="module" src="/js/matches.js"></script>
 
-<!-- ✅ Reset filters (UI helper only) -->
 <script>
     document.getElementById("resetFiltersBtn")?.addEventListener("click", () => {
-        ["campus","degree","year","genderPref","keyword"].forEach(id => {
+        ["campus", "degree", "year", "genderPref", "keyword"].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = "";
         });
