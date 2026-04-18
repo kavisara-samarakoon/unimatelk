@@ -9,9 +9,8 @@
     <link rel="stylesheet" href="/css/liquid.css"/>
     <link rel="stylesheet" href="/css/home.css"/>
 </head>
-<body class="liquid">
+<body class="liquid home-page">
 
-<!-- Background -->
 <div class="bg">
     <div class="blob b1"></div>
     <div class="blob b2"></div>
@@ -20,24 +19,22 @@
 </div>
 
 <main class="page">
-
-    <!-- ✅ NAVBAR MUST BE INSIDE .page -->
     <div id="navbarMount"></div>
 
-    <section class="container">
-        <div class="glass-shell">
+    <section class="container home-container">
+        <div class="glass-shell home-shell">
+            <div class="home-grid">
 
-            <div class="hero">
-                <div class="hero-left">
-                    <span class="badge">Roommate Matching • Chat • Safe Connect</span>
+                <div class="home-copy">
+                    <span class="badge home-badge">Smart roommate matching for university students</span>
 
                     <h1 class="hero-title">
-                        Find your best roommate match with <span class="grad">UniMateLK</span>
+                        Find a compatible roommate with <span class="grad">UniMateLK</span>
                     </h1>
 
                     <p class="hero-sub">
-                        Complete your profile and preferences to get smarter match suggestions,
-                        then connect instantly using our built-in chat.
+                        Complete your profile, set your lifestyle preferences, discover better matches,
+                        and connect safely through the platform.
                     </p>
 
                     <div class="row hero-actions">
@@ -46,132 +43,64 @@
                         <a class="btn ghost" href="/matches.html">View Matches</a>
                     </div>
 
-                    <div class="mini-stats">
-                        <div class="glass-card stat">
-                            <div class="stat-title">Step 1</div>
-                            <div class="stat-value">Profile</div>
-                            <div class="help">Add your personal details</div>
+                    <div class="journey-grid">
+                        <div class="glass-card journey-card">
+                            <div class="journey-step">Step 1</div>
+                            <div class="journey-title">Create Profile</div>
+                            <p>Add your university, degree, bio and personal details.</p>
                         </div>
-                        <div class="glass-card stat">
-                            <div class="stat-title">Step 2</div>
-                            <div class="stat-value">Preferences</div>
-                            <div class="help">Set lifestyle values (1–5)</div>
+
+                        <div class="glass-card journey-card">
+                            <div class="journey-step">Step 2</div>
+                            <div class="journey-title">Set Preferences</div>
+                            <p>Enter your lifestyle choices for better compatibility.</p>
                         </div>
-                        <div class="glass-card stat">
-                            <div class="stat-title">Step 3</div>
-                            <div class="stat-value">Matches</div>
-                            <div class="help">Choose and chat</div>
+
+                        <div class="glass-card journey-card">
+                            <div class="journey-step">Step 3</div>
+                            <div class="journey-title">Match & Chat</div>
+                            <p>Review suggestions and connect after mutual interest.</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="hero-right">
-                    <div class="glass-card preview-card">
-                        <p class="section-title">Quick Actions</p>
+                <aside class="home-side">
+                    <div class="glass-card side-card">
+                        <p class="section-title">Why UniMateLK</p>
 
-                        <div class="quick-grid">
-                            <a class="quick" href="/matches.html">
-                                <div class="quick-ico">✨</div>
+                        <div class="side-list">
+                            <div class="side-item">
+                                <span class="side-icon">🧠</span>
                                 <div>
-                                    <div class="quick-title">Find Matches</div>
-                                    <div class="help">View suggested users</div>
+                                    <div class="side-title">Smart Matching</div>
+                                    <div class="help">Suggestions based on profile and lifestyle preferences.</div>
                                 </div>
-                            </a>
+                            </div>
 
-                            <a class="quick" href="/chat.html">
-                                <div class="quick-ico">💬</div>
+                            <div class="side-item">
+                                <span class="side-icon">🔒</span>
                                 <div>
-                                    <div class="quick-title">Open Chat</div>
-                                    <div class="help">Start messaging</div>
+                                    <div class="side-title">Safe Connections</div>
+                                    <div class="help">Users connect through requests before chatting.</div>
                                 </div>
-                            </a>
+                            </div>
 
-                            <a class="quick" href="/requests.html">
-                                <div class="quick-ico">📩</div>
+                            <div class="side-item">
+                                <span class="side-icon">💬</span>
                                 <div>
-                                    <div class="quick-title">Requests</div>
-                                    <div class="help">See incoming/outgoing</div>
+                                    <div class="side-title">Real-time Chat</div>
+                                    <div class="help">Start conversations instantly after matching.</div>
                                 </div>
-                            </a>
-
-                            <a class="quick" href="/preferences.html">
-                                <div class="quick-ico">⚙️</div>
-                                <div>
-                                    <div class="quick-title">Update Preferences</div>
-                                    <div class="help">Improve match score</div>
-                                </div>
-                            </a>
+                            </div>
                         </div>
-
-                        <div class="divider"></div>
-
-                        <p class="section-title">How it works</p>
-                        <ol class="steps">
-                            <li><b>Profile:</b> Add details (uni, location, etc.)</li>
-                            <li><b>Preferences:</b> Set lifestyle sliders (1–5)</li>
-                            <li><b>Matches:</b> Select suggested users</li>
-                            <li><b>Chat:</b> Message and connect instantly</li>
-                        </ol>
                     </div>
-                </div>
+                </aside>
+
             </div>
-
-            <div class="divider"></div>
-
-            <div class="grid three">
-                <div class="glass-card feature">
-                    <div class="feature-top">
-                        <span class="feature-ico">🧠</span>
-                        <div>
-                            <div class="feature-title">Smart Matching</div>
-                            <div class="help">Based on your preferences and profile</div>
-                        </div>
-                    </div>
-                    <p class="muted" style="margin:10px 0 0;">
-                        Better suggestions when your preferences are filled correctly.
-                    </p>
-                </div>
-
-                <div class="glass-card feature">
-                    <div class="feature-top">
-                        <span class="feature-ico">🔒</span>
-                        <div>
-                            <div class="feature-title">Secure Login</div>
-                            <div class="help">Google login / manual login</div>
-                        </div>
-                    </div>
-                    <p class="muted" style="margin:10px 0 0;">
-                        Your account stays protected while you match and chat.
-                    </p>
-                </div>
-
-                <div class="glass-card feature">
-                    <div class="feature-top">
-                        <span class="feature-ico">💬</span>
-                        <div>
-                            <div class="feature-title">Real-time Chat</div>
-                            <div class="help">Main feature of your project</div>
-                        </div>
-                    </div>
-                    <p class="muted" style="margin:10px 0 0;">
-                        Match → open chat room → message instantly.
-                    </p>
-                </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <footer class="footer">
-                <span class="muted">© UniMateLK • Student Project</span>
-                <span class="muted">Glass UI Theme</span>
-            </footer>
-
         </div>
     </section>
-
 </main>
 
-<!-- ✅ Mount navbar explicitly (guaranteed) -->
 <script type="module">
     import { mountNavbar } from "/js/navbar.js";
     mountNavbar();
