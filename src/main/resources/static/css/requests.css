@@ -1,147 +1,190 @@
-/* Requests Page - Design Only (works with existing JS) */
+/* ===== Requests page layout ===== */
 
-.req-layout{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-top: 12px;
-}
-
-.req-column{
-    display: grid;
-    gap: 12px;
-}
-
-.req-header{
+.requests-page .page {
+    min-height: 100vh;
+    padding: 8px 10px 20px;
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 10px;
+    flex-direction: column;
 }
 
-.req-title{
-    margin: 0;
-    font-size: 16px;
-    letter-spacing: 0.2px;
+.requests-page .container,
+.requests-page .topbar {
+    width: min(1380px, 98vw);
 }
 
-.req-sub{
-    margin: 6px 0 0 0;
-    font-size: 13px;
-    color: rgba(255,255,255,0.78);
+.requests-page #navbarMount {
+    margin-bottom: 8px;
 }
 
-.req-list{
-    display: grid;
-    gap: 10px;
-}
-
-/* JS will likely inject rows/cards inside #incoming and #outgoing.
-   These styles apply to common patterns without breaking anything. */
-.req-item,
-.request-item,
-.card,
-.list-item{
-    border-radius: 18px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.16);
-    padding: 14px;
-}
-
-.req-row{
+.requests-page .requests-container {
+    flex: 1;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
 }
 
-/* User info block */
-.req-user{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 220px;
-}
-
-.req-avatar{
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.18);
-    display: grid;
-    place-items: center;
-    font-weight: 900;
-    color: rgba(255,255,255,0.92);
-    overflow: hidden;
-}
-
-.req-avatar img{
+.requests-page .requests-shell {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+    padding: 22px;
 }
 
-.req-name{
-    font-weight: 900;
-    color: rgba(255,255,255,0.95);
+.requests-page .requests-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.requests-page .requests-title {
     margin: 0;
+    font-size: clamp(42px, 5vw, 60px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-shadow: 0 12px 34px rgba(0,0,0,0.24);
 }
 
-.req-meta{
-    margin: 3px 0 0;
-    font-size: 12px;
-    color: rgba(255,255,255,0.78);
+.requests-page .requests-sub {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 17px;
+    line-height: 1.6;
+    max-width: 760px;
 }
 
-/* Buttons area */
-.req-actions{
+.requests-page .requests-badge {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.requests-page .req-layout {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 16px;
+    align-items: start;
+}
+
+.requests-page .req-column {
+    min-width: 0;
+}
+
+.requests-page .req-panel {
+    padding: 20px;
+    min-height: 100%;
+}
+
+.requests-page .req-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.requests-page .req-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.requests-page .req-subtitle {
+    margin: 6px 0 0;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+.requests-page .req-list {
+    display: grid;
+    gap: 14px;
+}
+
+.requests-page .req-empty,
+.requests-page #incoming > .muted,
+.requests-page #outgoing > .muted {
+    padding: 18px;
+    border-radius: 18px;
+    color: rgba(255,255,255,0.72);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.10);
+}
+
+.requests-page .card {
+    padding: 18px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
+    border: 1px solid rgba(255,255,255,0.14);
+    box-shadow: 0 18px 42px rgba(0,0,0,0.18);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+}
+
+.requests-page .card strong {
+    display: block;
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1.3;
+    margin-bottom: 6px;
+}
+
+.requests-page .card .muted {
+    color: rgba(255,255,255,0.68);
+    font-size: 14px;
+}
+
+.requests-page .card > div:last-child {
+    margin-top: 14px !important;
     display: flex;
     gap: 10px;
-    align-items: center;
     flex-wrap: wrap;
 }
 
-/* If your JS adds buttons without classes, these still help */
-.req-actions button,
-.req-item button,
-#incoming button,
-#outgoing button{
-    padding: 9px 12px;
-    border-radius: 999px;
-    cursor: pointer;
-    font-weight: 800;
-    border: 1px solid rgba(255,255,255,0.18);
-    background: rgba(255,255,255,0.10);
-    color: rgba(255,255,255,0.92);
+.requests-page .card .btn {
+    box-shadow: 0 14px 36px rgba(0,0,0,0.22);
 }
 
-.req-actions button:hover,
-.req-item button:hover,
-#incoming button:hover,
-#outgoing button:hover{
-    border-color: rgba(255,255,255,0.40);
-    transform: translateY(-1px);
+@media (max-width: 1100px) {
+    .requests-page .req-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .requests-page .requests-hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
-/* Optional semantic classes if your JS already uses them */
-.btn-accept{ background: linear-gradient(90deg, rgba(0,255,180,0.55), rgba(0,212,255,0.45)); }
-.btn-reject{ background: linear-gradient(90deg, rgba(255,80,160,0.55), rgba(124,77,255,0.45)); }
-.btn-cancel{ background: rgba(255,255,255,0.10); }
+@media (max-width: 780px) {
+    .requests-page .page {
+        padding: 8px;
+    }
 
-/* Empty state */
-.req-empty{
-    padding: 16px;
-    border-radius: 18px;
-    background: rgba(0,0,0,0.25);
-    border: 1px dashed rgba(255,255,255,0.18);
-    color: rgba(255,255,255,0.78);
-    text-align: center;
-}
+    .requests-page .container,
+    .requests-page .topbar {
+        width: min(100%, calc(100vw - 16px));
+    }
 
-/* Responsive */
-@media (max-width: 980px){
-    .req-layout{ grid-template-columns: 1fr; }
+    .requests-page .requests-shell {
+        padding: 16px;
+    }
+
+    .requests-page .requests-title {
+        font-size: clamp(30px, 10vw, 42px);
+    }
+
+    .requests-page .requests-sub {
+        font-size: 15px;
+    }
+
+    .requests-page .req-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .requests-page .card > div:last-child {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .requests-page .card .btn {
+        width: 100%;
+    }
 }
