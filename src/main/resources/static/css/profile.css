@@ -1,69 +1,231 @@
-/* Profile page only (design-only) */
+/* ===== Profile page layout ===== */
 
-.avatar-wrap{
+.profile-page .page {
+    min-height: 100vh;
+    padding: 8px 10px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-page .container,
+.profile-page .topbar {
+    width: min(1380px, 98vw);
+}
+
+.profile-page #navbarMount {
+    margin-bottom: 8px;
+}
+
+.profile-page .profile-container {
+    flex: 1;
+    display: flex;
+}
+
+.profile-page .profile-shell {
+    width: 100%;
+    padding: 22px;
+}
+
+.profile-page .profile-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.profile-page .profile-title {
+    margin: 0;
+    font-size: clamp(42px, 5vw, 60px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-shadow: 0 12px 34px rgba(0,0,0,0.24);
+}
+
+.profile-page .profile-sub {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 17px;
+    line-height: 1.6;
+    max-width: 760px;
+}
+
+.profile-page .profile-badge {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* ===== MAIN LAYOUT FIX ===== */
+/* Stretch both columns equally so the empty shell space disappears */
+.profile-page .profile-layout {
+    display: flex;
+    align-items: stretch;
+    gap: 18px;
+    margin-top: 16px;
+}
+
+.profile-page .profile-main-card {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.profile-page .profile-side {
+    flex: 0 0 36%;
+    max-width: 520px;
+    display: grid;
+    gap: 18px;
+    align-self: stretch;
+}
+
+.profile-page .side-block {
+    padding: 20px;
+    height: auto;
+}
+
+.profile-page .profile-grid {
+    gap: 14px;
+    margin-bottom: 10px;
+}
+
+.profile-page .section-head {
+    margin-bottom: 10px;
+}
+
+.profile-page .section-title {
+    margin: 0 0 12px;
+    font-size: 15px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: rgba(255,255,255,0.82);
+}
+
+/* Make left card fill the available height nicely */
+.profile-page .profile-main-card > .profile-actions {
+    margin-top: auto;
+    padding-top: 10px;
+}
+
+/* Reduce the awkward bottom spacing before actions */
+.profile-page .profile-main-card .divider:last-of-type {
+    margin-top: 14px;
+    margin-bottom: 12px;
+}
+
+.avatar-wrap {
     display: grid;
     place-items: center;
-    gap: 10px;
-    padding: 10px 0 4px;
+    gap: 12px;
+    padding: 10px 0 6px;
 }
 
-.avatar{
-    width: 120px;
-    height: 120px;
+.avatar {
+    width: 138px;
+    height: 138px;
     border-radius: 999px;
     object-fit: cover;
-    border: 1px solid rgba(255,255,255,0.20);
+    border: 1px solid rgba(255,255,255,0.22);
     background: rgba(255,255,255,0.08);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    box-shadow:
+            0 18px 50px rgba(0,0,0,0.30),
+            0 0 24px rgba(0,212,255,0.10);
 }
 
-.upload-box{
+.center-help {
+    text-align: center;
+}
+
+.upload-box {
     display: flex;
     gap: 12px;
     align-items: center;
-    padding: 14px;
+    padding: 16px;
     border-radius: 18px;
-    background: rgba(255,255,255,0.08);
-    border: 1px dashed rgba(255,255,255,0.22);
+    background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
+    border: 1px dashed rgba(255,255,255,0.24);
     cursor: pointer;
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    position: relative;
+    overflow: hidden;
 }
-.upload-box:hover{
+
+.upload-box:hover {
     border-color: rgba(255,255,255,0.40);
 }
 
-.upload-ico{
-    width: 44px;
-    height: 44px;
+.upload-box::before {
+    content: "";
+    position: absolute;
+    inset: -50px;
+    pointer-events: none;
+    background:
+            radial-gradient(circle at 20% 30%, rgba(255,255,255,0.20), transparent 55%),
+            radial-gradient(circle at 80% 70%, rgba(124,77,255,0.12), transparent 60%);
+    filter: blur(18px);
+    opacity: 0.55;
+}
+
+.upload-ico,
+.upload-title,
+.upload-box .help {
+    position: relative;
+    z-index: 1;
+}
+
+.upload-ico {
+    width: 46px;
+    height: 46px;
     border-radius: 14px;
     display: grid;
     place-items: center;
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.16);
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    font-size: 18px;
 }
 
-.upload-title{
+.upload-title {
     font-weight: 900;
     margin-bottom: 2px;
 }
 
-.tips{
-    margin: 8px 0 0;
+.tips-card {
+    padding: 18px 20px;
+}
+
+.tips {
+    margin: 6px 0 0;
     padding-left: 18px;
-    color: rgba(255,255,255,0.75);
-}
-.tips li{ margin: 6px 0; }
-
-/* NEW: View/Edit mode UI */
-.profile-actions{
-    display:flex;
-    gap:12px;
-    flex-wrap:wrap;
-    margin-top:10px;
+    color: rgba(255,255,255,0.78);
 }
 
-/* Optional: make disabled fields look clean in view mode */
-input:disabled,
-textarea:disabled{
+.tips li {
+    margin: 8px 0;
+    line-height: 1.55;
+}
+
+.full-btn {
+    width: 100%;
+    margin-top: 14px;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+}
+
+.profile-page .profile-actions .btn {
+    box-shadow: 0 16px 42px rgba(0,0,0,0.24);
+}
+
+/* keep view mode fields clean */
+.profile-page input:disabled,
+.profile-page textarea:disabled {
     opacity: 1;
     cursor: default;
     color: rgba(255,255,255,0.92);
@@ -71,43 +233,57 @@ textarea:disabled{
     border-color: rgba(255,255,255,0.14);
 }
 
-/* =========================================================
-   LIQUID GLASS POLISH (only when body has class="liquid")
-   ========================================================= */
-.liquid .avatar{
-    border-color: rgba(255,255,255,0.28);
-    box-shadow:
-            0 18px 50px rgba(0,0,0,0.35),
-            0 0 26px rgba(0,212,255,0.12);
+@media (max-width: 1100px) {
+    .profile-page .profile-layout {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .profile-page .profile-side {
+        flex: 1 1 auto;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .profile-page .profile-hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .profile-page .profile-main-card > .profile-actions {
+        margin-top: 10px;
+        padding-top: 0;
+    }
 }
 
-.liquid .upload-box{
-    background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
-    border: 1px dashed rgba(255,255,255,0.26);
-    backdrop-filter: blur(16px) saturate(150%);
-    -webkit-backdrop-filter: blur(16px) saturate(150%);
-    position: relative;
-    overflow: hidden;
-}
+@media (max-width: 780px) {
+    .profile-page .page {
+        padding: 8px;
+    }
 
-.liquid .upload-box::before{
-    content:"";
-    position:absolute;
-    inset:-50px;
-    pointer-events:none;
-    background:
-            radial-gradient(circle at 20% 30%, rgba(255,255,255,0.22), transparent 55%),
-            radial-gradient(circle at 80% 70%, rgba(124,77,255,0.14), transparent 60%);
-    filter: blur(16px);
-    opacity: 0.55;
-}
+    .profile-page .container,
+    .profile-page .topbar {
+        width: min(100%, calc(100vw - 16px));
+    }
 
-.liquid .upload-ico{
-    background: rgba(255,255,255,0.12);
-    border-color: rgba(255,255,255,0.22);
-}
+    .profile-page .profile-shell {
+        padding: 16px;
+    }
 
-/* Make the action buttons feel more “liquid” but keep theme.css buttons */
-.liquid .profile-actions .btn{
-    box-shadow: 0 16px 42px rgba(0,0,0,0.28);
+    .profile-page .profile-title {
+        font-size: clamp(30px, 10vw, 42px);
+    }
+
+    .profile-page .profile-sub {
+        font-size: 15px;
+    }
+
+    .profile-page .profile-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .profile-page .profile-actions .btn {
+        width: 100%;
+    }
 }
