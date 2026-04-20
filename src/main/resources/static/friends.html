@@ -10,9 +10,8 @@
   <link rel="stylesheet" href="/css/friends.css"/>
 </head>
 
-<body class="liquid">
+<body class="liquid friends-page">
 
-<!-- Background (same as Home/Profile/Chat) -->
 <div class="bg">
   <div class="blob b1"></div>
   <div class="blob b2"></div>
@@ -21,25 +20,34 @@
 </div>
 
 <main class="page">
-
-  <!-- ✅ Navbar inside page -->
   <div id="navbarMount"></div>
 
-  <section class="container">
-    <div class="glass-shell friends-wrap">
+  <section class="container friends-container">
+    <div class="glass-shell friends-shell">
 
-      <div class="row" style="justify-content: space-between;">
+      <div class="friends-hero">
         <div>
-          <h2 style="margin:0;">Friends</h2>
-          <p class="muted" style="margin:6px 0 0;">Manage your friends • Open chat • Block • Report</p>
+          <h1 class="friends-title">Friends</h1>
+          <p class="friends-sub">
+            Manage your friends, open chat, block, or report when needed.
+          </p>
         </div>
-        <span class="badge">Connections</span>
+
+        <span class="badge friends-badge">Connections</span>
       </div>
 
-      <div id="msg" class="toast info">Loading friends…</div>
+      <div id="msg" class="toast info">Loading friends...</div>
 
       <div class="glass-card friends-card">
-        <div id="friendsList"></div>
+        <div class="friends-panel-head">
+          <div>
+            <h3 class="friends-panel-title">Your Friends</h3>
+            <p class="friends-panel-subtitle">Accepted connections available for chat and actions.</p>
+          </div>
+          <span class="badge">Connected</span>
+        </div>
+
+        <div id="friendsList" class="friends-list"></div>
       </div>
 
     </div>
