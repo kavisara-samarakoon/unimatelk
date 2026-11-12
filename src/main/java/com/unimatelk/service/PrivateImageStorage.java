@@ -6,24 +6,16 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.MemoryCacheImageInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributeView;
-import java.util.Iterator;
-import java.util.Locale;
 import java.util.Set;
 
 @Service
 public class PrivateImageStorage {
-    // Preserve the largest existing servlet upload limit, including legacy profile uploads.
+    // Preserve retrieval of legacy uploads up to 20 MiB; new uploads are limited to 5 MiB.
     private static final int MAX_BYTES = 20 * 1024 * 1024;
-    private static final long MAX_PIXELS = 40_000_000;
-    private static final int MAX_DIMENSION = 16_384;
     private final AppProps props;
 
     public PrivateImageStorage(AppProps props) {
@@ -73,30 +65,8 @@ public class PrivateImageStorage {
         }
     }
 
-    private MediaType verifiedType(byte[] bytes) throws IOException {
-        // Memory-only decoding avoids ImageIO disk caches and never trusts an extension or upload MIME.
-        try (var input = new MemoryCacheImageInputStream(new ByteArrayInputStream(bytes))) {
-            Iterator<ImageReader> readers = ImageIO.getImageReaders(input);
-            if (!readers.hasNext()) throw notFound();
-            ImageReader reader = readers.next();
-            try {
-                MediaType type = switch (reader.getFormatName().toLowerCase(Locale.ROOT)) {
-                    case "png" -> MediaType.IMAGE_PNG;
-                    case "jpeg", "jpg" -> MediaType.IMAGE_JPEG;
-                    case "webp" -> MediaType.parseMediaType("image/webp");
-                    default -> throw notFound();
-                };
-                reader.setInput(input, true, true);
-                int width = reader.getWidth(0);
-                int height = reader.getHeight(0);
-                if (width <= 0 || height <= 0 || width > MAX_DIMENSION || height > MAX_DIMENSION
-                        || (long) width * height > MAX_PIXELS) throw notFound();
-                if (reader.read(0) == null) throw notFound();
-                return type;
-            } finally {
-                reader.dispose();
-            }
-        }
+    private MediaType verifiedType(byte[] bytes) {
+        return ImageValidator.inspect(bytes).contentType();
     }
 
     private static ResponseStatusException notFound() {

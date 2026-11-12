@@ -9,8 +9,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -50,12 +50,12 @@ public class ProfileController {
     }
 
     @PostMapping("/api/profile/me/profile-photo")
+    @Transactional
     public Map<String, Object> uploadProfile(@AuthenticationPrincipal OAuth2User oauth,
-                                             @RequestParam("file") MultipartFile file) throws IOException {
-        AppUser u = current.requireUser(oauth);
-        Profile p = profileService.getOrCreate(u);
-
+                                             @RequestParam("file") MultipartFile file) {
+        AppUser u = current.requireExistingActiveUser(oauth);
         String url = storageService.storeProfileImage(u.getId(), file, "profile");
+        Profile p = profileService.getOrCreate(u);
         p.setProfilePhotoPath(url);
         profileService.save(p);
 
@@ -63,12 +63,12 @@ public class ProfileController {
     }
 
     @PostMapping("/api/profile/me/cover-photo")
+    @Transactional
     public Map<String, Object> uploadCover(@AuthenticationPrincipal OAuth2User oauth,
-                                           @RequestParam("file") MultipartFile file) throws IOException {
-        AppUser u = current.requireUser(oauth);
-        Profile p = profileService.getOrCreate(u);
-
+                                           @RequestParam("file") MultipartFile file) {
+        AppUser u = current.requireExistingActiveUser(oauth);
         String url = storageService.storeProfileImage(u.getId(), file, "cover");
+        Profile p = profileService.getOrCreate(u);
         p.setCoverPhotoPath(url);
         profileService.save(p);
 

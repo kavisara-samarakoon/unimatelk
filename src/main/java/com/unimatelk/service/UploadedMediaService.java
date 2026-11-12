@@ -18,12 +18,14 @@ import java.util.regex.Pattern;
 public class UploadedMediaService {
     private static final String EXTENSION = "\\.(?i:jpg|jpeg|png|webp)";
     private static final String ID = "[1-9][0-9]{0,18}";
-    private static final Pattern CHAT_NAME = Pattern.compile("u" + ID + "-[1-9][0-9]{0,18}" + EXTENSION);
-    private static final Pattern PROFILE_NAME = Pattern.compile("(?:profile|cover)-[1-9][0-9]{0,18}" + EXTENSION);
+    private static final String UUID = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
+    private static final String IMAGE_KEY = "(?:[1-9][0-9]{0,18}|" + UUID + ")";
+    private static final Pattern CHAT_NAME = Pattern.compile("u" + ID + "-" + IMAGE_KEY + EXTENSION);
+    private static final Pattern PROFILE_NAME = Pattern.compile("(?:profile|cover)-" + IMAGE_KEY + EXTENSION);
     private static final Pattern LEGACY_PROFILE = Pattern.compile(
             "profile-(" + ID + ")-[1-9][0-9]{0,18}" + EXTENSION);
     private static final Pattern UUID_PROFILE = Pattern.compile(
-            "profile_(" + ID + ")_[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}" + EXTENSION);
+            "profile_(" + ID + ")_" + UUID + EXTENSION);
 
     private final CurrentUserService current;
     private final ChatMemberRepository members;

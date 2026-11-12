@@ -78,6 +78,19 @@ public class ChatService {
     public Message sendText(AppUser sender, ChatRoom room, String content) {
         if (content == null || content.isBlank()) throw new IllegalArgumentException("Message is empty");
 
+        requireCanSend(sender, room);
+
+        Message m = new Message();
+        m.setRoom(room);
+        m.setSender(sender);
+        m.setType("TEXT");
+        m.setContent(content.trim());
+        m.setCreatedAt(Instant.now());
+        return messageRepo.save(m);
+    }
+
+    /** Shared membership/block policy; image uploads invoke this before storage. */
+    public void requireCanSend(AppUser sender, ChatRoom room) {
         if (!memberRepo.existsByRoomAndUser(room, sender)) {
             throw new org.springframework.security.access.AccessDeniedException("Not a member of this chat room");
         }
@@ -93,20 +106,10 @@ public class ChatService {
                 throw new IllegalArgumentException("Cannot send message (blocked)");
             }
         });
-
-        Message m = new Message();
-        m.setRoom(room);
-        m.setSender(sender);
-        m.setType("TEXT");
-        m.setContent(content.trim());
-        m.setCreatedAt(Instant.now());
-        return messageRepo.save(m);
     }
 
     public Message sendImage(AppUser sender, ChatRoom room, String attachmentUrl) {
-        if (!memberRepo.existsByRoomAndUser(room, sender)) {
-            throw new org.springframework.security.access.AccessDeniedException("Not a member of this chat room");
-        }
+        requireCanSend(sender, room);
         if (attachmentUrl == null || attachmentUrl.isBlank()) {
             throw new IllegalArgumentException("Attachment is empty");
         }

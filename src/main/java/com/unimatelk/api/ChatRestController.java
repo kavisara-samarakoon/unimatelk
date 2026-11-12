@@ -1,11 +1,10 @@
 package com.unimatelk.api;
 
 import com.unimatelk.domain.AppUser;
-import com.unimatelk.domain.ChatRoom;
 import com.unimatelk.domain.Message;
 import com.unimatelk.service.ChatService;
 import com.unimatelk.service.CurrentUserService;
-import com.unimatelk.service.StorageService;
+import com.unimatelk.service.ChatImageUploadService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,7 +13,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -23,13 +21,13 @@ public class ChatRestController {
 
     private final CurrentUserService current;
     private final ChatService chatService;
-    private final StorageService storage;
+    private final ChatImageUploadService uploads;
     private final SimpMessagingTemplate messaging;
 
-    public ChatRestController(CurrentUserService current, ChatService chatService, StorageService storage, SimpMessagingTemplate messaging) {
+    public ChatRestController(CurrentUserService current, ChatService chatService, ChatImageUploadService uploads, SimpMessagingTemplate messaging) {
         this.current = current;
         this.chatService = chatService;
-        this.storage = storage;
+        this.uploads = uploads;
         this.messaging = messaging;
     }
 
@@ -63,14 +61,9 @@ public class ChatRestController {
             @AuthenticationPrincipal OAuth2User oauth,
             @PathVariable Long roomId,
             @RequestParam("file") MultipartFile file
-    ) throws IOException {
-        AppUser me = current.requireUser(oauth);
-        ChatRoom room = chatService.getRoomOrThrow(roomId);
-        // chatService checks membership
-        String url = storage.storeChatImage(roomId, me.getId(), file);
-        Message msg = chatService.sendImage(me, room, url);
-
-        ChatDtos.MessageDto dto = toDto(msg);
+    ) {
+        // The service completes its transaction before returning; broadcast errors must retain the image.
+        ChatDtos.MessageDto dto = uploads.upload(oauth, roomId, file);
         messaging.convertAndSend("/topic/rooms/" + roomId, dto);
         return dto;
     }

@@ -2,9 +2,9 @@ package com.unimatelk.api;
 
 import com.unimatelk.domain.AppUser;
 import com.unimatelk.service.CurrentUserService;
+import com.unimatelk.service.StorageService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -13,13 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/my/profile")
@@ -30,11 +25,11 @@ public class MyProfileController {
     @PersistenceContext
     private EntityManager em;
 
-    @Value("${app.uploads-dir:./uploads}")
-    private String uploadsDir;
+    private final StorageService storage;
 
-    public MyProfileController(CurrentUserService currentUserService) {
+    public MyProfileController(CurrentUserService currentUserService, StorageService storage) {
         this.currentUserService = currentUserService;
+        this.storage = storage;
     }
 
     private AppUser requireMe(Authentication auth) {
@@ -305,53 +300,28 @@ public class MyProfileController {
                                                   @RequestParam(value = "file", required = false) MultipartFile file,
                                                   @RequestParam(value = "image", required = false) MultipartFile image,
                                                   @RequestParam(value = "photo", required = false) MultipartFile photo) {
-        AppUser me = requireMe(auth);
+        if (auth == null || !auth.isAuthenticated() || !(auth.getPrincipal() instanceof OAuth2User principal)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not logged in");
+        }
+        AppUser me = currentUserService.requireExistingActiveUser(principal);
         Long userId = me.getId();
+        MultipartFile selected = file != null ? file : (image != null ? image : photo);
+        String urlPath = storage.storeLegacyProfileImage(userId, selected);
 
         ensureProfileRow(userId);
-
-        MultipartFile f = file != null ? file : (image != null ? image : photo);
-        if (f == null || f.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No file uploaded");
-        }
-
+        // Retain the existing compatibility fallback for older profile schemas.
         try {
-            Path dir = Paths.get(uploadsDir);
-            Files.createDirectories(dir);
-
-            String original = f.getOriginalFilename() == null ? "photo" : f.getOriginalFilename();
-            String ext = "";
-            int idx = original.lastIndexOf('.');
-            if (idx >= 0) ext = original.substring(idx).toLowerCase();
-            if (!(ext.equals(".jpg") || ext.equals(".jpeg") || ext.equals(".png") || ext.equals(".webp"))) {
-                ext = ".png";
-            }
-
-            String filename = "profile_" + userId + "_" + UUID.randomUUID() + ext;
-            Path target = dir.resolve(filename);
-
-            Files.copy(f.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
-
-            String urlPath = "/uploads/" + filename;
-
-            // profile_photo_path should exist in your schema, but keep safe anyway
-            try {
-                em.createNativeQuery("UPDATE profiles SET profile_photo_path = ? WHERE user_id = ?")
-                        .setParameter(1, urlPath)
-                        .setParameter(2, userId)
-                        .executeUpdate();
-            } catch (Exception e) {
-                if (!isUnknownColumn(e)) throw e;
-            }
-
-            em.createNativeQuery("UPDATE users SET picture_url = ? WHERE id = ?")
+            em.createNativeQuery("UPDATE profiles SET profile_photo_path = ? WHERE user_id = ?")
                     .setParameter(1, urlPath)
                     .setParameter(2, userId)
                     .executeUpdate();
-
-            return Map.of("url", urlPath);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Upload failed");
+        } catch (Exception exception) {
+            if (!isUnknownColumn(exception)) throw exception;
         }
+        em.createNativeQuery("UPDATE users SET picture_url = ? WHERE id = ?")
+                .setParameter(1, urlPath)
+                .setParameter(2, userId)
+                .executeUpdate();
+        return Map.of("url", urlPath);
     }
 }
