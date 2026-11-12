@@ -1,7 +1,10 @@
 package com.unimatelk.config;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,7 +18,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, ObjectProvider<ClientRegistrationRepository> registrations) throws Exception {
 
         http.authorizeHttpRequests(auth -> auth
                 // Public pages + assets
@@ -24,22 +27,33 @@ public class SecurityConfig {
                         "/home.html", "/profile.html", "/preferences.html",
                         "/matches.html", "/requests.html", "/chat.html", "/admin.html", "/friends.html",
                         "/css/**", "/js/**", "/images/**", "/favicon.ico",
-                        "/uploads/**",
                         "/login**", "/oauth2/**",
                         "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
                         "/actuator/health", "/actuator/info", "/actuator/flyway"
                 ).permitAll()
 
                 // APIs require login
+                .requestMatchers(HttpMethod.POST, "/api/auth/signup", "/api/auth/login").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/csrf").permitAll()
+                // Disable insecure password recovery until repaired.
+                .requestMatchers(HttpMethod.POST, "/api/auth/forgot", "/api/auth/reset").denyAll()
                 .requestMatchers("/api/**").authenticated()
+
+                // Only controller-backed media routes may read uploaded files.
+                .requestMatchers(HttpMethod.GET, "/uploads/chat/{roomId}/{filename}",
+                        "/uploads/profiles/{userId}/{filename}", "/uploads/{filename}").authenticated()
+                .requestMatchers(HttpMethod.HEAD, "/uploads/chat/{roomId}/{filename}",
+                        "/uploads/profiles/{userId}/{filename}", "/uploads/{filename}").authenticated()
+                .requestMatchers("/uploads", "/uploads/**").denyAll()
 
                 .anyRequest().permitAll()
         );
 
-        // ✅ IMPORTANT: Return 401 for /api/** instead of redirecting to Google login
+        // APIs and protected media return 401 instead of a login redirect.
         RequestMatcher apiMatcher = request -> {
             String uri = request.getRequestURI();
-            return uri != null && uri.startsWith("/api/");
+            String path = uri == null ? "" : uri.substring(request.getContextPath().length());
+            return path.startsWith("/api/") || path.equals("/uploads") || path.startsWith("/uploads/");
         };
 
         http.exceptionHandling(ex -> ex
@@ -49,23 +63,21 @@ public class SecurityConfig {
                 )
         );
 
-        // ✅ CSRF cookie kept, but ignore CSRF for APIs + websocket + logout (fixes logout not working)
+        // Enforce CSRF for API writes and logout; WebSocket paths remain temporarily exempt.
         http.csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .ignoringRequestMatchers(
-                        "/api/**",
-                        "/ws/**",
-                        "/logout"   // ✅ KEY FIX
-                )
+                .ignoringRequestMatchers("/ws/**")
         );
 
         // Force CSRF cookie generation (optional)
         http.addFilterAfter(new CsrfCookieFilter(), CsrfFilter.class);
 
         // ✅ Always redirect to home after Google login
-        http.oauth2Login(oauth -> oauth
-                .defaultSuccessUrl("/home.html", true)
-        );
+        if (registrations.getIfAvailable() != null) {
+            http.oauth2Login(oauth -> oauth
+                    .defaultSuccessUrl("/home.html", true)
+            );
+        }
 
         http.logout(logout -> logout
                 .logoutUrl("/logout")

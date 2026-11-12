@@ -191,17 +191,17 @@ function escapeHtml(value) {
 }
 
 async function doLogout() {
-    const token = getCookie("XSRF-TOKEN");
+    try {
+        // Obtain a fresh CSRF token before logout.
+        await initCsrf();
 
-    await fetch("/logout", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-            ...(token ? { "X-XSRF-TOKEN": token, "X-CSRF-TOKEN": token } : {})
-        }
-    });
+        await apiFetch("/logout", { method: "POST" });
 
-    window.location.href = "/index.html";
+        window.location.href = "/index.html";
+    } catch (error) {
+        console.error("Logout failed:", error);
+        alert("Logout failed. Please try again.");
+    }
 }
 
 function normalizePath(path) {

@@ -28,10 +28,17 @@ goSignup?.addEventListener("click", () => setMode(true));
 goSignin?.addEventListener("click", () => setMode(false));
 
 async function postJson(url, data){
+    // Obtain a fresh CSRF token before each authentication request.
+    const { initCsrf } = await import("/js/api.js");
+    const { data: csrf } = await initCsrf();
+
     const res = await fetch(url, {
         method: "POST",
         credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            [csrf.headerName]: csrf.token
+        },
         body: JSON.stringify(data)
     });
 

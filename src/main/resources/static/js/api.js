@@ -1,17 +1,29 @@
 // src/main/resources/static/js/api.js
 
 let csrfToken = null;
+let csrfHeaderName = null;
 
 export async function initCsrf() {
-    // If /api/csrf exists, we grab token; if not, ignore.
-    try {
-        const res = await fetch("/api/csrf", { credentials: "include" });
-        if (!res.ok) return;
-        const data = await res.json();
-        csrfToken = data.token || data.csrfToken || data?._csrf?.token || null;
-    } catch (_) {
-        // ignore
+    const res = await fetch("/api/csrf", {
+        credentials: "same-origin",
+        cache: "no-store"
+    });
+
+    if (!res.ok) {
+        throw new Error(`CSRF initialization failed (${res.status})`);
     }
+
+    const data = await res.json();
+
+    if (!data?.token ||
+        !["X-CSRF-TOKEN", "X-XSRF-TOKEN"].includes(data.headerName)) {
+        throw new Error("Invalid CSRF response");
+    }
+
+    csrfToken = data.token;
+    csrfHeaderName = data.headerName;
+
+    return { data };
 }
 
 export async function apiFetch(url, options = {}) {
@@ -27,9 +39,13 @@ export async function apiFetch(url, options = {}) {
         body = JSON.stringify(body);
     }
 
-    // CSRF for writes if available
-    if (method !== "GET" && method !== "HEAD" && csrfToken) {
-        headers.set("X-CSRF-TOKEN", csrfToken);
+    // Require a valid CSRF token for unsafe requests.
+    if (!["GET", "HEAD", "OPTIONS", "TRACE"].includes(method)) {
+        if (!csrfToken || !csrfHeaderName) {
+            await initCsrf();
+        }
+
+        headers.set(csrfHeaderName, csrfToken);
     }
 
     let res;

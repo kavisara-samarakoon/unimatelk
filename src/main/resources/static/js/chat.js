@@ -201,14 +201,14 @@ async function sendImage(){
         return;
     }
 
-    const token = getCookie("XSRF-TOKEN");
+    const { data: csrf } = await initCsrf();
     const form = new FormData();
     form.append("file", file);
 
     const res = await fetch(`/api/chat/rooms/${currentRoomId}/image`, {
         method: "POST",
         credentials: "same-origin",
-        headers: token ? { "X-XSRF-TOKEN": token } : {},
+        headers: { [csrf.headerName]: csrf.token },
         body: form
     });
 

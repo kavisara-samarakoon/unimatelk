@@ -6,6 +6,8 @@ import com.unimatelk.repo.AppUserRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 
@@ -29,6 +31,20 @@ public class CurrentUserService {
     private boolean isAdminEmail(String email) {
         if (email == null) return false;
         return props.getAdminEmails().stream().anyMatch(e -> e.equalsIgnoreCase(email.trim()));
+    }
+
+    /** Media reads must never provision users or update login/profile activity. */
+    public AppUser requireExistingActiveUser(OAuth2User oauth) {
+        Object email = oauth == null ? null : oauth.getAttributes().get("email");
+        if (!(email instanceof String value) || value.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+        AppUser user = userRepo.findByEmail(value).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+        if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        return user;
     }
 
     public AppUser requireUser(OAuth2User oauth) {
