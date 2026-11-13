@@ -3,12 +3,15 @@ package com.unimatelk.service;
 import com.unimatelk.config.AppProps;
 import com.unimatelk.domain.AppUser;
 import com.unimatelk.repo.AppUserRepository;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
 import java.time.Instant;
 
 @Service
@@ -45,6 +48,21 @@ public class CurrentUserService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         return user;
+    }
+
+    /** WebSocket handshakes carry the existing local/OAuth2 HTTP session authentication. */
+    public AppUser requireExistingActiveSessionUser(Principal principal) {
+        try {
+            if (principal instanceof Authentication auth && auth.isAuthenticated()
+                    && !(auth instanceof AnonymousAuthenticationToken)
+                    && auth.getPrincipal() instanceof OAuth2User oauth) {
+                AppUser user = requireExistingActiveUser(oauth);
+                if (user.getId() != null && user.getId() > 0) return user;
+            }
+        } catch (RuntimeException rejected) {
+            // Do not expose account state, attributes or repository errors to a STOMP client.
+        }
+        throw new AccessDeniedException("Chat operation denied");
     }
 
     public AppUser requireUser(OAuth2User oauth) {

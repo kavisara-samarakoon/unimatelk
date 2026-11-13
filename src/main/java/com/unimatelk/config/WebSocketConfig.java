@@ -6,22 +6,25 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final ChatChannelInterceptor chatChannelInterceptor;
+    private final ChatOutboundAuthorization outboundAuthorization;
 
-    public WebSocketConfig(ChatChannelInterceptor chatChannelInterceptor) {
+    public WebSocketConfig(ChatChannelInterceptor chatChannelInterceptor, ChatOutboundAuthorization outboundAuthorization) {
         this.chatChannelInterceptor = chatChannelInterceptor;
+        this.outboundAuthorization = outboundAuthorization;
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                // Dev only: allow all. In production, restrict this to your real frontend origin(s).
-                .setAllowedOriginPatterns("*")
+                .addInterceptors(new ChatSessionHandshakeInterceptor())
+                // The bundled UI uses /ws on the same origin. Keep Spring's same-origin default.
                 .withSockJS();
     }
 
@@ -35,5 +38,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(chatChannelInterceptor);
+    }
+
+    @Override
+    public void configureClientOutboundChannel(ChannelRegistration registration) {
+        registration.interceptors(outboundAuthorization);
+    }
+
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
+        registration.addDecoratorFactory(outboundAuthorization);
     }
 }

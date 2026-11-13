@@ -24,13 +24,43 @@ function setRoomInUrl(roomId){
     window.history.replaceState({}, "", u.toString());
 }
 
-function escapeHtml(str){
-    return String(str || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+// Match the protected media controller's current and legacy image names.
+const mediaId = "[1-9][0-9]{0,18}";
+const mediaUuid = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
+const mediaKey = `(?:${mediaId}|${mediaUuid})`;
+const mediaExtension = "\\.(?:jpg|jpeg|png|webp)";
+const chatImagePath = new RegExp(`^/uploads/chat/${mediaId}/u${mediaId}-${mediaKey}${mediaExtension}$`, "i");
+const profileImagePath = new RegExp(`^/uploads/(?:profiles/${mediaId}/(?:profile|cover)-${mediaKey}|profile-${mediaId}-${mediaId}|profile_${mediaId}_${mediaUuid})${mediaExtension}$`, "i");
+
+function remoteImageUrl(value){
+    if (typeof value !== "string" || /[\s\\]/.test(value)
+            || !(value.startsWith("/") && !value.startsWith("//") || /^https?:\/\//i.test(value))) return null;
+    try {
+        const url = new URL(value, window.location.origin);
+        if (!["http:", "https:"].includes(url.protocol) || url.username || url.password) return null;
+        return url;
+    } catch (_) {
+        return null;
+    }
+}
+
+function chatAttachmentUrl(value){
+    const url = remoteImageUrl(value);
+    if (!url || url.origin !== window.location.origin || url.search || url.hash
+            || /%|(?:^|\/)\.{1,2}(?:\/|$)/.test(value) || !chatImagePath.test(url.pathname)) return null;
+    // IDs must also fit the backend's signed Long range.
+    const ids = url.pathname.match(/\d+/g);
+    if (ids.slice(0, 2).some(id => BigInt(id) > 9223372036854775807n)) return null;
+    return url.href;
+}
+
+function roomAvatarUrl(value){
+    const url = remoteImageUrl(value);
+    if (!url) return null;
+    // OAuth profile pictures can be external HTTPS images; attachment URLs cannot.
+    if (url.origin !== window.location.origin) return url.protocol === "https:" ? url.href : null;
+    return !url.search && !url.hash && !/%|(?:^|\/)\.{1,2}(?:\/|$)/.test(value)
+        && profileImagePath.test(url.pathname) ? url.href : null;
 }
 
 /* ===== Image preview helpers ===== */
@@ -66,16 +96,25 @@ function renderMessage(m){
     wrap.className = "chat-msg" + (mine ? " me" : "");
 
     const time = m.createdAt ? new Date(m.createdAt).toLocaleString() : "";
-    const meta = `<div class="meta">${escapeHtml(m.senderName || "")} · ${escapeHtml(time)}</div>`;
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = `${m.senderName || ""} · ${time}`;
+    wrap.appendChild(meta);
 
-    let body = "";
     if ((m.type || "").toUpperCase() === "IMAGE" && m.attachmentUrl){
-        body = `<img src="${m.attachmentUrl}" alt="image"/>`;
+        const url = chatAttachmentUrl(m.attachmentUrl);
+        if (url) {
+            const image = document.createElement("img");
+            image.src = url;
+            image.alt = "image";
+            wrap.appendChild(image);
+        }
     } else {
-        body = `<div>${escapeHtml(m.content || "")}</div>`;
+        const body = document.createElement("div");
+        body.textContent = m.content || "";
+        wrap.appendChild(body);
     }
 
-    wrap.innerHTML = meta + body;
     $("chatBox").appendChild(wrap);
     $("chatBox").scrollTop = $("chatBox").scrollHeight;
 }
@@ -115,7 +154,7 @@ async function openRoom(roomId){
     $("roomTitle").textContent = `Room #${roomId}`;
     setRoomInUrl(roomId);
 
-    $("chatBox").innerHTML = "";
+    $("chatBox").replaceChildren();
 
     // Load history (API returns newest first, so reverse to show oldest→newest)
     const page = await apiFetch(`/api/chat/rooms/${roomId}/messages?page=0&size=50`);
@@ -126,31 +165,48 @@ async function openRoom(roomId){
     setToast("✅ Connected. Start chatting!", "success");
 }
 
-function roomCardHtml(r){
-    const name = r.otherName || "Chat";
-    const last = r.lastMessage || "";
-    const at = r.lastAt ? new Date(r.lastAt).toLocaleString() : "";
-    const pic = r.otherPic ? `<img class="avatar" src="${r.otherPic}" alt="pic"/>` : `<div class="avatar"></div>`;
+function roomCard(r){
+    const row = document.createElement("div");
+    row.className = "row";
+    const picture = roomAvatarUrl(r.otherPicture ?? r.otherPic);
+    const avatar = document.createElement(picture ? "img" : "div");
+    avatar.className = "avatar";
+    if (picture) {
+        avatar.src = picture;
+        avatar.alt = "pic";
+    }
+    row.appendChild(avatar);
 
-    return `
-    <div class="row">
-      ${pic}
-      <div style="flex:1">
-        <div><b>${escapeHtml(name)}</b></div>
-        <div class="help">${escapeHtml(last)} ${at ? "· " + escapeHtml(at) : ""}</div>
-      </div>
-      <span class="badge">Open</span>
-    </div>
-  `;
+    const details = document.createElement("div");
+    details.style.flex = "1";
+    const title = document.createElement("div");
+    const name = document.createElement("b");
+    name.textContent = r.otherName || "Chat";
+    title.appendChild(name);
+    details.appendChild(title);
+    const last = document.createElement("div");
+    last.className = "help";
+    const at = r.lastAt ? new Date(r.lastAt).toLocaleString() : "";
+    last.textContent = `${r.lastMessage || ""} ${at ? "· " + at : ""}`;
+    details.appendChild(last);
+    row.appendChild(details);
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = "Open";
+    row.appendChild(badge);
+    return row;
 }
 
 async function loadRooms(){
     const rooms = await apiFetch("/api/chat/rooms");
     const box = $("roomsList");
-    box.innerHTML = "";
+    box.replaceChildren();
 
     if (!rooms || rooms.length === 0){
-        box.innerHTML = `<div class="toast info">No chats yet. Go to Requests → Accept a request first.</div>`;
+        const empty = document.createElement("div");
+        empty.className = "toast info";
+        empty.textContent = "No chats yet. Go to Requests → Accept a request first.";
+        box.appendChild(empty);
         return;
     }
 
@@ -158,7 +214,7 @@ async function loadRooms(){
         const div = document.createElement("div");
         div.className = "list-item";
         div.style.cursor = "pointer";
-        div.innerHTML = roomCardHtml(r);
+        div.appendChild(roomCard(r));
 
         div.addEventListener("click", () => openRoom(r.roomId));
         box.appendChild(div);
