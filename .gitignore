@@ -31,3 +31,17 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Private uploads and local secrets ###
+/uploads/
+application-oauth.properties
+.env
+.env.*
+
+# Keep shareable environment configuration examples.
+!.env.example
+!.env.sample
+!.env.template
+!.env.*.example
+!.env.*.sample
+!.env.*.template
